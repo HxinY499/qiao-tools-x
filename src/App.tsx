@@ -1,8 +1,24 @@
-import { ChevronLeft, HelpCircle, Menu, Moon, Pin, Sun } from 'lucide-react';
+import { HelpCircle, Moon, Pin, Sun } from 'lucide-react';
 import { Suspense, useEffect, useMemo, useState } from 'react';
-import { Navigate, NavLink, Route, Routes } from 'react-router-dom';
+import { Navigate, NavLink, Route, Routes, useLocation } from 'react-router-dom';
 
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarHeader,
+  SidebarInset,
+  SidebarMenu,
+  SidebarMenuAction,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  SidebarRail,
+  SidebarTrigger,
+} from '@/components/ui/sidebar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { toolRoutes } from '@/router';
 import { useMenuStore } from '@/store/menu';
@@ -34,7 +50,7 @@ function RouteLoadingFallback() {
 }
 
 function App() {
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const location = useLocation();
   const { themeSetting, effectiveTheme, setThemeSetting } = useThemeStore();
   const { pinnedPaths, togglePin, isPinned } = useMenuStore();
   const isDark = effectiveTheme === 'dark';
@@ -49,122 +65,102 @@ function App() {
   const firstPath = sortedRoutes[0]?.path ?? '/';
 
   return (
-    <div className="h-screen bg-background text-foreground flex">
-      {/* 左侧工具菜单 */}
-      <aside
-        className={cn(
-          'border-r border-border/80 bg-gradient-to-b from-background/95 via-card/95 to-background/90 backdrop-blur flex flex-col transition-all duration-200 shadow-sm',
-          isSidebarCollapsed ? 'w-0 opacity-0 pointer-events-none -ml-px' : 'w-64',
-        )}
-      >
-        {/* menu header */}
-        <div className="shrink-0 h-16 pl-12 border-b border-border/80 flex items-center gap-3">
-          <div className="flex flex-col leading-tight">
-            <span className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">QIAO</span>
-            <span className="text-sm font-semibold tracking-wide">Tools</span>
+    <SidebarProvider>
+      <Sidebar collapsible="offcanvas">
+        {/* Sidebar Header */}
+        <SidebarHeader className="border-b border-sidebar-border">
+          <div className="flex flex-col justify-center h-14 pl-12">
+            <span className="text-[10px] uppercase tracking-[0.3em] text-sidebar-foreground/50 font-medium">QIAO</span>
+            <span className="text-base font-semibold tracking-wide text-sidebar-foreground">Tools</span>
           </div>
-        </div>
+        </SidebarHeader>
 
-        {/* menu content */}
-        <nav className="flex-1 py-3 px-2 space-y-1 text-sm min-h-0 overflow-auto">
-          {sortedRoutes.map((route) => {
-            const Icon = route.icon;
-            const pinned = isPinned(route.path);
-            return (
-              <div key={route.path} className="relative group">
-                <NavLink
-                  to={route.path}
-                  className={({ isActive }) =>
-                    [
-                      'flex items-center gap-2 rounded-md px-2 py-1.5 transition-colors pr-8',
-                      isActive
-                        ? 'bg-primary/10 text-primary'
-                        : 'text-muted-foreground hover:bg-muted hover:text-foreground',
-                    ].join(' ')
-                  }
-                >
-                  <Icon className="h-4 w-4 shrink-0" />
-                  <span className="truncate">{route.label}</span>
-                </NavLink>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    togglePin(route.path);
-                  }}
-                  className={cn(
-                    'absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded transition-all',
-                    pinned
-                      ? 'opacity-100 text-primary hover:text-primary/80'
-                      : 'opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-foreground',
-                  )}
-                  aria-label={pinned ? '取消置顶' : '置顶'}
-                >
-                  <Pin className={cn('h-3.5 w-3.5 transition-transform', pinned && 'fill-current')} />
-                </button>
-              </div>
-            );
-          })}
-        </nav>
+        {/* Sidebar Content */}
+        <SidebarContent>
+          <SidebarGroup>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {sortedRoutes.map((route) => {
+                  const Icon = route.icon;
+                  const pinned = isPinned(route.path);
+                  const isActive = location.pathname === route.path;
+                  return (
+                    <SidebarMenuItem key={route.path}>
+                      <SidebarMenuButton asChild isActive={isActive}>
+                        <NavLink to={route.path}>
+                          <Icon />
+                          <span>{route.label}</span>
+                        </NavLink>
+                      </SidebarMenuButton>
+                      <SidebarMenuAction
+                        showOnHover={!pinned}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          togglePin(route.path);
+                        }}
+                        className={cn(pinned && 'text-sidebar-accent-foreground')}
+                        aria-label={pinned ? '取消置顶' : '置顶'}
+                      >
+                        <Pin className={cn('h-3.5 w-3.5 transition-transform', pinned && 'fill-current')} />
+                      </SidebarMenuAction>
+                    </SidebarMenuItem>
+                  );
+                })}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </SidebarContent>
 
-        {/* menu footer */}
-        <div className="px-4 py-3 border-t border-border text-[11px] text-muted-foreground space-y-2 bg-background">
+        {/* Sidebar Footer */}
+        <SidebarFooter className="border-t border-sidebar-border">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground/70 cursor-help">
-                  <HelpCircle className="h-3 w-3" />
-                  <span>置顶数据存储说明</span>
+                <div className="flex items-center gap-1.5 text-[10px] text-sidebar-foreground/60 cursor-help">
+                  <HelpCircle className="h-3 w-3 shrink-0" />
+                  <span className="line-clamp-1">置顶数据存储说明</span>
                 </div>
               </TooltipTrigger>
-              <TooltipContent side="top" className="max-w-[200px] text-xs">
+              <TooltipContent side="right" className="max-w-[200px] text-xs">
                 <p>工具置顶数据保存在浏览器本地存储中，清除浏览器数据会导致置顶信息丢失。</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-        </div>
-      </aside>
+        </SidebarFooter>
 
-      <button
-        type="button"
-        onClick={() => setIsSidebarCollapsed(isSidebarCollapsed ? false : true)}
-        className="h-8 w-8 flex items-center border justify-center rounded-md text-muted-foreground hover:text-foreground hover:border-border hover:bg-muted/60 transition-colors absolute top-4 left-2 z-50"
-      >
-        {isSidebarCollapsed ? <Menu className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-        <span className="sr-only">{isSidebarCollapsed ? '展开菜单' : '收起菜单'}</span>
-      </button>
+        {/* Sidebar Rail - 提供拖拽交互 */}
+        <SidebarRail />
+      </Sidebar>
+
+      {/* SidebarTrigger - 固定在左上角 */}
+      <div className="fixed top-4 left-4 z-50">
+        <SidebarTrigger />
+      </div>
 
       {/* 右侧内容区 */}
-      <main className="flex-1 min-w-0 min-h-screen overflow-auto bg-background">
+      <SidebarInset>
         <Routes>
           {toolRoutes.map((route) => (
             <Route
               key={route.path}
               path={route.path}
               element={
-                <div className="min-h-screen">
-                  <header
-                    className={cn(
-                      'h-16 px-6 flex items-center sticky top-0 border-b border-border bg-background/80 backdrop-blur z-40',
-                    )}
-                  >
-                    <div
-                      className={cn(
-                        'h-full bg-transparent transition-all duration-2000',
-                        isSidebarCollapsed ? 'w-8' : 'w-1',
-                      )}
-                    ></div>
-                    <div className="flex items-center w-full">
+                <div className="flex flex-col min-h-screen">
+                  {/* 页面 Header */}
+                  <header className="h-16 px-6 flex items-center sticky top-0 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-40">
+                    {/* 预留 SidebarTrigger 的空间 */}
+                    <div className="w-10" />
+                    <div className="flex items-center flex-1">
                       <div className="flex flex-col">
-                        <h1 className="text-lg font-semibold tracking-wide">{route.title}</h1>
-                        {route.subtitle && <p className="text-xs text-muted-foreground">{route.subtitle}</p>}
+                        <h1 className="text-lg font-semibold tracking-tight">{route.title}</h1>
+                        {route.subtitle && <p className="text-xs text-muted-foreground mt-0.5">{route.subtitle}</p>}
                       </div>
                       <div className="ml-auto flex items-center gap-2">
                         <Select
                           value={themeSetting}
                           onValueChange={(value) => setThemeSetting(value as 'light' | 'dark' | 'system')}
                         >
-                          <SelectTrigger className="h-8 w-[120px] border-none bg-muted/60 text-[11px] px-3">
+                          <SelectTrigger className="h-8 w-[120px] border-none bg-muted/60 hover:bg-muted text-[11px] px-3 transition-colors">
                             <div className="flex items-center gap-1.5">
                               {isDark ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
                               <span>
@@ -185,7 +181,9 @@ function App() {
                       </div>
                     </div>
                   </header>
-                  <div>
+
+                  {/* 页面内容 */}
+                  <div className="flex-1">
                     <Suspense fallback={<RouteLoadingFallback />}>
                       <route.component />
                     </Suspense>
@@ -197,8 +195,8 @@ function App() {
           {/* 默认重定向到第一个工具 */}
           <Route path="*" element={<Navigate to={firstPath} replace />} />
         </Routes>
-      </main>
-    </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }
 
