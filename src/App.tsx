@@ -1,9 +1,11 @@
-import { ChevronLeft, Menu, Moon, Sun } from 'lucide-react';
-import { Suspense, useEffect, useState } from 'react';
+import { ChevronLeft, HelpCircle, Menu, Moon, Pin, Sun } from 'lucide-react';
+import { Suspense, useEffect, useMemo, useState } from 'react';
 import { Navigate, NavLink, Route, Routes } from 'react-router-dom';
 
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { toolRoutes } from '@/router';
+import { useMenuStore } from '@/store/menu';
 import { useThemeStore } from '@/store/theme';
 import { cn } from '@/utils';
 
@@ -33,9 +35,18 @@ function RouteLoadingFallback() {
 
 function App() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const firstPath = toolRoutes[0]?.path ?? '/';
   const { themeSetting, effectiveTheme, setThemeSetting } = useThemeStore();
+  const { pinnedPaths, togglePin, isPinned } = useMenuStore();
   const isDark = effectiveTheme === 'dark';
+
+  // 根据置顶状态排序工具路由
+  const sortedRoutes = useMemo(() => {
+    const pinned = toolRoutes.filter((route) => pinnedPaths.includes(route.path));
+    const unpinned = toolRoutes.filter((route) => !pinnedPaths.includes(route.path));
+    return [...pinned, ...unpinned];
+  }, [pinnedPaths]);
+
+  const firstPath = sortedRoutes[0]?.path ?? '/';
 
   return (
     <div className="h-screen bg-background text-foreground flex">
@@ -46,38 +57,71 @@ function App() {
           isSidebarCollapsed ? 'w-0 opacity-0 pointer-events-none -ml-px' : 'w-64',
         )}
       >
-        <div className="h-16 pl-12 border-b border-border/80 flex items-center gap-3">
+        {/* menu header */}
+        <div className="shrink-0 h-16 pl-12 border-b border-border/80 flex items-center gap-3">
           <div className="flex flex-col leading-tight">
             <span className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">QIAO</span>
             <span className="text-sm font-semibold tracking-wide">Tools</span>
           </div>
         </div>
 
-        <nav className="flex-1 py-3 px-2 space-y-1 text-sm">
-          {toolRoutes.map((route) => {
+        {/* menu content */}
+        <nav className="flex-1 py-3 px-2 space-y-1 text-sm min-h-0 overflow-auto">
+          {sortedRoutes.map((route) => {
             const Icon = route.icon;
+            const pinned = isPinned(route.path);
             return (
-              <NavLink
-                key={route.path}
-                to={route.path}
-                className={({ isActive }) =>
-                  [
-                    'flex items-center gap-2 rounded-md px-2 py-1.5 transition-colors',
-                    isActive
-                      ? 'bg-primary/10 text-primary'
-                      : 'text-muted-foreground hover:bg-muted hover:text-foreground',
-                  ].join(' ')
-                }
-              >
-                <Icon className="h-4 w-4 shrink-0" />
-                <span className="truncate">{route.label}</span>
-              </NavLink>
+              <div key={route.path} className="relative group">
+                <NavLink
+                  to={route.path}
+                  className={({ isActive }) =>
+                    [
+                      'flex items-center gap-2 rounded-md px-2 py-1.5 transition-colors pr-8',
+                      isActive
+                        ? 'bg-primary/10 text-primary'
+                        : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                    ].join(' ')
+                  }
+                >
+                  <Icon className="h-4 w-4 shrink-0" />
+                  <span className="truncate">{route.label}</span>
+                </NavLink>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    togglePin(route.path);
+                  }}
+                  className={cn(
+                    'absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded transition-all',
+                    pinned
+                      ? 'opacity-100 text-primary hover:text-primary/80'
+                      : 'opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-foreground',
+                  )}
+                  aria-label={pinned ? '取消置顶' : '置顶'}
+                >
+                  <Pin className={cn('h-3.5 w-3.5 transition-transform', pinned && 'fill-current')} />
+                </button>
+              </div>
             );
           })}
         </nav>
 
-        <div className="px-4 py-3 border-t border-border text-[11px] text-muted-foreground">
-          <p>选择左侧工具，在右侧面板中进行操作。</p>
+        {/* menu footer */}
+        <div className="px-4 py-3 border-t border-border text-[11px] text-muted-foreground space-y-2 bg-background">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground/70 cursor-help">
+                  <HelpCircle className="h-3 w-3" />
+                  <span>置顶数据存储说明</span>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="max-w-[200px] text-xs">
+                <p>工具置顶数据保存在浏览器本地存储中，清除浏览器数据会导致置顶信息丢失。</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </aside>
 
