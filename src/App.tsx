@@ -1,8 +1,10 @@
-import { ChevronLeft, Menu } from 'lucide-react';
+import { ChevronLeft, Menu, Moon, Sun } from 'lucide-react';
 import { Suspense, useEffect, useState } from 'react';
 import { Navigate, NavLink, Route, Routes } from 'react-router-dom';
 
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import { toolRoutes } from '@/router';
+import { useThemeStore } from '@/store/theme';
 import { cn } from '@/utils';
 
 import { LOADING_MESSAGES } from './constant';
@@ -32,6 +34,8 @@ function RouteLoadingFallback() {
 function App() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const firstPath = toolRoutes[0]?.path ?? '/';
+  const { themeSetting, effectiveTheme, setThemeSetting } = useThemeStore();
+  const isDark = effectiveTheme === 'dark';
 
   return (
     <div className="h-screen bg-background text-foreground flex">
@@ -101,12 +105,39 @@ function App() {
                     )}
                   >
                     <div
-                      className={cn('h-full bg-white transition-all duration-2000', isSidebarCollapsed ? 'w-8' : 'w-1')}
+                      className={cn(
+                        'h-full bg-transparent transition-all duration-2000',
+                        isSidebarCollapsed ? 'w-8' : 'w-1',
+                      )}
                     ></div>
                     <div className="flex items-center w-full">
                       <div className="flex flex-col">
                         <h1 className="text-lg font-semibold tracking-wide">{route.title}</h1>
                         {route.subtitle && <p className="text-xs text-muted-foreground">{route.subtitle}</p>}
+                      </div>
+                      <div className="ml-auto flex items-center gap-2">
+                        <Select
+                          value={themeSetting}
+                          onValueChange={(value) => setThemeSetting(value as 'light' | 'dark' | 'system')}
+                        >
+                          <SelectTrigger className="h-8 w-[120px] border-none bg-muted/60 text-[11px] px-3">
+                            <div className="flex items-center gap-1.5">
+                              {isDark ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
+                              <span>
+                                {themeSetting === 'system'
+                                  ? '跟随系统'
+                                  : themeSetting === 'dark'
+                                    ? '深色模式'
+                                    : '浅色模式'}
+                              </span>
+                            </div>
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="system">跟随系统</SelectItem>
+                            <SelectItem value="light">浅色模式</SelectItem>
+                            <SelectItem value="dark">深色模式</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </div>
                     </div>
                   </header>

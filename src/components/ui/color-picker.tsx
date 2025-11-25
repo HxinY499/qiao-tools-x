@@ -23,6 +23,35 @@ function normalizeHex(value: string, fallback = '#000000') {
   return fallback;
 }
 
+function getTextColor(color: string | undefined) {
+  if (!color || color === 'transparent') return undefined;
+  const hex = normalizeHex(color, '');
+  if (!hex) return undefined;
+
+  let r = 0;
+  let g = 0;
+  let b = 0;
+
+  if (hex.length === 4 || hex.length === 5) {
+    const rHex = hex[1] + hex[1];
+    const gHex = hex[2] + hex[2];
+    const bHex = hex[3] + hex[3];
+    r = parseInt(rHex, 16);
+    g = parseInt(gHex, 16);
+    b = parseInt(bHex, 16);
+  } else if (hex.length === 7 || hex.length === 9) {
+    const rHex = hex.slice(1, 3);
+    const gHex = hex.slice(3, 5);
+    const bHex = hex.slice(5, 7);
+    r = parseInt(rHex, 16);
+    g = parseInt(gHex, 16);
+    b = parseInt(bHex, 16);
+  }
+
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return luminance > 0.6 ? '#000000' : '#ffffff';
+}
+
 export function ColorPicker({ value, defaultValue, onChange, className }: ColorPickerProps) {
   const isControlled = value !== undefined;
   const [internalValue, setInternalValue] = useState(defaultValue ?? '');
@@ -52,13 +81,14 @@ export function ColorPicker({ value, defaultValue, onChange, className }: ColorP
 
   const previewColor = inputValue || 'transparent';
   const pickerColor = normalizeHex(inputValue);
+  const textColor = getTextColor(previewColor);
 
   return (
     <div className={cn('relative inline-flex items-center gap-2', className)}>
       {/* <span className="h-5 w-5 shrink-0 rounded border bg-white shadow-sm" style={{ backgroundColor: previewColor }} /> */}
       <Input
         className={'h-7 text-xs'}
-        style={{ backgroundColor: previewColor }}
+        style={{ backgroundColor: previewColor, color: textColor }}
         value={inputValue}
         onChange={(e) => {
           const v = e.target.value;

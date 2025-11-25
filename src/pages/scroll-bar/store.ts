@@ -1,9 +1,9 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-type BorderStyle = 'solid' | 'dashed' | 'dotted' | 'double';
+export type BorderStyle = 'solid' | 'dashed' | 'dotted' | 'double';
 
-type ConfigType = {
+export type ConfigType = {
   scrollbar: { width: number };
   track: {
     'border-radius': number;
@@ -22,7 +22,7 @@ type ConfigType = {
   corner: { 'background-color': string };
 };
 
-const initConfig: ConfigType = {
+export const initConfig: ConfigType = {
   scrollbar: { width: 15 },
   track: {
     'border-radius': 10,

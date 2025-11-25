@@ -6,48 +6,9 @@ import { ColorPicker } from '@/components/ui/color-picker';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { useThemeStore } from '@/store/theme';
 
-import { useScrollbarStore } from './store';
-
-type BorderStyle = 'solid' | 'dashed' | 'dotted' | 'double';
-
-type ConfigType = {
-  scrollbar: { width: number };
-  track: {
-    'border-radius': number;
-    'border-width': number;
-    'background-color': string;
-    'border-color': string;
-    'border-style': BorderStyle;
-  };
-  thumb: {
-    'border-radius': number;
-    'border-width': number;
-    'background-color': string;
-    'border-color': string;
-    'border-style': BorderStyle;
-  };
-  corner: { 'background-color': string };
-};
-
-const initConfig: ConfigType = {
-  scrollbar: { width: 15 },
-  track: {
-    'border-radius': 10,
-    'border-width': 0,
-    'border-style': 'solid',
-    'background-color': '#CFCFCF',
-    'border-color': '#000000',
-  },
-  thumb: {
-    'border-radius': 10,
-    'border-width': 0,
-    'border-style': 'solid',
-    'background-color': '#FFA116',
-    'border-color': '#000000',
-  },
-  corner: { 'background-color': 'transparent' },
-};
+import { BorderStyle, ConfigType, initConfig, useScrollbarStore } from './store';
 
 function loadBool(key: string, fallback: boolean): boolean {
   if (typeof window === 'undefined') return fallback;
@@ -73,31 +34,32 @@ function generateCss(config: ConfigType, hasHorizontal: boolean, showWhenHover: 
     : '';
 
   return `
-.code-area::-webkit-scrollbar {
-    width: ${width}px;${heightLine}${baseVisibility}
-}
+  .code-area::-webkit-scrollbar {
+      width: ${width}px;${heightLine}${baseVisibility}
+  }
 
-.code-area::-webkit-scrollbar-track {
-    border: ${config.track['border-width']}px ${config.track['border-style']} ${config.track['border-color']};
-    border-radius: ${config.track['border-radius']}px;
-    background-color: ${config.track['background-color']};${trackVisibility}
-}
+  .code-area::-webkit-scrollbar-track {
+      border: ${config.track['border-width']}px ${config.track['border-style']} ${config.track['border-color']};
+      border-radius: ${config.track['border-radius']}px;
+      background-color: ${config.track['background-color']};${trackVisibility}
+  }
 
-.code-area::-webkit-scrollbar-thumb {
-    border: ${config.thumb['border-width']}px ${config.thumb['border-style']} ${config.thumb['border-color']};
-    border-radius: ${config.thumb['border-radius']}px;
-    background-color: ${config.thumb['background-color']};${thumbVisibility}
-}
+  .code-area::-webkit-scrollbar-thumb {
+      border: ${config.thumb['border-width']}px ${config.thumb['border-style']} ${config.thumb['border-color']};
+      border-radius: ${config.thumb['border-radius']}px;
+      background-color: ${config.thumb['background-color']};${thumbVisibility}
+  }
 
-.code-area::-webkit-scrollbar-corner {
-    background-color: ${config.corner['background-color']};
-}
+  .code-area::-webkit-scrollbar-corner {
+      background-color: ${config.corner['background-color']};
+  }
 
 ${hoverPart}`;
 }
 
 function ScrollBarPage() {
   const { config, setConfig } = useScrollbarStore();
+  const { effectiveTheme } = useThemeStore();
   const [hasHorizontal, setHasHorizontal] = useState<boolean>(() => loadBool('Scrollbar__hasHorizontal', false));
   const [showWhenHover, setShowWhenHover] = useState<boolean>(() => loadBool('Scrollbar__showWhenHover', false));
   const [cssCode, setCssCode] = useState('');
@@ -125,7 +87,8 @@ function ScrollBarPage() {
 
       try {
         const { codeToHtml } = await import('shiki');
-        const html = await codeToHtml(cssCode, { lang: 'css', theme: 'github-light' });
+        const themeName = effectiveTheme === 'dark' ? 'dark-plus' : 'github-light';
+        const html = await codeToHtml(cssCode, { lang: 'css', theme: themeName });
         if (!cancelled) setHighlightedCss(html);
       } catch {
         if (!cancelled) setHighlightedCss('');
@@ -137,7 +100,7 @@ function ScrollBarPage() {
     return () => {
       cancelled = true;
     };
-  }, [cssCode]);
+  }, [cssCode, effectiveTheme]);
 
   const scrollVars = useMemo(
     () => ({
@@ -387,7 +350,7 @@ function ScrollBarPage() {
               <span className="text-sm font-medium">拐角</span>
               <span className="text-[11px] text-muted-foreground">corner</span>
             </div>
-            <div className="space-y-1">
+            <div className="space-y-1 flex flex-col">
               <Label className="text-[11px]">background-color</Label>
               <ColorPicker
                 value={config.corner['background-color']}
@@ -455,9 +418,11 @@ function ScrollBarPage() {
           </div>
           <div className="relative flex-1 min-h-[140px]">
             <div
-              className="code-area text-[11px] font-mono border rounded-md bg-background/80 h-full overflow-auto px-3 py-2"
+              className="code-area text-[11px] font-mono border rounded-md bg-background/80 h-full overflow-auto"
               style={scrollVars}
-              dangerouslySetInnerHTML={{ __html: highlightedCss || `<pre><code>${cssCode || ''}</code></pre>` }}
+              dangerouslySetInnerHTML={{
+                __html: highlightedCss || `<pre><code>${cssCode || ''}</code></pre>`,
+              }}
             />
           </div>
         </div>
