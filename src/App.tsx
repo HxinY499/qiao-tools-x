@@ -44,8 +44,8 @@ function App() {
       >
         <div className="h-16 pl-12 border-b border-border/80 flex items-center gap-3">
           <div className="flex flex-col leading-tight">
-            <span className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">Tool</span>
-            <span className="text-sm font-semibold tracking-wide">Kit</span>
+            <span className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">QIAO</span>
+            <span className="text-sm font-semibold tracking-wide">Tools</span>
           </div>
         </div>
 
