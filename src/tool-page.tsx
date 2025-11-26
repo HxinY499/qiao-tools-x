@@ -1,9 +1,17 @@
-import { Moon, Sun } from 'lucide-react';
+import { Laptop, Moon, Sun } from 'lucide-react';
 import { Suspense, useEffect, useState } from 'react';
 
-import { Select, SelectContent, SelectItem, SelectTrigger } from './components/ui/select';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+
 import { useSidebar } from './components/ui/sidebar';
 import { LOADING_MESSAGES } from './constant';
+import { useIsMobile } from './hooks/use-mobile';
 import { ToolRoute } from './router';
 import { useThemeStore } from './store/theme';
 import { cn } from './utils';
@@ -32,6 +40,7 @@ function RouteLoadingFallback() {
 
 export function ToolPage({ route }: { route: ToolRoute }) {
   const { open } = useSidebar();
+  const isMobile = useIsMobile();
   const { themeSetting, effectiveTheme, setThemeSetting } = useThemeStore();
   const isDark = effectiveTheme === 'dark';
 
@@ -39,33 +48,47 @@ export function ToolPage({ route }: { route: ToolRoute }) {
     <>
       <div className="flex flex-col min-h-screen">
         {/* 页面 Header */}
-        <header className="h-16 px-6 flex items-center sticky top-0 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-40">
-          <div className="flex items-center flex-1">
-            <div className={cn('h-full w-8 bg-transparent transition-all', open && 'w-1')}></div>
-
-            <div className="flex flex-col">
-              <h1 className="text-lg font-semibold tracking-tight">{route.title}</h1>
-              {route.subtitle && <p className="text-xs text-muted-foreground mt-0.5">{route.subtitle}</p>}
+        <header
+          className={cn(
+            'h-16 px-6 flex items-center sticky top-0 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-40',
+          )}
+        >
+          <div className="flex items-center flex-1 min-w-0">
+            <div
+              className={cn('h-full w-8 bg-transparent transition-all shrink-0', open && 'w-1', isMobile && 'w-6')}
+            ></div>
+            <div className="flex flex-col min-w-0">
+              <h1 className="text-lg font-semibold tracking-tight truncate">{route.title}</h1>
+              {route.subtitle && <p className="text-xs text-muted-foreground mt-0.5 truncate">{route.subtitle}</p>}
             </div>
-            <div className="ml-auto flex items-center gap-2">
-              <Select
-                value={themeSetting}
-                onValueChange={(value) => setThemeSetting(value as 'light' | 'dark' | 'system')}
-              >
-                <SelectTrigger className="h-8 w-[120px] border-none bg-muted/60 hover:bg-muted text-[11px] px-3 transition-colors">
-                  <div className="flex items-center gap-1.5">
-                    {isDark ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
-                    <span>
-                      {themeSetting === 'system' ? '跟随系统' : themeSetting === 'dark' ? '深色模式' : '浅色模式'}
-                    </span>
-                  </div>
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="system">跟随系统</SelectItem>
-                  <SelectItem value="light">浅色模式</SelectItem>
-                  <SelectItem value="dark">深色模式</SelectItem>
-                </SelectContent>
-              </Select>
+            <div className="ml-auto flex items-center gap-2 shrink-0">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-10 bg-muted/60 hover:bg-muted">
+                    {themeSetting === 'system' ? (
+                      <Laptop className="h-3.5 w-3.5" />
+                    ) : isDark ? (
+                      <Sun className="h-3.5 w-3.5" />
+                    ) : (
+                      <Moon className="h-3.5 w-3.5" />
+                    )}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => setThemeSetting('system')}>
+                    <Laptop className="mr-2 h-3.5 w-3.5" />
+                    <span>跟随系统</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setThemeSetting('light')}>
+                    <Sun className="mr-2 h-3.5 w-3.5" />
+                    <span>浅色模式</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setThemeSetting('dark')}>
+                    <Moon className="mr-2 h-3.5 w-3.5" />
+                    <span>深色模式</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </header>

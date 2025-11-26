@@ -147,7 +147,7 @@ function hslToRgb(h: number, s: number, l: number, a: number): RGBColor {
   };
 }
 
-const initialColor: RGBColor = { r: 255, g: 87, b: 51, a: 1 };
+const initialColor: RGBColor = { r: 255, g: 161, b: 22, a: 1 };
 
 export const useColorConverterStore = create<ColorConverterStore>()(
   persist(

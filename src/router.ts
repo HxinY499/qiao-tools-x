@@ -1,11 +1,13 @@
 import type { LucideIcon } from 'lucide-react';
-import { ImageIcon, Palette, ScrollText } from 'lucide-react';
+import { ImageIcon, Palette, Rainbow, ScrollText, Square } from 'lucide-react';
 import type { ComponentType } from 'react';
 import { lazy } from 'react';
 
 const ImageCompressorPage = lazy(() => import('@/pages/image-compressor'));
 const ScrollBarPage = lazy(() => import('@/pages/scroll-bar'));
 const ColorConverterPage = lazy(() => import('@/pages/color-converter'));
+const BoxShadowPage = lazy(() => import('@/pages/box-shadow'));
+const GradientGeneratorPage = lazy(() => import('@/pages/gradient-generator'));
 
 export type ToolRoute = {
   path: string;
@@ -32,6 +34,22 @@ export const toolRoutes: ToolRoute[] = [
     subtitle: '可视化调整滚动条样式，并生成可复制的 CSS 代码',
     icon: ScrollText,
     component: ScrollBarPage,
+  },
+  {
+    path: '/box-shadow',
+    label: '阴影生成器',
+    title: 'Box Shadow Generator',
+    subtitle: '可视化叠加多层阴影，并一键生成 CSS 与 Tailwind 代码',
+    icon: Square,
+    component: BoxShadowPage,
+  },
+  {
+    path: '/gradient-generator',
+    label: 'CSS 渐变生成器',
+    title: 'CSS Gradient Generator',
+    subtitle: '可视化创建 linear/radial 渐变，支持多色断点与角度调整，并生成 CSS 与 Tailwind 类名',
+    icon: Rainbow,
+    component: GradientGeneratorPage,
   },
   {
     path: '/color-converter',

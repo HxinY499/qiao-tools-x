@@ -1,12 +1,12 @@
 import { type ChangeEvent, useEffect, useMemo, useState } from 'react';
 
+import { CodeArea } from '@/components/code-area';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ColorPicker } from '@/components/ui/color-picker';
+import { ColorPicker } from '@/components/color-picker';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { useThemeStore } from '@/store/theme';
 
 import { BorderStyle, ConfigType, initConfig, useScrollbarStore } from './store';
 
@@ -59,12 +59,9 @@ ${hoverPart}`;
 
 function ScrollBarPage() {
   const { config, setConfig } = useScrollbarStore();
-  const { effectiveTheme } = useThemeStore();
   const [hasHorizontal, setHasHorizontal] = useState<boolean>(() => loadBool('Scrollbar__hasHorizontal', false));
   const [showWhenHover, setShowWhenHover] = useState<boolean>(() => loadBool('Scrollbar__showWhenHover', false));
   const [cssCode, setCssCode] = useState('');
-  const [highlightedCss, setHighlightedCss] = useState('');
-  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -73,34 +70,7 @@ function ScrollBarPage() {
       window.localStorage.setItem('Scrollbar__showWhenHover', JSON.stringify(showWhenHover));
     }
     setCssCode(generateCss(config, hasHorizontal, showWhenHover));
-    setCopied(false);
   }, [config, hasHorizontal, showWhenHover]);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function highlight() {
-      if (!cssCode) {
-        if (!cancelled) setHighlightedCss('');
-        return;
-      }
-
-      try {
-        const { codeToHtml } = await import('shiki');
-        const themeName = effectiveTheme === 'dark' ? 'dark-plus' : 'github-light';
-        const html = await codeToHtml(cssCode, { lang: 'css', theme: themeName });
-        if (!cancelled) setHighlightedCss(html);
-      } catch {
-        if (!cancelled) setHighlightedCss('');
-      }
-    }
-
-    highlight();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [cssCode, effectiveTheme]);
 
   const scrollVars = useMemo(
     () => ({
@@ -158,18 +128,6 @@ function ScrollBarPage() {
     setConfig(() => initConfig);
     setHasHorizontal(false);
     setShowWhenHover(false);
-  }
-
-  async function handleCopy() {
-    if (!cssCode) return;
-    try {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        await navigator.clipboard.writeText(cssCode);
-        setCopied(true);
-      }
-    } catch {
-      // ignore
-    }
   }
 
   return (
@@ -402,29 +360,8 @@ function ScrollBarPage() {
           </div>
         </div>
 
-        <div className="rounded-lg border bg-muted/40 p-3 flex-1 flex flex-col gap-2 min-h-[180px]">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium">CSS Code</span>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="h-7 px-2 text-[11px]"
-              onClick={handleCopy}
-              disabled={!cssCode}
-            >
-              {copied ? '已复制' : '复制代码'}
-            </Button>
-          </div>
-          <div className="relative flex-1 min-h-[140px]">
-            <div
-              className="code-area text-[11px] font-mono border rounded-md bg-background/80 h-full overflow-auto"
-              style={scrollVars}
-              dangerouslySetInnerHTML={{
-                __html: highlightedCss || `<pre><code>${cssCode || ''}</code></pre>`,
-              }}
-            />
-          </div>
+        <div className="border bg-muted/40 p-3">
+          <CodeArea title="CSS Code" code={cssCode} language="css" codeStyle={scrollVars} />
         </div>
 
         <div className="border-t border-border pt-3 mt-1">

@@ -41,24 +41,34 @@ pnpm lint         # 运行 ESLint 并自动修复问题
 ### 项目结构
 
 - `src/pages/`: 各工具页面,每个工具独立文件夹
-- `src/components/ui/`: UI 组件库(主要来自 shadcn/ui)
+- `src/components/`: 组件目录
+  - `src/components/ui/`: **shadcn/ui 组件库**（已全量下载完成，不要再安装新组件）
+  - `src/components/` 根目录: **自定义业务组件**（如 `code-area.tsx` 等）
 - `src/router.ts`: 统一路由配置
 - `src/App.tsx`: 主应用框架(含侧边栏与主内容区)
 - `src/utils/`: 工具函数(如 `cn` 用于合并 className)
 
+### 组件说明
+
+**shadcn/ui 组件 (`src/components/ui/`)**
+
+- 全部来自 [shadcn/ui](https://ui.shadcn.com/)，已全量下载完成
+- 基于 Radix UI + CVA，完美支持暗色模式
+- **不要使用 shadcn CLI 下载新组件**，所有常用组件已就绪
+
+**自定义组件 (`src/components/*.tsx`)**
+
+- `CodeArea`: 代码展示组件，用于显示生成的代码（支持语法高亮、一键复制等功能）
+- 其他业务组件根据需要自行实现，放在此目录下
+
 ### UI 组件使用
 
 - `src/components/ui/` 下的组件**全部来自 shadcn/ui，已全量下载完成**
-- **开发时必须优先使用 shadcn 组件**，常用组件包括：
-  - 布局：`Card`, `Separator`, `ScrollArea`, `Sheet`, `Dialog`
-  - 表单：`Input`, `Button`, `Select`, `Checkbox`, `Switch`, `Slider`, `Label`, `Textarea`
-  - 反馈：`Toast`, `Alert`, `Progress`, `Skeleton`
-  - 其他：`Tabs`, `Tooltip`, `Popover`, `Badge`, `Avatar` 等
+- **开发时必须优先使用 shadcn 组件**
 - 需要新组件时的优先级:
   1. **首先检查 `src/components/ui/` 是否已有对应组件**（避免重复造轮子）
   2. 如果 shadcn 没有提供该组件，再考虑自己实现
   3. **不要使用 shadcn CLI 下载新组件**（所有组件已下载完毕）
-- shadcn 组件基于 Radix UI + CVA，已完美集成暗色模式和样式系统
 
 ### 状态管理
 
