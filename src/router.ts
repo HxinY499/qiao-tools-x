@@ -8,6 +8,7 @@ const ScrollBarPage = lazy(() => import('@/pages/scroll-bar'));
 const ColorConverterPage = lazy(() => import('@/pages/color-converter'));
 const BoxShadowPage = lazy(() => import('@/pages/box-shadow'));
 const GradientGeneratorPage = lazy(() => import('@/pages/gradient-generator'));
+const Base64ToolPage = lazy(() => import('@/pages/base64'));
 
 export type ToolRoute = {
   path: string;
@@ -58,5 +59,14 @@ export const toolRoutes: ToolRoute[] = [
     subtitle: '在线颜色格式转换工具，支持 Hex、RGB/RGBA、HSL/HSLA 格式互转',
     icon: Palette,
     component: ColorConverterPage,
+  },
+  {
+    path: '/base64',
+    label: 'Base64 编解码',
+    title: 'Base64 编解码',
+    subtitle:
+      '在文本模式下支持普通文本与 Base64 间互转，在图片模式下可将本地图片转换为 Base64 Data URL，方便内联到 CSS 或 HTML 中',
+    icon: Square,
+    component: Base64ToolPage,
   },
 ];
