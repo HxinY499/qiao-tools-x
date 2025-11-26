@@ -1,9 +1,9 @@
 import { type ChangeEvent, useEffect, useMemo, useState } from 'react';
 
 import { CodeArea } from '@/components/code-area';
+import { ColorPicker } from '@/components/color-picker';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ColorPicker } from '@/components/color-picker';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -137,9 +137,6 @@ function ScrollBarPage() {
         <div className="flex items-center justify-between gap-2 mb-1">
           <div>
             <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">配置滚动条样式</h2>
-            <p className="mt-1 text-[11px] text-muted-foreground">
-              调整宽度、轨道、滑块和拐角的样式，右侧实时预览和生成 CSS。
-            </p>
           </div>
           <Button type="button" variant="ghost" size="sm" className="h-7 px-2 text-[11px]" onClick={resetConfig}>
             重置
@@ -323,9 +320,6 @@ function ScrollBarPage() {
       <section className="rounded-xl border bg-card text-card-foreground shadow-sm p-4 lg:p-5 flex flex-col gap-4">
         <div>
           <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">预览 & CSS 代码</h2>
-          <p className="mt-1 text-[11px] text-muted-foreground">
-            在下方区域滚动查看效果，并复制生成的 CSS 片段到你的项目中。
-          </p>
         </div>
 
         <div className="rounded-lg border bg-muted/40 p-3">

@@ -29,9 +29,7 @@ export function ImagePreview({ imageUrl, placeholder }: ImagePreviewProps) {
             />
           </button>
         ) : (
-          <p className="text-[11px] text-muted-foreground text-center">
-            {placeholder || '选择或拖拽一张图片后，这里会展示预览效果。'}
-          </p>
+          <p className="text-[11px] text-muted-foreground text-center">{placeholder || '预览'}</p>
         )}
       </div>
 

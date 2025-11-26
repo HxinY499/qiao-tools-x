@@ -314,9 +314,6 @@ function Base64ToolPage() {
                   }
                   className="min-h-[160px] text-xs bg-muted/50"
                 />
-                <p className="text-[11px] text-muted-foreground mt-1">
-                  文本模式完全在浏览器本地完成，不会将你的内容上传到任何服务器。
-                </p>
               </div>
             </div>
           </TabsContent>
@@ -373,10 +370,7 @@ function Base64ToolPage() {
 
               <div className="flex flex-col gap-3">
                 <Label className="text-xs font-medium">预览与 Data URL</Label>
-                <ImagePreview
-                  imageUrl={imagePreviewUrl}
-                  placeholder="选择或拖拽一张图片后，这里会展示预览效果以及下方的 Base64 Data URL 代码块。"
-                />
+                <ImagePreview imageUrl={imagePreviewUrl} placeholder="预览" />
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center justify-between gap-2">
                     <Label className="text-xs font-medium">Base64 Data URL</Label>
@@ -391,12 +385,7 @@ function Base64ToolPage() {
                       复制
                     </Button>
                   </div>
-                  <Textarea
-                    value={displayDataUrl}
-                    readOnly
-                    placeholder="选择或拖拽图片后，这里会展示完整的 Base64 Data URL。"
-                    className="min-h-[140px] text-xs bg-muted/50"
-                  />
+                  <Textarea value={displayDataUrl} readOnly className="min-h-[140px] text-xs bg-muted/50" />
                   <div className="mt-1 space-y-1">
                     <div className="flex flex-wrap items-center gap-3 text-[11px] text-muted-foreground">
                       <label className="inline-flex items-center gap-1 cursor-pointer">

@@ -141,9 +141,6 @@ function BoxShadowPage() {
         <header className="flex items-center justify-between gap-2">
           <div>
             <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">配置阴影层</h2>
-            <p className="mt-1 text-[11px] text-muted-foreground">
-              调整偏移、模糊、扩展、颜色和内阴影，多层叠加塑造卡片立体感。
-            </p>
           </div>
           <div className="flex items-center gap-1.5">
             <Button type="button" variant="ghost" size="sm" className="h-7 px-2 text-[11px]" onClick={resetConfig}>
@@ -259,9 +256,6 @@ function BoxShadowPage() {
       <section className="rounded-xl border bg-card text-card-foreground shadow-sm p-4 lg:p-5 flex flex-col gap-4">
         <div>
           <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">预览 & 代码</h2>
-          <p className="mt-1 text-[11px] text-muted-foreground">
-            右侧卡片实时展示当前 box-shadow 效果，下方可复制 CSS、Tailwind 工具类和主题配置代码。
-          </p>
         </div>
 
         <div className="rounded-lg border bg-background p-12 flex items-center justify-center">

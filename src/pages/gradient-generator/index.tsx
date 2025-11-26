@@ -102,9 +102,6 @@ function GradientGeneratorPage() {
         <header className="flex items-center justify-between gap-2">
           <div>
             <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">配置渐变</h2>
-            <p className="mt-1 text-[11px] text-muted-foreground">
-              在左侧选择线性或径向渐变，调整角度与颜色断点，右侧实时预览并生成代码。
-            </p>
           </div>
           <div className="flex items-center gap-1.5">
             <Button type="button" variant="ghost" size="sm" className="h-7 px-2 text-[11px]" onClick={resetConfig}>
@@ -223,9 +220,6 @@ function GradientGeneratorPage() {
       <section className="rounded-xl border bg-card text-card-foreground shadow-sm p-4 lg:p-5 flex flex-col gap-4">
         <div>
           <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">预览 & 代码</h2>
-          <p className="mt-1 text-[11px] text-muted-foreground">
-            右侧卡片展示当前渐变效果，下方可复制 CSS 与 Tailwind 类名直接用于组件样式。
-          </p>
         </div>
 
         <div className="rounded-lg border bg-background p-12 flex items-center justify-center">

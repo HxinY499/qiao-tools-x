@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
-import { ImageIcon, Palette, Rainbow, ScrollText, Square } from 'lucide-react';
+import { CalendarClock, ImageIcon, Palette, Rainbow, ScrollText, Square } from 'lucide-react';
 import type { ComponentType } from 'react';
 import { lazy } from 'react';
 
@@ -9,6 +9,7 @@ const ColorConverterPage = lazy(() => import('@/pages/color-converter'));
 const BoxShadowPage = lazy(() => import('@/pages/box-shadow'));
 const GradientGeneratorPage = lazy(() => import('@/pages/gradient-generator'));
 const Base64ToolPage = lazy(() => import('@/pages/base64'));
+const TimestampConverterPage = lazy(() => import('@/pages/timestamp-converter'));
 
 export type ToolRoute = {
   path: string;
@@ -59,6 +60,14 @@ export const toolRoutes: ToolRoute[] = [
     subtitle: '在线颜色格式转换工具，支持 Hex、RGB/RGBA、HSL/HSLA 格式互转',
     icon: Palette,
     component: ColorConverterPage,
+  },
+  {
+    path: '/timestamp-converter',
+    label: '时间戳转换',
+    title: 'Timestamp Converter',
+    subtitle: '时间戳与日期时间互转，支持多种常用格式并可快速复制当前时间',
+    icon: CalendarClock,
+    component: TimestampConverterPage,
   },
   {
     path: '/base64',
