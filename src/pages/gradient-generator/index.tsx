@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { CodeArea } from '@/components/code-area';
 import { ColorPicker } from '@/components/color-picker';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -98,7 +99,7 @@ function GradientGeneratorPage() {
 
   return (
     <div className="max-w-5xl w-full mx-auto px-4 pb-5 lg:py-8 grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
-      <section className="rounded-xl border bg-card text-card-foreground shadow-sm p-4 lg:p-5 flex flex-col gap-4">
+      <Card className="shadow-sm flex flex-col gap-4 p-4 lg:p-5">
         <header className="flex items-center justify-between gap-2">
           <div>
             <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">配置渐变</h2>
@@ -215,9 +216,9 @@ function GradientGeneratorPage() {
             </div>
           </div>
         </div>
-      </section>
+      </Card>
 
-      <section className="rounded-xl border bg-card text-card-foreground shadow-sm p-4 lg:p-5 flex flex-col gap-4">
+      <Card className="shadow-sm flex flex-col gap-4 p-4 lg:p-5">
         <div>
           <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">预览 & 代码</h2>
         </div>
@@ -256,7 +257,7 @@ function GradientGeneratorPage() {
             <li>Tailwind arbitrary value 形式适合快速试验，可将常用渐变抽成自定义类名复用。</li>
           </ul>
         </div>
-      </section>
+      </Card>
     </div>
   );
 }

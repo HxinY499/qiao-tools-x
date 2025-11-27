@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { HexAlphaColorPicker } from 'react-colorful';
 
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
@@ -127,265 +128,273 @@ function ColorConverterPage() {
   return (
     <div className="max-w-7xl w-full mx-auto px-4 pb-5 lg:py-8">
       {/* 颜色选择器和预览区域 */}
-      <div className="rounded-xl border bg-card text-card-foreground shadow-sm p-6 mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* 颜色选择器 */}
-          <div className="flex justify-center items-center">
-            <HexAlphaColorPicker
-              color={hexValue}
-              onChange={(hex) => setFromHex(hex)}
-              style={{ width: '100%', maxWidth: '280px' }}
-            />
-          </div>
+      <Card className="shadow-sm mb-6">
+        <CardContent className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* 颜色选择器 */}
+            <div className="flex justify-center items-center">
+              <HexAlphaColorPicker
+                color={hexValue}
+                onChange={(hex) => setFromHex(hex)}
+                style={{ width: '100%', maxWidth: '280px' }}
+              />
+            </div>
 
-          {/* 颜色预览 */}
-          <div>
-            <div
-              className="w-full h-[200px] rounded-lg border relative overflow-hidden"
-              style={{
-                backgroundColor: `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`,
-              }}
-            >
-              {hexError && (
-                <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center">
-                  <div className="bg-red-500/90 text-white px-4 py-2 rounded-lg text-sm font-medium">
-                    颜色格式不正确
+            {/* 颜色预览 */}
+            <div>
+              <div
+                className="w-full h-[200px] rounded-lg border relative overflow-hidden"
+                style={{
+                  backgroundColor: `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`,
+                }}
+              >
+                {hexError && (
+                  <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center">
+                    <div className="bg-red-500/90 text-white px-4 py-2 rounded-lg text-sm font-medium">
+                      颜色格式不正确
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
       {/* 三个颜色格式面板 - 响应式网格布局 */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Hex 格式 */}
-        <div className="rounded-xl border bg-card text-card-foreground shadow-sm p-4">
-          <div className="flex justify-between items-center mb-3">
-            <h3 className="text-base font-semibold">Hex</h3>
-            <Button size="sm" variant="outline" onClick={() => copyToClipboard(hexValue, 'hex')} className="h-8 px-2">
-              {copiedHex ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-            </Button>
-          </div>
-          <div>
-            <Input
-              value={hexInput}
-              onChange={(e) => handleHexChange(e.target.value)}
-              placeholder="#FF5733"
-              className={`font-mono text-sm ${hexError ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
-            />
-            {hexError ? (
-              <p className="text-xs text-red-500 mt-2">{hexError}</p>
-            ) : (
-              <p className="text-xs text-muted-foreground mt-2">支持 3/4/6/8 位格式（如 #333 或 #FF5733）</p>
-            )}
-          </div>
-        </div>
+        <Card className="shadow-sm">
+          <CardContent className="p-4">
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="text-base font-semibold">Hex</h3>
+              <Button size="sm" variant="outline" onClick={() => copyToClipboard(hexValue, 'hex')} className="h-8 px-2">
+                {copiedHex ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+              </Button>
+            </div>
+            <div>
+              <Input
+                value={hexInput}
+                onChange={(e) => handleHexChange(e.target.value)}
+                placeholder="#FF5733"
+                className={`font-mono text-sm ${hexError ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
+              />
+              {hexError ? (
+                <p className="text-xs text-red-500 mt-2">{hexError}</p>
+              ) : (
+                <p className="text-xs text-muted-foreground mt-2">支持 3/4/6/8 位格式（如 #333 或 #FF5733）</p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
 
         {/* RGB/RGBA 格式 */}
-        <div className="rounded-xl border bg-card text-card-foreground shadow-sm p-4">
-          <div className="flex justify-between items-center mb-3">
-            <h3 className="text-base font-semibold">RGB / RGBA</h3>
-            <Button size="sm" variant="outline" onClick={() => copyToClipboard(rgbaValue, 'rgb')} className="h-8 px-2">
-              {copiedRgb ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-            </Button>
-          </div>
-          <div className="p-2 rounded-lg bg-muted my-2">
-            <p className="text-xs font-mono break-all">{rgbaValue}</p>
-          </div>
-          <div className="space-y-3">
-            {/* R */}
-            <div>
-              <div className="flex justify-between items-center mb-1">
-                <Label htmlFor="rgb-r" className="text-xs">
-                  R
-                </Label>
-                <Input
-                  id="rgb-r"
-                  type="number"
-                  min="0"
-                  max="255"
-                  value={color.r}
-                  onChange={(e) => handleRGBChange('r', e.target.value)}
-                  className="w-22 h-7 text-xs text-center"
+        <Card className="shadow-sm">
+          <CardContent className="p-4">
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="text-base font-semibold">RGB / RGBA</h3>
+              <Button size="sm" variant="outline" onClick={() => copyToClipboard(rgbaValue, 'rgb')} className="h-8 px-2">
+                {copiedRgb ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+              </Button>
+            </div>
+            <div className="p-2 rounded-lg bg-muted my-2">
+              <p className="text-xs font-mono break-all">{rgbaValue}</p>
+            </div>
+            <div className="space-y-3">
+              {/* R */}
+              <div>
+                <div className="flex justify-between items-center mb-1">
+                  <Label htmlFor="rgb-r" className="text-xs">
+                    R
+                  </Label>
+                  <Input
+                    id="rgb-r"
+                    type="number"
+                    min="0"
+                    max="255"
+                    value={color.r}
+                    onChange={(e) => handleRGBChange('r', e.target.value)}
+                    className="w-22 h-7 text-xs text-center"
+                  />
+                </div>
+                <Slider
+                  value={[color.r]}
+                  onValueChange={([value]) => setColor({ r: value })}
+                  min={0}
+                  max={255}
+                  step={1}
                 />
               </div>
-              <Slider
-                value={[color.r]}
-                onValueChange={([value]) => setColor({ r: value })}
-                min={0}
-                max={255}
-                step={1}
-              />
-            </div>
 
-            {/* G */}
-            <div>
-              <div className="flex justify-between items-center mb-1">
-                <Label htmlFor="rgb-g" className="text-xs">
-                  G
-                </Label>
-                <Input
-                  id="rgb-g"
-                  type="number"
-                  min="0"
-                  max="255"
-                  value={color.g}
-                  onChange={(e) => handleRGBChange('g', e.target.value)}
-                  className="w-22 h-7 text-xs text-center"
+              {/* G */}
+              <div>
+                <div className="flex justify-between items-center mb-1">
+                  <Label htmlFor="rgb-g" className="text-xs">
+                    G
+                  </Label>
+                  <Input
+                    id="rgb-g"
+                    type="number"
+                    min="0"
+                    max="255"
+                    value={color.g}
+                    onChange={(e) => handleRGBChange('g', e.target.value)}
+                    className="w-22 h-7 text-xs text-center"
+                  />
+                </div>
+                <Slider
+                  value={[color.g]}
+                  onValueChange={([value]) => setColor({ g: value })}
+                  min={0}
+                  max={255}
+                  step={1}
                 />
               </div>
-              <Slider
-                value={[color.g]}
-                onValueChange={([value]) => setColor({ g: value })}
-                min={0}
-                max={255}
-                step={1}
-              />
-            </div>
 
-            {/* B */}
-            <div>
-              <div className="flex justify-between items-center mb-1">
-                <Label htmlFor="rgb-b" className="text-xs">
-                  B
-                </Label>
-                <Input
-                  id="rgb-b"
-                  type="number"
-                  min="0"
-                  max="255"
-                  value={color.b}
-                  onChange={(e) => handleRGBChange('b', e.target.value)}
-                  className="w-22 h-7 text-xs text-center"
+              {/* B */}
+              <div>
+                <div className="flex justify-between items-center mb-1">
+                  <Label htmlFor="rgb-b" className="text-xs">
+                    B
+                  </Label>
+                  <Input
+                    id="rgb-b"
+                    type="number"
+                    min="0"
+                    max="255"
+                    value={color.b}
+                    onChange={(e) => handleRGBChange('b', e.target.value)}
+                    className="w-22 h-7 text-xs text-center"
+                  />
+                </div>
+                <Slider
+                  value={[color.b]}
+                  onValueChange={([value]) => setColor({ b: value })}
+                  min={0}
+                  max={255}
+                  step={1}
                 />
               </div>
-              <Slider
-                value={[color.b]}
-                onValueChange={([value]) => setColor({ b: value })}
-                min={0}
-                max={255}
-                step={1}
-              />
-            </div>
 
-            {/* A */}
-            <div>
-              <div className="flex justify-between items-center mb-1">
-                <Label htmlFor="rgb-a" className="text-xs">
-                  A
-                </Label>
-                <Input
-                  id="rgb-a"
-                  type="number"
-                  min="0"
-                  max="1"
-                  step="0.01"
-                  value={color.a.toFixed(2)}
-                  onChange={(e) => handleAlphaChange(e.target.value)}
-                  className="w-22 h-7 text-xs text-center"
+              {/* A */}
+              <div>
+                <div className="flex justify-between items-center mb-1">
+                  <Label htmlFor="rgb-a" className="text-xs">
+                    A
+                  </Label>
+                  <Input
+                    id="rgb-a"
+                    type="number"
+                    min="0"
+                    max="1"
+                    step="0.01"
+                    value={color.a.toFixed(2)}
+                    onChange={(e) => handleAlphaChange(e.target.value)}
+                    className="w-22 h-7 text-xs text-center"
+                  />
+                </div>
+                <Slider
+                  value={[color.a * 100]}
+                  onValueChange={([value]) => setColor({ a: value / 100 })}
+                  min={0}
+                  max={100}
+                  step={1}
                 />
               </div>
-              <Slider
-                value={[color.a * 100]}
-                onValueChange={([value]) => setColor({ a: value / 100 })}
-                min={0}
-                max={100}
-                step={1}
-              />
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
         {/* HSL/HSLA 格式 */}
-        <div className="rounded-xl border bg-card text-card-foreground shadow-sm p-4">
-          <div className="flex justify-between items-center mb-3">
-            <h3 className="text-base font-semibold">HSL / HSLA</h3>
-            <Button size="sm" variant="outline" onClick={() => copyToClipboard(hslaValue, 'hsl')} className="h-8 px-2">
-              {copiedHsl ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-            </Button>
-          </div>
-          <div className="p-2 rounded-lg bg-muted my-2">
-            <p className="text-xs font-mono break-all">{hslaValue}</p>
-          </div>
-          <div className="space-y-3">
-            {/* H */}
-            <div>
-              <div className="flex justify-between items-center mb-1">
-                <Label htmlFor="hsl-h" className="text-xs">
-                  H
-                </Label>
-                <Input
-                  id="hsl-h"
-                  type="number"
-                  min="0"
-                  max="360"
-                  value={hslValue.h}
-                  onChange={(e) => handleHSLChange('h', e.target.value)}
-                  className="w-22 h-7 text-xs text-center"
+        <Card className="shadow-sm">
+          <CardContent className="p-4">
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="text-base font-semibold">HSL / HSLA</h3>
+              <Button size="sm" variant="outline" onClick={() => copyToClipboard(hslaValue, 'hsl')} className="h-8 px-2">
+                {copiedHsl ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+              </Button>
+            </div>
+            <div className="p-2 rounded-lg bg-muted my-2">
+              <p className="text-xs font-mono break-all">{hslaValue}</p>
+            </div>
+            <div className="space-y-3">
+              {/* H */}
+              <div>
+                <div className="flex justify-between items-center mb-1">
+                  <Label htmlFor="hsl-h" className="text-xs">
+                    H
+                  </Label>
+                  <Input
+                    id="hsl-h"
+                    type="number"
+                    min="0"
+                    max="360"
+                    value={hslValue.h}
+                    onChange={(e) => handleHSLChange('h', e.target.value)}
+                    className="w-22 h-7 text-xs text-center"
+                  />
+                </div>
+                <Slider
+                  value={[hslValue.h]}
+                  onValueChange={([value]) => setFromHSL({ ...hslValue, h: value })}
+                  min={0}
+                  max={360}
+                  step={1}
                 />
               </div>
-              <Slider
-                value={[hslValue.h]}
-                onValueChange={([value]) => setFromHSL({ ...hslValue, h: value })}
-                min={0}
-                max={360}
-                step={1}
-              />
-            </div>
 
-            {/* S */}
-            <div>
-              <div className="flex justify-between items-center mb-1">
-                <Label htmlFor="hsl-s" className="text-xs">
-                  S
-                </Label>
-                <Input
-                  id="hsl-s"
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={hslValue.s}
-                  onChange={(e) => handleHSLChange('s', e.target.value)}
-                  className="w-22 h-7 text-xs text-center"
+              {/* S */}
+              <div>
+                <div className="flex justify-between items-center mb-1">
+                  <Label htmlFor="hsl-s" className="text-xs">
+                    S
+                  </Label>
+                  <Input
+                    id="hsl-s"
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={hslValue.s}
+                    onChange={(e) => handleHSLChange('s', e.target.value)}
+                    className="w-22 h-7 text-xs text-center"
+                  />
+                </div>
+                <Slider
+                  value={[hslValue.s]}
+                  onValueChange={([value]) => setFromHSL({ ...hslValue, s: value })}
+                  min={0}
+                  max={100}
+                  step={1}
                 />
               </div>
-              <Slider
-                value={[hslValue.s]}
-                onValueChange={([value]) => setFromHSL({ ...hslValue, s: value })}
-                min={0}
-                max={100}
-                step={1}
-              />
-            </div>
 
-            {/* L */}
-            <div>
-              <div className="flex justify-between items-center mb-1">
-                <Label htmlFor="hsl-l" className="text-xs">
-                  L
-                </Label>
-                <Input
-                  id="hsl-l"
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={hslValue.l}
-                  onChange={(e) => handleHSLChange('l', e.target.value)}
-                  className="w-22 h-7 text-xs text-center"
+              {/* L */}
+              <div>
+                <div className="flex justify-between items-center mb-1">
+                  <Label htmlFor="hsl-l" className="text-xs">
+                    L
+                  </Label>
+                  <Input
+                    id="hsl-l"
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={hslValue.l}
+                    onChange={(e) => handleHSLChange('l', e.target.value)}
+                    className="w-22 h-7 text-xs text-center"
+                  />
+                </div>
+                <Slider
+                  value={[hslValue.l]}
+                  onValueChange={([value]) => setFromHSL({ ...hslValue, l: value })}
+                  min={0}
+                  max={100}
+                  step={1}
                 />
               </div>
-              <Slider
-                value={[hslValue.l]}
-                onValueChange={([value]) => setFromHSL({ ...hslValue, l: value })}
-                min={0}
-                max={100}
-                step={1}
-              />
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

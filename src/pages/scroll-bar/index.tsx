@@ -3,6 +3,7 @@ import { type ChangeEvent, useEffect, useMemo, useState } from 'react';
 import { CodeArea } from '@/components/code-area';
 import { ColorPicker } from '@/components/color-picker';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -133,7 +134,7 @@ function ScrollBarPage() {
   return (
     <div className="max-w-5xl w-full mx-auto px-4 pb-5 lg:py-8 grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
       {/* 左侧：配置区域 */}
-      <section className="rounded-xl border bg-card text-card-foreground shadow-sm p-4 lg:p-5 flex flex-col gap-4">
+      <Card className="shadow-sm flex flex-col gap-4 p-4 lg:p-5">
         <div className="flex items-center justify-between gap-2 mb-1">
           <div>
             <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">配置滚动条样式</h2>
@@ -314,10 +315,10 @@ function ScrollBarPage() {
             </div>
           </div>
         </div>
-      </section>
+      </Card>
 
       {/* 右侧：预览 + 代码 */}
-      <section className="rounded-xl border bg-card text-card-foreground shadow-sm p-4 lg:p-5 flex flex-col gap-4">
+      <Card className="shadow-sm flex flex-col gap-4 p-4 lg:p-5">
         <div>
           <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">预览 & CSS 代码</h2>
         </div>
@@ -366,7 +367,7 @@ function ScrollBarPage() {
             <li>横向滚动开关只影响预览区域的内容宽度，方便你同时预览横向滚动条样式。</li>
           </ul>
         </div>
-      </section>
+      </Card>
     </div>
   );
 }

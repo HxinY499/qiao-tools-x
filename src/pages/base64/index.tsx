@@ -2,6 +2,7 @@ import type { ChangeEvent, DragEvent } from 'react';
 import { useMemo, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -213,18 +214,18 @@ function Base64ToolPage() {
 
   return (
     <div className="max-w-5xl w-full mx-auto px-4 pb-5 lg:py-8 space-y-4 lg:space-y-6">
-      <section className="rounded-xl border bg-card text-card-foreground shadow-sm p-4 lg:p-5">
-        <Tabs defaultValue="text" className="w-full">
+      <Card className="shadow-sm p-4 lg:p-5">
+        <Tabs defaultValue="image" className="w-full">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">Base64 编解码</h2>
             </div>
             <TabsList className="mt-2 sm:mt-0">
-              <TabsTrigger value="text" className="text-xs">
-                文本 ⇄ Base64
-              </TabsTrigger>
               <TabsTrigger value="image" className="text-xs">
                 图片转 Data URL
+              </TabsTrigger>
+              <TabsTrigger value="text" className="text-xs">
+                文本 ⇄ Base64
               </TabsTrigger>
             </TabsList>
           </div>
@@ -426,9 +427,9 @@ function Base64ToolPage() {
             </div>
           </TabsContent>
         </Tabs>
-      </section>
+      </Card>
 
-      <section className="rounded-xl border bg-card text-card-foreground shadow-sm p-4 lg:p-5">
+      <Card className="shadow-sm p-4 lg:p-5">
         <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">使用说明 & 提示</h2>
         <ul className="mt-3 list-disc pl-4 text-[11px] text-muted-foreground space-y-1.5">
           <li>所有编码与解码操作都在浏览器本地完成，不会上传到服务器，适合处理敏感文本或图片。</li>
@@ -439,7 +440,7 @@ function Base64ToolPage() {
             Data URL 一般形如：<code>data:image/png;base64,......</code>，复制时可直接整段粘贴到你的样式或标签属性中。
           </li>
         </ul>
-      </section>
+      </Card>
     </div>
   );
 }

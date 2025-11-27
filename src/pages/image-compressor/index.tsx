@@ -1,6 +1,7 @@
 import { type ChangeEvent, type DragEvent, useEffect, useRef, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -377,7 +378,7 @@ function ImageCompressorPage() {
 
   return (
     <div className="max-w-5xl w-full mx-auto px-4 pb-5 lg:py-8 grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
-      <section className="rounded-xl border bg-card text-card-foreground shadow-sm p-4 lg:p-5">
+      <Card className="shadow-sm p-4 lg:p-5">
         <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">上传图片</h2>
         <div
           className={`relative mt-3 border border-dashed rounded-lg bg-muted/60 transition-colors cursor-pointer overflow-hidden h-4/5 flex items-center justify-center px-4 py-6 sm:py-8 ${
@@ -409,9 +410,9 @@ function ImageCompressorPage() {
         <p className={`mt-2 text-xs ${hasFile ? 'text-emerald-600 font-medium' : 'text-muted-foreground'}`}>
           {uploadStatus}
         </p>
-      </section>
+      </Card>
 
-      <section className="rounded-xl border bg-card text-card-foreground shadow-sm p-4 lg:p-5">
+      <Card className="shadow-sm p-4 lg:p-5">
         <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">设置压缩参数</h2>
         <div className="mt-3 grid gap-3">
           <div className="rounded-lg border bg-muted/60 px-3 py-3">
@@ -543,9 +544,9 @@ function ImageCompressorPage() {
             </p>
           </div>
         </div>
-      </section>
+      </Card>
 
-      <section className="lg:col-span-2 rounded-xl border bg-card text-card-foreground shadow-sm p-4 lg:p-5">
+      <Card className="lg:col-span-2 shadow-sm p-4 lg:p-5">
         <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">预览对比</h2>
         <div className="mt-3 grid gap-4 lg:grid-cols-2">
           <div className="rounded-lg border bg-muted/40 p-3 sm:p-4">
@@ -632,9 +633,9 @@ function ImageCompressorPage() {
             </ul>
           </div>
         </div>
-      </section>
+      </Card>
 
-      <section className="lg:col-span-2 rounded-xl border bg-card text-card-foreground shadow-sm p-4 lg:p-5">
+      <Card className="lg:col-span-2 shadow-sm p-4 lg:p-5">
         <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">操作 & 使用说明</h2>
         <div className="mt-3 flex flex-col gap-3">
           <div className="flex flex-wrap gap-2">
@@ -680,7 +681,7 @@ function ImageCompressorPage() {
             </ul>
           </div>
         </div>
-      </section>
+      </Card>
     </div>
   );
 }

@@ -3,6 +3,7 @@ import { Check, Copy, RefreshCcw } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
@@ -232,81 +233,84 @@ function TimestampConverterPage() {
   const normalizedDatetimeText = formatDisplayDatetime(converterDate);
 
   return (
-    <div className="max-w-5xl w-full mx-auto px-4 py-6 lg:py-10">
-      <div className="rounded-2xl border bg-card text-card-foreground shadow-sm p-5 space-y-5">
-        <div>
-          <h3 className="text-base font-semibold">时间戳 ⇄ 日期时间</h3>
-        </div>
-        <div className="space-y-5">
-          <div className="space-y-2">
-            <Label htmlFor="timestamp-input">Unix 时间戳</Label>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Input
-                id="timestamp-input"
-                inputMode="numeric"
-                value={timestampValue}
-                onChange={(event) => handleTimestampChange(event.target.value)}
-                placeholder="1700000000 或 1700000000000"
-                className="font-mono"
-              />
-              <Button
-                variant="outline"
-                size="sm"
-                className="sm:w-32"
-                onClick={() => handleCopy(timestampValue, 'converter-timestamp')}
-              >
-                {copiedKey === 'converter-timestamp' ? (
-                  <Check className="h-4 w-4" />
-                ) : (
-                  <>
-                    <Copy className="h-4 w-4 mr-1" />
-                    复制
-                  </>
-                )}
-              </Button>
-            </div>
-            {timestampError && <p className="text-xs text-red-500">{timestampError}</p>}
+    <div className="max-w-5xl w-full mx-auto px-4 py-6 lg:py-10 space-y-6">
+      <Card className="shadow-sm">
+        <CardContent className="p-5">
+          <div className="mb-4">
+            <h3 className="text-base font-semibold">时间戳 ⇄ 日期时间</h3>
           </div>
+          <div className="space-y-5">
+            <div className="space-y-2">
+              <Label htmlFor="timestamp-input">Unix 时间戳</Label>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Input
+                  id="timestamp-input"
+                  inputMode="numeric"
+                  value={timestampValue}
+                  onChange={(event) => handleTimestampChange(event.target.value)}
+                  placeholder="1700000000 或 1700000000000"
+                  className="font-mono"
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="sm:w-32"
+                  onClick={() => handleCopy(timestampValue, 'converter-timestamp')}
+                >
+                  {copiedKey === 'converter-timestamp' ? (
+                    <Check className="h-4 w-4" />
+                  ) : (
+                    <>
+                      <Copy className="h-4 w-4 mr-1" />
+                      复制
+                    </>
+                  )}
+                </Button>
+              </div>
+              {timestampError && <p className="text-xs text-red-500">{timestampError}</p>}
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="datetime-input">日期时间（{timezoneLabel}）</Label>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Input
-                id="datetime-input"
-                value={datetimeInput}
-                onChange={(event) => handleDatetimeInputChange(event.target.value)}
-                placeholder="2024-05-20 12:30:45 / 2024/05/20 / ISO 8601"
-                className="font-mono"
-              />
-              <Button
-                variant="outline"
-                size="sm"
-                className="sm:w-32"
-                onClick={() => handleCopy(normalizedDatetimeText, 'converter-datetime')}
-              >
-                {copiedKey === 'converter-datetime' ? (
-                  <Check className="h-4 w-4" />
-                ) : (
-                  <>
-                    <Copy className="h-4 w-4 mr-1" />
-                    复制
-                  </>
-                )}
-              </Button>
+            <div className="space-y-2">
+              <Label htmlFor="datetime-input">日期时间（{timezoneLabel}）</Label>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Input
+                  id="datetime-input"
+                  value={datetimeInput}
+                  onChange={(event) => handleDatetimeInputChange(event.target.value)}
+                  placeholder="2024-05-20 12:30:45 / 2024/05/20 / ISO 8601"
+                  className="font-mono"
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="sm:w-32"
+                  onClick={() => handleCopy(normalizedDatetimeText, 'converter-datetime')}
+                >
+                  {copiedKey === 'converter-datetime' ? (
+                    <Check className="h-4 w-4" />
+                  ) : (
+                    <>
+                      <Copy className="h-4 w-4 mr-1" />
+                      复制
+                    </>
+                  )}
+                </Button>
+              </div>
+              {datetimeError ? (
+                <p className="text-xs text-red-500">{datetimeError}</p>
+              ) : (
+                <p className="text-xs text-muted-foreground">
+                  支持 ISO8601、yyyy-MM-dd HH:mm:ss、yyyy/MM/dd 等常见格式，解析结果已规范化。
+                </p>
+              )}
             </div>
-            {datetimeError ? (
-              <p className="text-xs text-red-500">{datetimeError}</p>
-            ) : (
-              <p className="text-xs text-muted-foreground">
-                支持 ISO8601、yyyy-MM-dd HH:mm:ss、yyyy/MM/dd 等常见格式，解析结果已规范化。
-              </p>
-            )}
           </div>
-        </div>
-      </div>
-      <div className="mt-6">
-        <div className="rounded-2xl border bg-card text-card-foreground shadow-sm p-6 space-y-6">
-          <div className="flex flex-wrap gap-4 items-center justify-between">
+        </CardContent>
+      </Card>
+
+      <Card className="shadow-sm">
+        <CardContent className="p-6">
+          <div className="flex flex-wrap gap-4 items-center justify-between mb-6">
             <div>
               <p className="text-sm font-medium text-muted-foreground">当前时间</p>
               <div className="flex items-center gap-2 mt-1">
@@ -361,8 +365,8 @@ function TimestampConverterPage() {
               })}
             </div>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
