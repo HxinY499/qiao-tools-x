@@ -38,7 +38,7 @@ export const useMenuStore = create<MenuState>()(
       isPinned: (path) => get().pinnedPaths.includes(path),
     }),
     {
-      name: 'qiao-tools-menu-storage',
+      name: 'qiao-tools-x-persist-menu',
     },
   ),
 );

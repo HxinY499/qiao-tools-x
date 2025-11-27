@@ -47,7 +47,7 @@ export const useBoxShadowStore = create<BoxShadowStore>()(
         })),
     }),
     {
-      name: 'Boxshadow_config',
+      name: 'qiao-tools-x-persist-box-shadow',
     },
   ),
 );

@@ -36,7 +36,7 @@ export const useUUIDStore = create<UUIDStore>()(
         })),
     }),
     {
-      name: 'uuid-generator-storage',
+      name: 'qiao-tools-x-persist-uuid-generator',
     },
   ),
 );

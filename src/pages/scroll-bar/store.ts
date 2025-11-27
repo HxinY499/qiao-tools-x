@@ -44,7 +44,7 @@ export const initConfig: ConfigType = {
 function loadInitialConfig(): ConfigType {
   if (typeof window === 'undefined') return initConfig;
   try {
-    const raw = window.localStorage.getItem('Scrollbar__config');
+    const raw = window.localStorage.getItem('qiao-tools-x-scroll-bar');
     if (!raw) return initConfig;
     const parsed = JSON.parse(raw) as Partial<ConfigType>;
     return {
@@ -73,7 +73,7 @@ export const useScrollbarStore = create<ScrollbarStore>()(
         })),
     }),
     {
-      name: 'Scrollbar__config_store',
+      name: 'qiao-tools-x-persist-scroll-bar',
     },
   ),
 );

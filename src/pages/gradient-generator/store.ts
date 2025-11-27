@@ -42,7 +42,7 @@ export const useGradientStore = create<GradientStore>()(
         })),
     }),
     {
-      name: 'Gradient_config',
+      name: 'qiao-tools-x-persist-gradient-generator',
     },
   ),
 );

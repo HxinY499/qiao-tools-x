@@ -5,6 +5,7 @@ enabled: true
 updatedAt: 2025-11-25T09:24:42.822Z
 provider: 
 ---
+始终使用中文回复
 
 ## 项目概述
 
@@ -222,9 +223,10 @@ export default YourToolPage;
 
 注意：
 
-- 外层布局建议参考现有工具（如 `image-compressor`、`scroll-bar`），保持统一风格。
+- 外层布局建议参考现有工具保持统一风格。
 - 页头标题 / 副标题由全局 `App` + `router.ts` 渲染，工具页本身不需要再写标题。
 - 如果需要存储比较复杂的状态，使用zustand，复杂状态和ui 需要分开管理，不要放在同一个文件里，新建一个store.ts 文件。
+- **Zustand 持久化命名规范**: 如果使用了 `persist` 中间件，`name` 属性必须严格遵循 `qiao-tools-x-persist-[tool-name]` 格式（例如 `qiao-tools-x-persist-uuid-generator`），以避免命名冲突并保持统一。
 - **必须确保工具在亮色和暗色模式下都能完美显示**，使用语义化的 Tailwind 类名（如 `bg-card`、`text-foreground`）而非硬编码颜色。
 
 ## 2. 在 router 中注册工具信息
@@ -290,4 +292,3 @@ export const toolRoutes: ToolRoute[] = [
 
 - 新工具页面统一放在 `src/pages/<tool>/index.tsx`
 - 所有工具的元信息（路由、标题、副标题、图标、组件）统一在 `src/router.ts` 中配置
-- 不需要在 `App.tsx` 手动改 `<Routes>` 或左侧菜单，只维护 `toolRoutes` 即可。

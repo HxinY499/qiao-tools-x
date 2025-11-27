@@ -183,7 +183,7 @@ export const useColorConverterStore = create<ColorConverterStore>()(
       },
     }),
     {
-      name: 'Color_converter_store',
+      name: 'qiao-tools-x-persist-color-converter',
     },
   ),
 );
