@@ -1,8 +1,7 @@
-import { Check, Copy } from 'lucide-react';
 import type { CSSProperties } from 'react';
 import { useEffect, useState } from 'react';
 
-import { Button } from '@/components/ui/button';
+import { CopyButton } from '@/components/copy-button';
 import { useThemeStore } from '@/store/theme';
 import { cn } from '@/utils';
 
@@ -20,6 +19,8 @@ type CodeAreaProps = {
   codeClassName?: string;
   // 代码区域内联样式，例如传入滚动条相关 CSS 变量
   codeStyle?: CSSProperties;
+  // 是否显示右上角复制按钮
+  showCopyButton?: boolean;
 };
 
 function escapeHtml(value: string): string {
@@ -29,17 +30,23 @@ function escapeHtml(value: string): string {
 /**
  * 代码展示卡片，支持语法高亮、复制
  */
-export function CodeArea({ title, code, language = 'text', className, codeClassName, codeStyle }: CodeAreaProps) {
+export function CodeArea({
+  title,
+  code,
+  language = 'text',
+  className,
+  codeClassName,
+  codeStyle,
+  showCopyButton = true,
+}: CodeAreaProps) {
   const { effectiveTheme } = useThemeStore();
   const [highlightedHtml, setHighlightedHtml] = useState('');
-  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
 
     if (!code) {
       setHighlightedHtml('');
-      setCopied(false);
       return;
     }
 
@@ -65,23 +72,7 @@ export function CodeArea({ title, code, language = 'text', className, codeClassN
     };
   }, [code, language, effectiveTheme]);
 
-  // 点击右上角按钮复制代码，并短暂显示对勾反馈，提升可感知性
-  function handleCopy() {
-    if (!code || !navigator.clipboard || !navigator.clipboard.writeText) return;
-    navigator.clipboard
-      .writeText(code)
-      .then(() => {
-        setCopied(true);
-        window.setTimeout(() => {
-          setCopied(false);
-        }, 1600);
-      })
-      .catch((error) => {
-        console.error('Failed to copy code', error);
-      });
-  }
-
-  const containerClassName = cn('rounded-lg  flex flex-col gap-2 min-h-[180px]', className);
+  const containerClassName = cn('rounded-lg flex flex-col min-h-[180px]', className);
 
   const contentClassName = cn(
     'code-area text-[11px] font-mono border rounded-md bg-background/80 h-full overflow-auto px-3 py-2 dark:bg-[#1E1E1E]',
@@ -90,22 +81,28 @@ export function CodeArea({ title, code, language = 'text', className, codeClassN
 
   const fallbackHtml = `<pre><code>${escapeHtml(code)}</code></pre>`;
 
+  const showHeader = title || showCopyButton;
+
   return (
     <div className={containerClassName}>
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-medium">{title}</span>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          className="h-4 w-4 text-muted-foreground hover:text-foreground"
-          onClick={handleCopy}
-          disabled={!code}
-          aria-label={copied ? '复制成功' : '复制代码'}
-        >
-          {copied ? <Check className="size-3 text-emerald-500" /> : <Copy className="size-3" />}
-        </Button>
-      </div>
+      {showHeader && (
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-xs font-medium">{title}</span>
+          {showCopyButton && (
+            <CopyButton
+              text={code}
+              mode="icon"
+              variant="ghost"
+              size="icon"
+              className="h-4 w-4 text-muted-foreground hover:text-foreground"
+              iconClassName="size-3"
+              disabled={!code}
+              aria-label="复制代码"
+            />
+          )}
+        </div>
+      )}
+
       <div className="relative flex-1">
         <div
           className={contentClassName}

@@ -33,6 +33,7 @@ pnpm lint         # 运行 ESLint 并自动修复问题
   - `title/subtitle`: 页面标题与副标题
   - `icon`: Lucide React 图标
   - `component`: 懒加载的页面组件
+  - `category`: 工具分类 (image, css, dev, other)
 
 ### 添加新工具的步骤
 
@@ -40,7 +41,7 @@ pnpm lint         # 运行 ESLint 并自动修复问题
 2. 实现 `index.tsx` 作为页面组件
 3. 在 [src/router.ts](src/router.ts) 中:
    - 导入图标和懒加载组件
-   - 添加新的路由配置到 `toolRoutes` 数组
+   - 添加新的路由配置到 `toolRoutes` 数组，并指定 `category` 分类
 4. 应用会自动在侧边栏展示新工具
 
 ### 项目结构
@@ -63,7 +64,9 @@ pnpm lint         # 运行 ESLint 并自动修复问题
 
 **自定义组件 (`src/components/*.tsx`)**
 
-- `CodeArea`: 代码展示组件，用于显示生成的代码（支持语法高亮、一键复制等功能）
+- `code-area`: 代码展示组件，用于显示生成的代码（支持语法高亮、一键复制等功能）
+- `copy-button`: 复制按钮，用于复制文字
+- `color-picker`: 颜色选择器，用于选择颜色
 - 其他业务组件根据需要自行实现，放在此目录下
 
 ### UI 组件使用
@@ -253,7 +256,8 @@ export type ToolRoute = {
   title: string; // 右侧工具页 Header 大标题
   subtitle?: string; // 右侧工具页 Header 副标题
   icon: LucideIcon; // 左侧菜单图标（lucide-react）
-  component: () => JSX.Element; // 工具页面组件
+  component: ComponentType; // 工具页面组件
+  category: ToolCategory; // 工具分类
 };
 ```
 
@@ -262,28 +266,13 @@ export type ToolRoute = {
 ```ts
 export const toolRoutes: ToolRoute[] = [
   {
-    path: '/image-compressor',
-    label: '图片压缩工具',
-    title: 'ImageCompressor',
-    subtitle: '在线图片压缩与尺寸调整工具，支持实时预览与参数调节',
-    icon: ImageIcon,
-    component: ImageCompressorPage,
-  },
-  {
-    path: '/scroll-bar',
-    label: '滚动条生成器',
-    title: '滚动条样式可视化',
-    subtitle: '可视化调整滚动条样式，并生成可复制的 CSS 代码',
-    icon: ScrollText,
-    component: ScrollBarPage,
-  },
-  {
     path: '/your-tool', // 新工具路由
     label: '你的工具名称', // 左侧菜单文案
     title: 'Your Tool Title', // 右侧大标题
     subtitle: '一句话说明这个工具用途', // （可选）副标题
     icon: ScrollText, // 任选一个 lucide 图标
     component: YourToolPage, // 对应页面组件
+    category: 'dev', // 分类
   },
 ];
 ```

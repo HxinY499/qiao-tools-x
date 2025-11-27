@@ -8,6 +8,7 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarInset,
   SidebarMenu,
@@ -18,7 +19,7 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { toolRoutes } from '@/router';
+import { CATEGORY_LABELS, ToolCategory, toolRoutes } from '@/router';
 import { useMenuStore } from '@/store/menu';
 import { cn } from '@/utils';
 
@@ -28,14 +29,71 @@ function App() {
   const location = useLocation();
   const { pinnedPaths, togglePin, isPinned } = useMenuStore();
 
-  // 根据置顶状态排序工具路由
-  const sortedRoutes = useMemo(() => {
-    const pinned = toolRoutes.filter((route) => pinnedPaths.includes(route.path));
-    const unpinned = toolRoutes.filter((route) => !pinnedPaths.includes(route.path));
-    return [...pinned, ...unpinned];
+  // 分组逻辑
+  const groupedRoutes = useMemo(() => {
+    // 1. 先找出所有置顶的工具，它们不参与后续的分类展示
+    const pinnedRoutes = toolRoutes.filter((route) => pinnedPaths.includes(route.path));
+
+    // 2. 找出未置顶的工具，并按 category 分组
+    const unpinnedRoutes = toolRoutes.filter((route) => !pinnedPaths.includes(route.path));
+    const groups: Record<string, typeof toolRoutes> = {};
+
+    unpinnedRoutes.forEach((route) => {
+      const category = route.category;
+      if (!groups[category]) {
+        groups[category] = [];
+      }
+      groups[category].push(route);
+    });
+
+    // 3. 定义分类显示的顺序（可根据需要调整）
+    const categoryOrder: ToolCategory[] = ['image', 'css', 'dev', 'other'];
+
+    return {
+      pinned: pinnedRoutes,
+      categories: categoryOrder
+        .filter((cat) => groups[cat] && groups[cat].length > 0)
+        .map((cat) => ({
+          id: cat,
+          label: CATEGORY_LABELS[cat],
+          routes: groups[cat],
+        })),
+    };
   }, [pinnedPaths]);
 
-  const firstPath = sortedRoutes[0]?.path ?? '/';
+  // 计算默认跳转路径：如果有置顶，跳转第一个置顶；否则跳转第一个分类的第一个工具
+  const firstPath =
+    groupedRoutes.pinned.length > 0
+      ? groupedRoutes.pinned[0].path
+      : (groupedRoutes.categories[0]?.routes[0]?.path ?? '/');
+
+  const renderMenuItem = (route: (typeof toolRoutes)[0]) => {
+    const Icon = route.icon;
+    const pinned = isPinned(route.path);
+    const isActive = location.pathname === route.path;
+
+    return (
+      <SidebarMenuItem key={route.path}>
+        <SidebarMenuButton asChild isActive={isActive}>
+          <NavLink to={route.path}>
+            <Icon />
+            <span>{route.label}</span>
+          </NavLink>
+        </SidebarMenuButton>
+        <SidebarMenuAction
+          showOnHover={!pinned}
+          onClick={(e) => {
+            e.stopPropagation();
+            togglePin(route.path);
+          }}
+          className={cn(pinned && 'text-sidebar-accent-foreground')}
+          aria-label={pinned ? '取消置顶' : '置顶'}
+        >
+          <Pin className={cn('h-3.5 w-3.5 transition-transform', pinned && 'fill-current')} />
+        </SidebarMenuAction>
+      </SidebarMenuItem>
+    );
+  };
 
   return (
     <SidebarProvider>
@@ -50,38 +108,25 @@ function App() {
 
         {/* Sidebar Content */}
         <SidebarContent>
-          <SidebarGroup>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {sortedRoutes.map((route) => {
-                  const Icon = route.icon;
-                  const pinned = isPinned(route.path);
-                  const isActive = location.pathname === route.path;
-                  return (
-                    <SidebarMenuItem key={route.path}>
-                      <SidebarMenuButton asChild isActive={isActive}>
-                        <NavLink to={route.path}>
-                          <Icon />
-                          <span>{route.label}</span>
-                        </NavLink>
-                      </SidebarMenuButton>
-                      <SidebarMenuAction
-                        showOnHover={!pinned}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          togglePin(route.path);
-                        }}
-                        className={cn(pinned && 'text-sidebar-accent-foreground')}
-                        aria-label={pinned ? '取消置顶' : '置顶'}
-                      >
-                        <Pin className={cn('h-3.5 w-3.5 transition-transform', pinned && 'fill-current')} />
-                      </SidebarMenuAction>
-                    </SidebarMenuItem>
-                  );
-                })}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
+          {/* 置顶分组 - 仅当有置顶项时显示 */}
+          {groupedRoutes.pinned.length > 0 && (
+            <SidebarGroup>
+              <SidebarGroupLabel>置顶工具</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>{groupedRoutes.pinned.map((route) => renderMenuItem(route))}</SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          )}
+
+          {/* 常规分类分组 */}
+          {groupedRoutes.categories.map((category) => (
+            <SidebarGroup key={category.id}>
+              <SidebarGroupLabel>{category.label}</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>{category.routes.map((route) => renderMenuItem(route))}</SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          ))}
         </SidebarContent>
 
         {/* Sidebar Footer */}

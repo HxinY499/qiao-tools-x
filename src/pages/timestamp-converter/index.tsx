@@ -1,7 +1,8 @@
 import { format, parse } from 'date-fns';
-import { Check, Copy, RefreshCcw } from 'lucide-react';
+import { RefreshCcw } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
+import { CopyButton } from '@/components/copy-button';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -116,8 +117,6 @@ function TimestampConverterPage() {
   }
   const initialDate = initialDateRef.current!;
 
-  const copyTimerRef = useRef<number | null>(null);
-
   const [currentDate, setCurrentDate] = useState(initialDate);
   const [autoRefresh, setAutoRefresh] = useState(true);
 
@@ -126,8 +125,6 @@ function TimestampConverterPage() {
   const [converterDate, setConverterDate] = useState(initialDate);
   const [datetimeInput, setDatetimeInput] = useState(() => formatDisplayDatetime(initialDate));
   const [datetimeError, setDatetimeError] = useState('');
-
-  const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
   const timezoneLabel = useMemo(() => {
     const offsetMinutes = -new Date().getTimezoneOffset();
@@ -147,30 +144,6 @@ function TimestampConverterPage() {
     }, 1000);
     return () => window.clearInterval(timer);
   }, [autoRefresh]);
-
-  useEffect(() => {
-    return () => {
-      if (copyTimerRef.current) {
-        window.clearTimeout(copyTimerRef.current);
-      }
-    };
-  }, []);
-
-  const handleCopy = async (value: string, key: string) => {
-    if (!value) return;
-    try {
-      await navigator.clipboard.writeText(value);
-      setCopiedKey(key);
-      if (copyTimerRef.current) {
-        window.clearTimeout(copyTimerRef.current);
-      }
-      copyTimerRef.current = window.setTimeout(() => {
-        setCopiedKey((current) => (current === key ? null : current));
-      }, 1500);
-    } catch (error) {
-      console.error('复制失败', error);
-    }
-  };
 
   const handleManualCurrentDateChange = (nextDate: Date) => {
     setAutoRefresh(false);
@@ -251,21 +224,7 @@ function TimestampConverterPage() {
                   placeholder="1700000000 或 1700000000000"
                   className="font-mono"
                 />
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="sm:w-32"
-                  onClick={() => handleCopy(timestampValue, 'converter-timestamp')}
-                >
-                  {copiedKey === 'converter-timestamp' ? (
-                    <Check className="h-4 w-4" />
-                  ) : (
-                    <>
-                      <Copy className="h-4 w-4 mr-1" />
-                      复制
-                    </>
-                  )}
-                </Button>
+                <CopyButton text={timestampValue} mode="icon-text" variant="outline" size="sm" className="sm:w-32" />
               </div>
               {timestampError && <p className="text-xs text-red-500">{timestampError}</p>}
             </div>
@@ -280,21 +239,13 @@ function TimestampConverterPage() {
                   placeholder="2024-05-20 12:30:45 / 2024/05/20 / ISO 8601"
                   className="font-mono"
                 />
-                <Button
+                <CopyButton
+                  text={normalizedDatetimeText}
+                  mode="icon-text"
                   variant="outline"
                   size="sm"
                   className="sm:w-32"
-                  onClick={() => handleCopy(normalizedDatetimeText, 'converter-datetime')}
-                >
-                  {copiedKey === 'converter-datetime' ? (
-                    <Check className="h-4 w-4" />
-                  ) : (
-                    <>
-                      <Copy className="h-4 w-4 mr-1" />
-                      复制
-                    </>
-                  )}
-                </Button>
+                />
               </div>
               {datetimeError ? (
                 <p className="text-xs text-red-500">{datetimeError}</p>
@@ -315,14 +266,13 @@ function TimestampConverterPage() {
               <p className="text-sm font-medium text-muted-foreground">当前时间</p>
               <div className="flex items-center gap-2 mt-1">
                 <h2 className="text-2xl font-semibold">{format(currentDate, 'yyyy-MM-dd HH:mm:ss')}</h2>
-                <Button
+                <CopyButton
+                  text={format(currentDate, 'yyyy-MM-dd HH:mm:ss')}
+                  mode="icon"
                   variant="ghost"
                   size="icon"
                   className="h-8 w-8"
-                  onClick={() => handleCopy(format(currentDate, 'yyyy-MM-dd HH:mm:ss'), 'current-display')}
-                >
-                  {copiedKey === 'current-display' ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                </Button>
+                />
               </div>
               <p className="text-xs text-muted-foreground mt-1">
                 {timezoneLabel} {autoRefresh ? '· 自动刷新中' : '· 自动刷新已暂停'}
@@ -352,14 +302,7 @@ function TimestampConverterPage() {
                       <p className="text-xs text-muted-foreground">{item.label}</p>
                       <p className="text-sm font-mono mt-1 break-all">{value}</p>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 shrink-0"
-                      onClick={() => handleCopy(value, item.id)}
-                    >
-                      {copiedKey === item.id ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                    </Button>
+                    <CopyButton text={value} mode="icon" variant="ghost" size="icon" className="h-8 w-8 shrink-0" />
                   </div>
                 );
               })}

@@ -1,6 +1,7 @@
 import type { ChangeEvent, DragEvent } from 'react';
 import { useMemo, useState } from 'react';
 
+import { CopyButton } from '@/components/copy-button';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -86,13 +87,6 @@ function Base64ToolPage() {
     setTextError('');
     return decodeBase64ToText(compact);
   }, [textInput, textMode]);
-
-  function handleCopy(value: string) {
-    if (!value || !navigator.clipboard || !navigator.clipboard.writeText) return;
-    navigator.clipboard.writeText(value).catch((error) => {
-      console.error('Failed to copy text', error);
-    });
-  }
 
   function handleTextChange(event: ChangeEvent<HTMLTextAreaElement>) {
     setTextInput(event.target.value);
@@ -296,16 +290,16 @@ function Base64ToolPage() {
               <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between gap-2">
                   <Label className="text-xs font-medium">输出结果</Label>
-                  <Button
-                    type="button"
-                    size="sm"
+                  <CopyButton
+                    text={encodedResult}
+                    mode="text"
+                    copyText="复制结果"
+                    successText="已复制"
                     variant="secondary"
+                    size="sm"
                     className="h-7 px-2 text-[11px]"
                     disabled={!canCopyTextResult}
-                    onClick={() => handleCopy(encodedResult)}
-                  >
-                    复制结果
-                  </Button>
+                  />
                 </div>
                 <Textarea
                   value={encodedResult}
@@ -375,16 +369,16 @@ function Base64ToolPage() {
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center justify-between gap-2">
                     <Label className="text-xs font-medium">Base64 Data URL</Label>
-                    <Button
-                      type="button"
-                      size="sm"
+                    <CopyButton
+                      text={displayDataUrl}
+                      mode="text"
+                      copyText="复制"
+                      successText="已复制"
                       variant="secondary"
+                      size="sm"
                       className="h-7 px-2 text-[11px]"
-                      onClick={() => handleCopy(displayDataUrl)}
                       disabled={!canCopyDataUrl}
-                    >
-                      复制
-                    </Button>
+                    />
                   </div>
                   <Textarea value={displayDataUrl} readOnly className="min-h-[140px] text-xs bg-muted/50" />
                   <div className="mt-1 space-y-1">

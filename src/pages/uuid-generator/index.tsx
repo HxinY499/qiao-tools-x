@@ -1,7 +1,8 @@
-import { Check, Copy, History, RefreshCw, Trash2 } from 'lucide-react';
+import { Check, History, RefreshCw, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
+import { CopyButton } from '@/components/copy-button';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -42,18 +43,6 @@ function UUIDGeneratorPage() {
     addHistory(uuids);
 
     toast.success(`已生成 ${quantity} 个 UUID`);
-  };
-
-  const copyToClipboard = (text: string) => {
-    if (!text) return;
-    navigator.clipboard
-      .writeText(text)
-      .then(() => {
-        toast.success('已复制到剪贴板');
-      })
-      .catch(() => {
-        toast.error('复制失败');
-      });
   };
 
   return (
@@ -127,16 +116,15 @@ function UUIDGeneratorPage() {
                 <Check className="w-4 h-4" />
                 生成结果
               </span>
-              <Button
+              <CopyButton
+                text={generatedContent}
+                mode="icon-text"
                 variant="ghost"
                 size="sm"
-                onClick={() => copyToClipboard(generatedContent)}
                 disabled={!generatedContent}
                 className="h-8 px-2 lg:px-3"
-              >
-                <Copy className="w-4 h-4 mr-2" />
-                复制
-              </Button>
+                onCopy={() => toast.success('已复制到剪贴板')}
+              />
             </CardTitle>
           </CardHeader>
           <CardContent className="flex-1 min-h-[200px]">
@@ -184,14 +172,15 @@ function UUIDGeneratorPage() {
                         {new Date(batch.timestamp).toLocaleString()} • {batch.uuids.length} 个 UUID
                       </span>
                       <div className="flex items-center gap-1">
-                        <Button
+                        <CopyButton
+                          text={batch.uuids.join('\n')}
+                          mode="icon"
                           variant="ghost"
                           size="icon"
                           className="h-7 w-7"
-                          onClick={() => copyToClipboard(batch.uuids.join('\n'))}
-                        >
-                          <Copy className="w-3.5 h-3.5" />
-                        </Button>
+                          iconClassName="w-3.5 h-3.5"
+                          onCopy={() => toast.success('已复制到剪贴板')}
+                        />
                         <Button
                           variant="ghost"
                           size="icon"

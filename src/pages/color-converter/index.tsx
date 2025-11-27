@@ -1,8 +1,7 @@
-import { Check, Copy } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { HexAlphaColorPicker } from 'react-colorful';
 
-import { Button } from '@/components/ui/button';
+import { CopyButton } from '@/components/copy-button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -23,11 +22,6 @@ function ColorConverterPage() {
   const [hexInput, setHexInput] = useState(hexValue);
   const [hexError, setHexError] = useState('');
 
-  // 复制状态
-  const [copiedHex, setCopiedHex] = useState(false);
-  const [copiedRgb, setCopiedRgb] = useState(false);
-  const [copiedHsl, setCopiedHsl] = useState(false);
-
   // 同步 hexValue 到 hexInput
   useEffect(() => {
     setHexInput(hexValue);
@@ -44,26 +38,6 @@ function ColorConverterPage() {
       document.body.style.backgroundColor = '';
     };
   }, [color]);
-
-  // 复制到剪贴板
-  const copyToClipboard = async (text: string, type: 'hex' | 'rgb' | 'hsl') => {
-    try {
-      await navigator.clipboard.writeText(text);
-      // 设置对应的复制状态
-      if (type === 'hex') {
-        setCopiedHex(true);
-        setTimeout(() => setCopiedHex(false), 2000);
-      } else if (type === 'rgb') {
-        setCopiedRgb(true);
-        setTimeout(() => setCopiedRgb(false), 2000);
-      } else if (type === 'hsl') {
-        setCopiedHsl(true);
-        setTimeout(() => setCopiedHsl(false), 2000);
-      }
-    } catch (err) {
-      console.error('复制失败:', err);
-    }
-  };
 
   // 处理 Hex 输入变化
   const handleHexChange = (value: string) => {
@@ -168,9 +142,7 @@ function ColorConverterPage() {
           <CardContent className="p-4">
             <div className="flex justify-between items-center mb-3">
               <h3 className="text-base font-semibold">Hex</h3>
-              <Button size="sm" variant="outline" onClick={() => copyToClipboard(hexValue, 'hex')} className="h-8 px-2">
-                {copiedHex ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-              </Button>
+              <CopyButton text={hexValue} mode="icon" variant="outline" size="sm" className="h-8 px-2" />
             </div>
             <div>
               <Input
@@ -193,9 +165,7 @@ function ColorConverterPage() {
           <CardContent className="p-4">
             <div className="flex justify-between items-center mb-3">
               <h3 className="text-base font-semibold">RGB / RGBA</h3>
-              <Button size="sm" variant="outline" onClick={() => copyToClipboard(rgbaValue, 'rgb')} className="h-8 px-2">
-                {copiedRgb ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-              </Button>
+              <CopyButton text={rgbaValue} mode="icon" variant="outline" size="sm" className="h-8 px-2" />
             </div>
             <div className="p-2 rounded-lg bg-muted my-2">
               <p className="text-xs font-mono break-all">{rgbaValue}</p>
@@ -310,9 +280,7 @@ function ColorConverterPage() {
           <CardContent className="p-4">
             <div className="flex justify-between items-center mb-3">
               <h3 className="text-base font-semibold">HSL / HSLA</h3>
-              <Button size="sm" variant="outline" onClick={() => copyToClipboard(hslaValue, 'hsl')} className="h-8 px-2">
-                {copiedHsl ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-              </Button>
+              <CopyButton text={hslaValue} mode="icon" variant="outline" size="sm" className="h-8 px-2" />
             </div>
             <div className="p-2 rounded-lg bg-muted my-2">
               <p className="text-xs font-mono break-all">{hslaValue}</p>
