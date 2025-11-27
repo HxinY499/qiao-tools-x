@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
-import { CalendarClock, ImageIcon, Palette, Rainbow, ScrollText, Square } from 'lucide-react';
+import { CalendarClock, Fingerprint, ImageIcon, Palette, Rainbow, ScrollText, Square } from 'lucide-react';
 import type { ComponentType } from 'react';
 import { lazy } from 'react';
 
@@ -10,6 +10,7 @@ const BoxShadowPage = lazy(() => import('@/pages/box-shadow'));
 const GradientGeneratorPage = lazy(() => import('@/pages/gradient-generator'));
 const Base64ToolPage = lazy(() => import('@/pages/base64'));
 const TimestampConverterPage = lazy(() => import('@/pages/timestamp-converter'));
+const UUIDGeneratorPage = lazy(() => import('@/pages/uuid-generator'));
 
 export type ToolRoute = {
   path: string;
@@ -77,5 +78,13 @@ export const toolRoutes: ToolRoute[] = [
       '在文本模式下支持普通文本与 Base64 间互转，在图片模式下可将本地图片转换为 Base64 Data URL，方便内联到 CSS 或 HTML 中',
     icon: Square,
     component: Base64ToolPage,
+  },
+  {
+    path: '/uuid-generator',
+    label: 'UUID 生成器',
+    title: 'UUID Generator',
+    subtitle: '在线批量生成 UUID/GUID，支持自定义格式（大小写、连字符）与历史记录功能',
+    icon: Fingerprint,
+    component: UUIDGeneratorPage,
   },
 ];
