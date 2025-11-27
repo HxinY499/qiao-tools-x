@@ -122,7 +122,6 @@ function TimestampConverterPage() {
 
   const [timestampValue, setTimestampValue] = useState(() => formatTimestampByPrecision(initialDate, 'seconds'));
   const [timestampError, setTimestampError] = useState('');
-  const [timestampPrecision, setTimestampPrecision] = useState<TimestampPrecision>('seconds');
   const [converterDate, setConverterDate] = useState(initialDate);
   const [datetimeInput, setDatetimeInput] = useState(() => formatDisplayDatetime(initialDate));
   const [datetimeError, setDatetimeError] = useState('');
@@ -202,7 +201,6 @@ function TimestampConverterPage() {
       setTimestampError('无法解析该时间戳');
       return;
     }
-    setTimestampPrecision(nextPrecision);
     setTimestampError('');
     setConverterDate(parsedDate);
     setDatetimeError('');
@@ -227,7 +225,6 @@ function TimestampConverterPage() {
     setDatetimeError('');
     setTimestampError('');
     setConverterDate(parsed);
-    setTimestampPrecision(nextPrecision);
     setTimestampValue(formatTimestampByPrecision(parsed, nextPrecision));
     setDatetimeInput(formatDisplayDatetime(parsed));
   };

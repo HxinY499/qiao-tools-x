@@ -28,6 +28,7 @@ export default tseslint.config(
       'simple-import-sort/imports': 'warn',
       'simple-import-sort/exports': 'warn',
       'unused-imports/no-unused-imports': 'warn',
+      '@typescript-eslint/no-unused-vars': 'warn',
     },
   },
 );
