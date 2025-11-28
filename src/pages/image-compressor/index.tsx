@@ -2,14 +2,10 @@ import { type ChangeEvent, type DragEvent, useEffect, useRef, useState } from 'r
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 
-type ResizeMode = 'keep' | 'custom';
 type MessageType = 'info' | 'error' | 'success';
 
 function formatBytes(bytes: number | null | undefined) {
@@ -47,11 +43,6 @@ function ImageCompressorPage() {
 
   const [quality, setQuality] = useState(80);
   const [formatValue, setFormatValue] = useState<'auto' | 'image/jpeg' | 'image/png'>('auto');
-  const [resizeMode, setResizeMode] = useState<ResizeMode>('keep');
-  const [scalePercent, setScalePercent] = useState(100);
-  const [customWidth, setCustomWidth] = useState<number | ''>('');
-  const [customHeight, setCustomHeight] = useState<number | ''>('');
-  const [lockRatio, setLockRatio] = useState(true);
 
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -91,11 +82,6 @@ function ImageCompressorPage() {
 
     setQuality(80);
     setFormatValue('auto');
-    setResizeMode('keep');
-    setScalePercent(100);
-    setCustomWidth('');
-    setCustomHeight('');
-    setLockRatio(true);
 
     setIsProcessing(false);
     showMessage('');
@@ -177,49 +163,12 @@ function ImageCompressorPage() {
     reader.readAsDataURL(file);
   }
 
-  function computeTargetSize() {
-    if (!originalWidth || !originalHeight) return null;
-
-    let targetW = originalWidth;
-    let targetH = originalHeight;
-
-    if (resizeMode === 'keep') {
-      const clampedScale = Math.max(1, Math.min(scalePercent, 100));
-      const factor = clampedScale / 100;
-      targetW = Math.max(1, Math.round(originalWidth * factor));
-      targetH = Math.max(1, Math.round(originalHeight * factor));
-    } else {
-      const cw = typeof customWidth === 'number' ? customWidth : null;
-      const ch = typeof customHeight === 'number' ? customHeight : null;
-      if (lockRatio) {
-        if (cw) {
-          targetW = cw;
-          targetH = Math.max(1, Math.round((originalHeight / originalWidth) * targetW));
-        } else if (ch) {
-          targetH = ch;
-          targetW = Math.max(1, Math.round((originalWidth / originalHeight) * targetH));
-        }
-      } else {
-        targetW = cw || originalWidth;
-        targetH = ch || originalHeight;
-      }
-    }
-
-    // 不允许放大尺寸，目标尺寸最大不超过原图
-    targetW = Math.min(targetW, originalWidth);
-    targetH = Math.min(targetH, originalHeight);
-
-    return { width: targetW, height: targetH };
-  }
-
   async function compress(showProgress: boolean) {
     if (!originalUrl || !originalFile || !originalWidth || !originalHeight) return;
     if (isProcessing && showProgress) return;
 
-    const size = computeTargetSize();
-    if (!size) return;
-
-    const noResize = size.width === originalWidth && size.height === originalHeight;
+    const targetWidth = originalWidth;
+    const targetHeight = originalHeight;
 
     try {
       if (showProgress) {
@@ -227,8 +176,8 @@ function ImageCompressorPage() {
         showMessage('正在根据参数压缩图片，请稍候...');
       }
 
-      // 质量 100% 且不改尺寸且保持原格式：直接使用原图，不做重新编码
-      if (quality === 100 && formatValue === 'auto' && noResize) {
+      // 质量 100% 且保持原格式：直接使用原图，不做重新编码
+      if (quality === 100 && formatValue === 'auto') {
         setCompressedBlob(originalFile);
         setCompressedUrl(originalUrl);
         setCompressedSize(originalFile.size);
@@ -254,9 +203,9 @@ function ImageCompressorPage() {
       const ctx = canvas.getContext('2d');
       if (!ctx) throw new Error('no-context');
 
-      canvas.width = size.width;
-      canvas.height = size.height;
-      ctx.drawImage(image, 0, 0, size.width, size.height);
+      canvas.width = targetWidth;
+      canvas.height = targetHeight;
+      ctx.drawImage(image, 0, 0, targetWidth, targetHeight);
 
       let mimeType: string = formatValue;
       if (mimeType === 'auto') {
@@ -276,8 +225,8 @@ function ImageCompressorPage() {
 
       // 保证不会比原图更大：如果重编码后更大，则回退到原图
       let finalBlob: Blob = encodedBlob;
-      let finalWidth = size.width;
-      let finalHeight = size.height;
+      let finalWidth = targetWidth;
+      let finalHeight = targetHeight;
       let useOriginalForSize = false;
 
       if (encodedBlob.size > originalFile.size) {
@@ -336,7 +285,7 @@ function ImageCompressorPage() {
     }, 260);
     return () => window.clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [quality, formatValue, resizeMode, scalePercent, customWidth, customHeight, lockRatio, originalUrl, originalFile]);
+  }, [quality, formatValue, originalUrl, originalFile]);
 
   function handleDownload() {
     if (!compressedBlob || !originalFile) return;
@@ -449,99 +398,6 @@ function ImageCompressorPage() {
                 </SelectItem>
               </SelectContent>
             </Select>
-          </div>
-
-          <div className="rounded-lg border bg-muted/60 px-3 py-3">
-            <Label className="mb-1.5 block text-xs">尺寸调整</Label>
-
-            <div className="mb-2 flex items-center justify之间 gap-3">
-              <div className="flex items-center gap-2 text-xs">
-                <RadioGroup
-                  value={resizeMode}
-                  onValueChange={(val) => setResizeMode(val as ResizeMode)}
-                  className="flex flex-row gap-2"
-                >
-                  <div className="flex items-center gap-1.5">
-                    <RadioGroupItem value="keep" id="resize-keep" />
-                    <Label htmlFor="resize-keep" className="text-xs">
-                      按比例缩放
-                    </Label>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <RadioGroupItem value="custom" id="resize-custom" />
-                    <Label htmlFor="resize-custom" className="text-xs">
-                      自定义宽高
-                    </Label>
-                  </div>
-                </RadioGroup>
-              </div>
-            </div>
-
-            {resizeMode === 'keep' && (
-              <div className="mb-2 flex items-center justify-between gap-3">
-                <div className="flex-1 flex items-center gap-2 flex-wrap">
-                  <Slider
-                    value={[scalePercent]}
-                    min={10}
-                    max={100}
-                    step={1}
-                    onValueChange={([v]) => {
-                      setScalePercent(v);
-                      if (resizeMode !== 'keep') setResizeMode('keep');
-                    }}
-                    className="w-32"
-                  />
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground text-[11px] font-medium">
-                    缩放至 {scalePercent}%
-                  </span>
-                </div>
-              </div>
-            )}
-
-            {resizeMode === 'custom' && (
-              <div className="flex items-center justify-between gap-3 flex-wrap">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
-                    <span>宽度</span>
-                    <Input
-                      type="number"
-                      min={1}
-                      placeholder="px"
-                      value={customWidth}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        setResizeMode('custom');
-                        setCustomWidth(value ? Number(value) : '');
-                      }}
-                      className="w-20 h-7 rounded-full px-2 py-1 text-xs"
-                    />
-                  </div>
-                  <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
-                    <span>高度</span>
-                    <Input
-                      type="number"
-                      min={1}
-                      placeholder="px"
-                      value={customHeight}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        setResizeMode('custom');
-                        setCustomHeight(value ? Number(value) : '');
-                      }}
-                      className="w-20 h-7 rounded-full px-2 py-1 text-xs"
-                    />
-                  </div>
-                </div>
-                <Label className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                  <Checkbox checked={lockRatio} onCheckedChange={(v) => setLockRatio(Boolean(v))} />
-                  <span>锁定原始比例</span>
-                </Label>
-              </div>
-            )}
-
-            <p className="mt-1.5 text-[11px] leading-relaxed text-muted-foreground">
-              不确定时可仅调整质量并保持原始尺寸。
-            </p>
           </div>
         </div>
       </Card>
