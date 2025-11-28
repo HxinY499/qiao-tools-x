@@ -127,7 +127,23 @@ export function ColorPicker({ value, defaultValue, onChange, className }: ColorP
               }}
             />
           </div>
-          <div className="flex justify-end">
+          <div className="flex items-center justify-between">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="h-7 px-2 text-[11px]"
+              onClick={() => {
+                const v = 'transparent';
+                setInputValue(v);
+                if (!isControlled) {
+                  setInternalValue(v);
+                }
+                onChange?.(v);
+              }}
+            >
+              透明
+            </Button>
             <Button
               type="button"
               variant="ghost"
