@@ -9,6 +9,7 @@ import {
   Palette,
   Rainbow,
   ScrollText,
+  Shield,
   Square,
 } from 'lucide-react';
 import { lazy } from 'react';
@@ -25,6 +26,7 @@ const TimestampConverterPage = lazy(() => import('@/pages/timestamp-converter'))
 const UrlEncoderPage = lazy(() => import('@/pages/url-encoder'));
 const UUIDGeneratorPage = lazy(() => import('@/pages/uuid-generator'));
 const WordCountAndProcessPage = lazy(() => import('@/pages/word-count-and-process'));
+const PasswordGeneratorPage = lazy(() => import('@/pages/password-generator'));
 
 export const toolRoutes: ToolRoute[] = [
   {
@@ -145,6 +147,16 @@ export const toolRoutes: ToolRoute[] = [
     subtitle: '字数、字符数统计工具，支持段落、句子分析与目标字数进度追踪，支持各种格式处理',
     icon: AlignLeft,
     component: WordCountAndProcessPage,
+    category: 'text',
+  },
+  {
+    key: ToolKey.PasswordGenerator,
+    path: '/password-generator',
+    label: '密码生成器',
+    title: 'Password Generator',
+    subtitle: '根据长度与字符类型选项生成高强度随机密码，适用于网站账号和重要服务',
+    icon: Shield,
+    component: PasswordGeneratorPage,
     category: 'text',
   },
 ];

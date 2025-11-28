@@ -16,6 +16,7 @@ export enum ToolKey {
   Base64 = 'base64',
   UuidGenerator = 'uuid-generator',
   WordCount = 'word-count',
+  PasswordGenerator = 'password-generator',
 }
 
 export type ToolRoute = {
