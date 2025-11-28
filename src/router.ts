@@ -1,5 +1,5 @@
-import type { LucideIcon } from 'lucide-react';
 import {
+  AlignLeft,
   Braces,
   CalendarClock,
   Circle,
@@ -11,8 +11,9 @@ import {
   ScrollText,
   Square,
 } from 'lucide-react';
-import type { ComponentType } from 'react';
 import { lazy } from 'react';
+
+import { ToolRoute } from './type';
 
 const ImageCompressorPage = lazy(() => import('@/pages/image-compressor'));
 const ScrollBarPage = lazy(() => import('@/pages/scroll-bar'));
@@ -23,27 +24,7 @@ const Base64ToolPage = lazy(() => import('@/pages/base64'));
 const TimestampConverterPage = lazy(() => import('@/pages/timestamp-converter'));
 const UrlEncoderPage = lazy(() => import('@/pages/url-encoder'));
 const UUIDGeneratorPage = lazy(() => import('@/pages/uuid-generator'));
-
-export type ToolCategory = 'image' | 'css' | 'dev' | 'text' | 'life' | 'other';
-
-export type ToolRoute = {
-  path: string;
-  label: string;
-  title: string;
-  subtitle?: string;
-  icon: LucideIcon;
-  component: ComponentType;
-  category: ToolCategory;
-};
-
-export const CATEGORY_LABELS: Record<ToolCategory, string> = {
-  image: '图片类',
-  css: '样式类',
-  dev: '开发类',
-  text: '文本类',
-  life: '生活实用类',
-  other: '其他',
-};
+const WordCountPage = lazy(() => import('@/pages/word-count'));
 
 export const toolRoutes: ToolRoute[] = [
   {
@@ -144,5 +125,14 @@ export const toolRoutes: ToolRoute[] = [
     icon: Fingerprint,
     component: UUIDGeneratorPage,
     category: 'dev',
+  },
+  {
+    path: '/word-count',
+    label: '字数统计',
+    title: 'Word Count',
+    subtitle: '在线字数、字符数统计工具，支持段落、句子分析与目标字数进度追踪',
+    icon: AlignLeft,
+    component: WordCountPage,
+    category: 'text',
   },
 ];

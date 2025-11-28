@@ -12,8 +12,8 @@ import {
 import { useSidebar } from './components/ui/sidebar';
 import { LOADING_MESSAGES } from './constant';
 import { useIsMobile } from './hooks/use-mobile';
-import { ToolRoute } from './router';
 import { useThemeStore } from './store/theme';
+import { ToolRoute } from './type';
 import { cn } from './utils';
 
 function RouteLoadingFallback() {

@@ -19,10 +19,11 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { CATEGORY_LABELS, ToolCategory, toolRoutes } from '@/router';
+import { toolRoutes } from '@/router';
 import { useMenuStore } from '@/store/menu';
 import { cn } from '@/utils';
 
+import { CATEGORY_LABELS, CATEGORY_ORDER } from './constant';
 import { ToolPage } from './tool-page';
 
 function App() {
@@ -46,18 +47,13 @@ function App() {
       groups[category].push(route);
     });
 
-    // 3. 定义分类显示的顺序（可根据需要调整）
-    const categoryOrder: ToolCategory[] = ['image', 'css', 'dev', 'other'];
-
     return {
       pinned: pinnedRoutes,
-      categories: categoryOrder
-        .filter((cat) => groups[cat] && groups[cat].length > 0)
-        .map((cat) => ({
-          id: cat,
-          label: CATEGORY_LABELS[cat],
-          routes: groups[cat],
-        })),
+      categories: CATEGORY_ORDER.filter((cat) => groups[cat] && groups[cat].length > 0).map((cat) => ({
+        id: cat,
+        label: CATEGORY_LABELS[cat],
+        routes: groups[cat],
+      })),
     };
   }, [pinnedPaths]);
 
