@@ -141,18 +141,11 @@ function PasswordGeneratorPage() {
     [hasLowercase, hasUppercase, hasNumbers, hasSymbols],
   );
 
-  const { score: strengthScore, level: strengthLevel } = useMemo(
-    () => evaluatePasswordStrength(password),
-    [password],
-  );
+  const { score: strengthScore, level: strengthLevel } = useMemo(() => evaluatePasswordStrength(password), [password]);
 
   const strengthLabel = strengthLevel === 'strong' ? '强' : strengthLevel === 'medium' ? '中' : '弱';
   const strengthBarClassName =
-    strengthLevel === 'strong'
-      ? 'bg-emerald-500'
-      : strengthLevel === 'medium'
-        ? 'bg-amber-500'
-        : 'bg-red-500';
+    strengthLevel === 'strong' ? 'bg-emerald-500' : strengthLevel === 'medium' ? 'bg-amber-500' : 'bg-red-500';
 
   const handleGenerate = () => {
     if (disabled) {
@@ -378,9 +371,7 @@ function PasswordGeneratorPage() {
                         </Button>
                       </div>
                     </div>
-                    <div className="font-mono text-xs break-all text-muted-foreground">
-                      {item.password}
-                    </div>
+                    <div className="font-mono text-xs break-all text-muted-foreground">{item.password}</div>
                     <div className="flex flex-wrap gap-1 text-[10px] text-muted-foreground">
                       {item.hasLowercase && <span className="px-1.5 py-0.5 rounded bg-muted">小写</span>}
                       {item.hasUppercase && <span className="px-1.5 py-0.5 rounded bg-muted">大写</span>}

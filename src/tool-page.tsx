@@ -1,6 +1,7 @@
 import { Info, Laptop, Moon, Sun } from 'lucide-react';
 import { Suspense, useEffect, useState } from 'react';
 
+import { SEO } from '@/components/seo';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -54,6 +55,16 @@ export function ToolPage({ route }: { route: ToolRoute }) {
 
   return (
     <>
+      {/* SEO 组件 */}
+      {route.seo && (
+        <SEO
+          title={route.title}
+          description={route.seo.description}
+          keywords={route.seo.keywords}
+          path={route.path}
+        />
+      )}
+
       <div className="flex flex-col min-h-screen">
         {/* 页面 Header */}
         <header

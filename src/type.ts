@@ -29,4 +29,8 @@ export type ToolRoute = {
   icon: LucideIcon;
   component: ComponentType;
   category: ToolCategory;
+  seo?: {
+    description: string;
+    keywords?: string;
+  };
 };

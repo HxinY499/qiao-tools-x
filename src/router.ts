@@ -39,6 +39,11 @@ export const toolRoutes: ToolRoute[] = [
     icon: ImageIcon,
     component: ImageCompressorPage,
     category: 'image',
+    seo: {
+      description:
+        '免费在线图片压缩工具，支持 JPG、PNG、WebP 等格式，可自定义压缩质量与图片尺寸，实时预览压缩效果。所有处理在浏览器本地完成，保护您的隐私。',
+      keywords: '图片压缩,在线图片压缩,图片优化,压缩图片,图片尺寸调整,JPG压缩,PNG压缩,WebP转换',
+    },
   },
   {
     key: ToolKey.ImageWatermark,
@@ -49,6 +54,11 @@ export const toolRoutes: ToolRoute[] = [
     icon: ImageIcon,
     component: ImageWatermarkPage,
     category: 'image',
+    seo: {
+      description:
+        '免费在线图片水印工具，支持添加文字或图片水印，可自定义位置、透明度、字体和大小，批量处理图片。所有处理在本地完成，保护您的隐私。',
+      keywords: '图片水印,添加水印,在线水印工具,图片批量水印,文字水印,图片水印,水印制作',
+    },
   },
   {
     key: ToolKey.ScrollBar,
@@ -59,6 +69,11 @@ export const toolRoutes: ToolRoute[] = [
     icon: ScrollText,
     component: ScrollBarPage,
     category: 'css',
+    seo: {
+      description:
+        '可视化滚动条样式生成器，支持调整颜色、宽度、圆角等属性，实时预览效果并一键生成 CSS 代码，提升网页设计质量。',
+      keywords: 'CSS滚动条,滚动条样式,scrollbar样式,CSS生成器,自定义滚动条,网页滚动条',
+    },
   },
   {
     key: ToolKey.BoxShadow,
@@ -69,6 +84,11 @@ export const toolRoutes: ToolRoute[] = [
     icon: Square,
     component: BoxShadowPage,
     category: 'css',
+    seo: {
+      description:
+        '可视化 CSS 阴影生成器，支持多层阴影叠加，调整颜色、模糊度、偏移量等参数，实时预览并生成 CSS 和 Tailwind 代码。',
+      keywords: 'CSS阴影,box-shadow,阴影生成器,Tailwind阴影,CSS生成器,网页阴影效果',
+    },
   },
   {
     key: ToolKey.GradientGenerator,
@@ -79,6 +99,11 @@ export const toolRoutes: ToolRoute[] = [
     icon: Rainbow,
     component: GradientGeneratorPage,
     category: 'css',
+    seo: {
+      description:
+        '可视化 CSS 渐变生成器，支持线性渐变和径向渐变，多色断点调整，实时预览并生成 CSS 和 Tailwind 代码，提升网页设计效率。',
+      keywords: 'CSS渐变,渐变生成器,linear-gradient,radial-gradient,Tailwind渐变,渐变背景,CSS生成器',
+    },
   },
   {
     key: ToolKey.ColorConverter,
@@ -89,6 +114,11 @@ export const toolRoutes: ToolRoute[] = [
     icon: Palette,
     component: ColorConverterPage,
     category: 'css',
+    seo: {
+      description:
+        '免费在线颜色格式转换工具，支持 Hex、RGB、RGBA、HSL、HSLA 等格式互相转换，实时预览颜色效果，方便前端开发和设计使用。',
+      keywords: '颜色转换,Hex转RGB,RGB转Hex,HSL转换,颜色格式转换,CSS颜色,颜色代码转换',
+    },
   },
   {
     key: ToolKey.TimestampConverter,
@@ -99,6 +129,11 @@ export const toolRoutes: ToolRoute[] = [
     icon: CalendarClock,
     component: TimestampConverterPage,
     category: 'dev',
+    seo: {
+      description:
+        '在线时间戳转换工具，支持时间戳与日期时间互转，支持多种时间格式，可快速获取当前时间戳，方便开发调试。',
+      keywords: '时间戳转换,Unix时间戳,时间戳转日期,日期转时间戳,timestamp,时间格式转换',
+    },
   },
   {
     key: ToolKey.JsonFormatter,
@@ -109,6 +144,11 @@ export const toolRoutes: ToolRoute[] = [
     icon: Braces,
     component: lazy(() => import('@/pages/json-formatter')),
     category: 'dev',
+    seo: {
+      description:
+        '免费在线 JSON 格式化工具，支持 JSON 美化、压缩、语法高亮和错误检测，可本地存储 JSON 数据，提升开发效率。',
+      keywords: 'JSON格式化,JSON美化,JSON压缩,JSON验证,JSON编辑器,JSON工具',
+    },
   },
   {
     key: ToolKey.BorderRadius,
@@ -118,6 +158,11 @@ export const toolRoutes: ToolRoute[] = [
     component: lazy(() => import('./pages/border-radius')),
     icon: Circle,
     category: 'css',
+    seo: {
+      description:
+        '可视化 CSS 圆角生成器，支持独立调整四个角的圆角半径，实时预览并生成 CSS 和 Tailwind 代码，提升设计效率。',
+      keywords: 'CSS圆角,border-radius,圆角生成器,Tailwind圆角,CSS生成器,网页圆角',
+    },
   },
   {
     key: ToolKey.UrlEncoder,
@@ -128,6 +173,10 @@ export const toolRoutes: ToolRoute[] = [
     icon: Link,
     component: UrlEncoderPage,
     category: 'dev',
+    seo: {
+      description: '免费在线 URL 编码解码工具，支持 URL 参数解析和可视化展示，方便开发调试和测试。',
+      keywords: 'URL编码,URL解码,URLEncode,URLDecode,URL参数解析,网址编码',
+    },
   },
   {
     key: ToolKey.Base64,
@@ -139,6 +188,11 @@ export const toolRoutes: ToolRoute[] = [
     icon: Square,
     component: Base64ToolPage,
     category: 'dev',
+    seo: {
+      description:
+        '免费在线 Base64 编解码工具，支持文本和图片的 Base64 编码解码，可将图片转换为 Data URL，方便嵌入到 CSS 或 HTML 中。',
+      keywords: 'Base64编码,Base64解码,图片转Base64,Base64工具,DataURL,Base64图片',
+    },
   },
   {
     key: ToolKey.UuidGenerator,
@@ -149,6 +203,11 @@ export const toolRoutes: ToolRoute[] = [
     icon: Fingerprint,
     component: UUIDGeneratorPage,
     category: 'dev',
+    seo: {
+      description:
+        '免费在线 UUID 生成器，支持批量生成 UUID/GUID，可自定义格式（大小写、连字符），提供历史记录功能，方便开发使用。',
+      keywords: 'UUID生成器,GUID生成器,UUID在线生成,批量生成UUID,唯一标识符',
+    },
   },
   {
     key: ToolKey.WordCount,
@@ -159,6 +218,10 @@ export const toolRoutes: ToolRoute[] = [
     icon: AlignLeft,
     component: WordCountAndProcessPage,
     category: 'text',
+    seo: {
+      description: '免费在线字数统计工具，支持字数、字符数、段落、句子统计，目标字数进度追踪，支持多种文本格式处理。',
+      keywords: '字数统计,字符统计,文本统计,段落统计,句子统计,文本处理工具',
+    },
   },
   {
     key: ToolKey.PasswordGenerator,
@@ -169,5 +232,10 @@ export const toolRoutes: ToolRoute[] = [
     icon: Shield,
     component: PasswordGeneratorPage,
     category: 'text',
+    seo: {
+      description:
+        '免费在线密码生成器，支持自定义密码长度和字符类型，生成高强度随机密码，保护账号安全。所有处理在本地完成。',
+      keywords: '密码生成器,随机密码,强密码生成,安全密码,密码工具,在线密码生成',
+    },
   },
 ];

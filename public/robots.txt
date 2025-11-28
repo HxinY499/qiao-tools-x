@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://qiaotools.com/sitemap.xml
+
+# 禁止抓取 node_modules 等开发文件（如果部署时这些目录不存在则可忽略）
+Disallow: /node_modules/
+Disallow: /*.json$
+Disallow: /*.config.js$
