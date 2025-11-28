@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { HexAlphaColorPicker } from 'react-colorful';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/utils';
 
 export type ColorPickerProps = {
@@ -59,33 +60,18 @@ export function ColorPicker({ value, defaultValue, onChange, className }: ColorP
 
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState(currentValue);
-  const panelRef = useRef<HTMLDivElement | null>(null);
 
   // 保证 inputValue 始终和当前颜色值保持一致
   useEffect(() => {
     setInputValue(currentValue);
   }, [currentValue]);
 
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (!panelRef.current) return;
-      if (!panelRef.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    }
-    if (open) {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
-    }
-  }, [open]);
-
   const previewColor = inputValue || 'transparent';
   const pickerColor = normalizeHex(inputValue);
   const textColor = getTextColor(previewColor);
 
   return (
-    <div className={cn('relative inline-flex items-center gap-2', className)}>
-      {/* <span className="h-5 w-5 shrink-0 rounded border bg-white shadow-sm" style={{ backgroundColor: previewColor }} /> */}
+    <div className={cn('inline-flex items-center gap-2', className)}>
       <Input
         className={'h-7 text-xs'}
         style={{ backgroundColor: previewColor, color: textColor }}
@@ -100,20 +86,13 @@ export function ColorPicker({ value, defaultValue, onChange, className }: ColorP
         }}
         placeholder="#RRGGBB 或 transparent"
       />
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        className="h-7 px-2 text-[11px]"
-        onClick={() => setOpen((prev) => !prev)}
-      >
-        选择
-      </Button>
-      {open && (
-        <div
-          ref={panelRef}
-          className="absolute z-50 mt-2 right-0 rounded-md border bg-popover p-3 shadow-md flex flex-col gap-2"
-        >
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button type="button" variant="outline" size="sm" className="h-7 px-2 text-[11px]">
+            选择
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-3 flex flex-col gap-2">
           <div className="text-[11px] text-muted-foreground">取色器</div>
           <div className="[&_.react-colorful]:w-40 [&_.react-colorful]:h-40">
             <HexAlphaColorPicker
@@ -154,8 +133,8 @@ export function ColorPicker({ value, defaultValue, onChange, className }: ColorP
               关闭
             </Button>
           </div>
-        </div>
-      )}
+        </PopoverContent>
+      </Popover>
     </div>
   );
 }
