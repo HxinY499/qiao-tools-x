@@ -1,4 +1,4 @@
-import { Laptop, Moon, Sun } from 'lucide-react';
+import { Info, Laptop, Moon, Sun } from 'lucide-react';
 import { Suspense, useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -8,6 +8,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 
 import { useSidebar } from './components/ui/sidebar';
 import { LOADING_MESSAGES } from './constant';
@@ -62,6 +70,25 @@ export function ToolPage({ route }: { route: ToolRoute }) {
               {route.subtitle && <p className="text-xs text-muted-foreground mt-0.5 truncate">{route.subtitle}</p>}
             </div>
             <div className="ml-auto flex items-center gap-2 shrink-0">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-10 bg-muted/60 hover:bg-muted">
+                    <Info className="h-3.5 w-3.5" />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>数据安全说明</DialogTitle>
+                    <DialogDescription className="pt-2 space-y-2">
+                      <p>
+                        这个工具站不会往后端存储任何数据，所有数据均存储在客户端本地（如 LocalStorage、IndexedDB
+                        等），不用担心数据泄露风险。
+                      </p>
+                      <p>菜单置顶数据也保存在本地了，所以当切换浏览器或者清理缓存后指定数据会消失。</p>
+                    </DialogDescription>
+                  </DialogHeader>
+                </DialogContent>
+              </Dialog>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon" className="h-8 w-10 bg-muted/60 hover:bg-muted">

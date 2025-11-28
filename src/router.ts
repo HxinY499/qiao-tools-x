@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import { lazy } from 'react';
 
-import { ToolRoute } from './type';
+import { ToolKey, ToolRoute } from './type';
 
 const ImageCompressorPage = lazy(() => import('@/pages/image-compressor'));
 const ScrollBarPage = lazy(() => import('@/pages/scroll-bar'));
@@ -24,10 +24,11 @@ const Base64ToolPage = lazy(() => import('@/pages/base64'));
 const TimestampConverterPage = lazy(() => import('@/pages/timestamp-converter'));
 const UrlEncoderPage = lazy(() => import('@/pages/url-encoder'));
 const UUIDGeneratorPage = lazy(() => import('@/pages/uuid-generator'));
-const WordCountPage = lazy(() => import('@/pages/word-count'));
+const WordCountAndProcessPage = lazy(() => import('@/pages/word-count-and-process'));
 
 export const toolRoutes: ToolRoute[] = [
   {
+    key: ToolKey.ImageCompressor,
     path: '/image-compressor',
     label: '图片压缩工具',
     title: 'Image Compressor',
@@ -37,6 +38,7 @@ export const toolRoutes: ToolRoute[] = [
     category: 'image',
   },
   {
+    key: ToolKey.ScrollBar,
     path: '/scroll-bar',
     label: '滚动条生成器',
     title: 'Scorllbar Style Generator',
@@ -46,6 +48,7 @@ export const toolRoutes: ToolRoute[] = [
     category: 'css',
   },
   {
+    key: ToolKey.BoxShadow,
     path: '/box-shadow',
     label: '阴影生成器',
     title: 'Box Shadow Generator',
@@ -55,6 +58,7 @@ export const toolRoutes: ToolRoute[] = [
     category: 'css',
   },
   {
+    key: ToolKey.GradientGenerator,
     path: '/gradient-generator',
     label: '渐变生成器',
     title: 'CSS Gradient Generator',
@@ -64,6 +68,7 @@ export const toolRoutes: ToolRoute[] = [
     category: 'css',
   },
   {
+    key: ToolKey.ColorConverter,
     path: '/color-converter',
     label: '颜色格式转换',
     title: 'Color Converter',
@@ -73,6 +78,7 @@ export const toolRoutes: ToolRoute[] = [
     category: 'css',
   },
   {
+    key: ToolKey.TimestampConverter,
     path: '/timestamp-converter',
     label: '时间戳转换',
     title: 'Timestamp Converter',
@@ -82,15 +88,17 @@ export const toolRoutes: ToolRoute[] = [
     category: 'dev',
   },
   {
+    key: ToolKey.JsonFormatter,
     path: '/json-formatter',
     label: 'JSON 格式化',
     title: 'JSON Formatter',
-    subtitle: 'JSON 美化、压缩、语法高亮与错误检测工具',
+    subtitle: 'JSON 美化、压缩、语法高亮与错误检测工具，也可以存储 JSON',
     icon: Braces,
     component: lazy(() => import('@/pages/json-formatter')),
     category: 'dev',
   },
   {
+    key: ToolKey.BorderRadius,
     path: '/border-radius',
     title: 'Border Radius Generator',
     label: '圆角生成器',
@@ -99,6 +107,7 @@ export const toolRoutes: ToolRoute[] = [
     category: 'css',
   },
   {
+    key: ToolKey.UrlEncoder,
     path: '/url-encoder',
     label: 'URL 编解码',
     title: 'URL Encoder / Decoder',
@@ -108,6 +117,7 @@ export const toolRoutes: ToolRoute[] = [
     category: 'dev',
   },
   {
+    key: ToolKey.Base64,
     path: '/base64',
     label: 'Base64 编解码',
     title: 'Base64 编解码',
@@ -118,6 +128,7 @@ export const toolRoutes: ToolRoute[] = [
     category: 'dev',
   },
   {
+    key: ToolKey.UuidGenerator,
     path: '/uuid-generator',
     label: 'UUID 生成器',
     title: 'UUID Generator',
@@ -127,12 +138,13 @@ export const toolRoutes: ToolRoute[] = [
     category: 'dev',
   },
   {
+    key: ToolKey.WordCount,
     path: '/word-count',
-    label: '字数统计',
-    title: 'Word Count',
-    subtitle: '在线字数、字符数统计工具，支持段落、句子分析与目标字数进度追踪',
+    label: '文本处理和字数统计',
+    title: 'Text Process Word Count',
+    subtitle: '字数、字符数统计工具，支持段落、句子分析与目标字数进度追踪，支持各种格式处理',
     icon: AlignLeft,
-    component: WordCountPage,
+    component: WordCountAndProcessPage,
     category: 'text',
   },
 ];

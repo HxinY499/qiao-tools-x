@@ -69,9 +69,9 @@ export function SaveJsonDialog({ content, onSaved, disabled }: SaveJsonDialogPro
         <Tooltip>
           <TooltipTrigger asChild>
             <DialogTrigger asChild>
-              <Button size="sm" variant="outline" className="h-8 gap-2" disabled={disabled}>
+              <Button size="sm" variant="outline" className="h-8 gap-2 px-2 xl:px-3" disabled={disabled} title="保存">
                 <Save className="h-3.5 w-3.5" />
-                保存
+                <span className="hidden xl:inline">保存</span>
               </Button>
             </DialogTrigger>
           </TooltipTrigger>

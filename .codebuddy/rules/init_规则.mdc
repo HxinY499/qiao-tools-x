@@ -232,7 +232,18 @@ export default YourToolPage;
 - **Zustand 持久化命名规范**: 如果使用了 `persist` 中间件，`name` 属性必须严格遵循 `qiao-tools-x-persist-[tool-name]` 格式（例如 `qiao-tools-x-persist-uuid-generator`），以避免命名冲突并保持统一。
 - **必须确保工具在亮色和暗色模式下都能完美显示**，使用语义化的 Tailwind 类名（如 `bg-card`、`text-foreground`）而非硬编码颜色。
 
-## 2. 在 router 中注册工具信息
+## 2. 定义工具 Key
+
+1. 打开 `src/type.ts`，在 `ToolKey` 枚举中添加新的 Key：
+
+```ts
+export enum ToolKey {
+  // ...
+  YourTool = 'your-tool', // 新增
+}
+```
+
+## 3. 在 router 中注册工具信息
 
 1. 打开 `src/router.ts`：
    - 路径：`src/router.ts`
@@ -242,6 +253,7 @@ export default YourToolPage;
 ```ts
 import type { LucideIcon } from 'lucide-react';
 import { ImageIcon, ScrollText } from 'lucide-react';
+import { ToolKey } from '@/type';
 import ImageCompressorPage from '@/pages/image-compressor';
 import ScrollBarPage from '@/pages/scroll-bar';
 import YourToolPage from '@/pages/your-tool'; // 新增
@@ -251,6 +263,7 @@ import YourToolPage from '@/pages/your-tool'; // 新增
 
 ```ts
 export type ToolRoute = {
+  key: ToolKey; // 工具唯一标识
   path: string; // 路由路径 & 左侧 NavLink 的 to
   label: string; // 左侧菜单显示的名称
   title: string; // 右侧工具页 Header 大标题
@@ -266,6 +279,7 @@ export type ToolRoute = {
 ```ts
 export const toolRoutes: ToolRoute[] = [
   {
+    key: ToolKey.YourTool,
     path: '/your-tool', // 新工具路由
     label: '你的工具名称', // 左侧菜单文案
     title: 'Your Tool Title', // 右侧大标题

@@ -2,7 +2,24 @@ import type { LucideIcon } from 'lucide-react';
 import { ComponentType } from 'react';
 
 export type ToolCategory = 'image' | 'css' | 'dev' | 'text' | 'life' | 'other';
+
+export enum ToolKey {
+  ImageCompressor = 'image-compressor',
+  ScrollBar = 'scroll-bar',
+  BoxShadow = 'box-shadow',
+  GradientGenerator = 'gradient-generator',
+  ColorConverter = 'color-converter',
+  TimestampConverter = 'timestamp-converter',
+  JsonFormatter = 'json-formatter',
+  BorderRadius = 'border-radius',
+  UrlEncoder = 'url-encoder',
+  Base64 = 'base64',
+  UuidGenerator = 'uuid-generator',
+  WordCount = 'word-count',
+}
+
 export type ToolRoute = {
+  key: ToolKey;
   path: string;
   label: string;
   title: string;

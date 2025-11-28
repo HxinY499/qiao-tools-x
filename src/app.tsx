@@ -18,6 +18,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from '@/components/ui/sidebar';
+import { Toaster } from '@/components/ui/sonner';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { toolRoutes } from '@/router';
 import { useMenuStore } from '@/store/menu';
@@ -158,6 +159,7 @@ function App() {
           <Route path="*" element={<Navigate to={firstPath} replace />} />
         </Routes>
       </SidebarInset>
+      <Toaster />
     </SidebarProvider>
   );
 }

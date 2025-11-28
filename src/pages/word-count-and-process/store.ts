@@ -18,6 +18,6 @@ export const useWordCountStore = create<WordCountState>()(
     }),
     {
       name: 'qiao-tools-x-persist-word-count',
-    }
-  )
+    },
+  ),
 );

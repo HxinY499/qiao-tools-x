@@ -1,5 +1,5 @@
 import { defaultTheme, githubDarkTheme, JsonEditor } from 'json-edit-react';
-import { Braces, FileJson, Maximize2, Minimize2, XCircle } from 'lucide-react';
+import { Braces, FileJson, Maximize2, Minimize2, Trash2, XCircle } from 'lucide-react';
 import { useState } from 'react';
 
 import { CodeArea } from '@/components/code-area';
@@ -68,24 +68,28 @@ export default function JsonFormatterPage() {
   };
 
   return (
-    <div className="container mx-auto p-2 lg:p-4 h-[calc(100vh-4rem)] flex flex-col gap-2 lg:gap-4">
+    <div className="container mx-auto p-2 lg:p-4 lg:h-[calc(100vh-4rem)] flex flex-col gap-2 lg:gap-4">
       <div
         className={cn(
-          'grid gap-2 lg:gap-4 h-full transition-all duration-300',
+          'grid gap-2 lg:gap-4 lg:h-full transition-all duration-300',
           isExpanded ? 'grid-cols-1' : 'grid-cols-1 lg:grid-cols-2',
         )}
       >
         {/* Input Section */}
         <Card
           className={cn(
-            'flex flex-col p-3 lg:p-4 gap-3 lg:gap-4 h-full transition-all duration-300',
+            'flex flex-col p-3 lg:p-4 gap-3 lg:gap-4 transition-all duration-300',
+            // 移动端给固定高度，方便输入；桌面端撑满
+            'h-[400px] lg:h-full',
             isExpanded ? 'hidden' : 'flex',
           )}
         >
           <header className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <FileJson className="h-5 w-5 text-muted-foreground" />
-              <h2 className="font-medium text-sm text-muted-foreground uppercase tracking-wider">输入 JSON</h2>
+              <h2 className="font-medium text-sm text-muted-foreground uppercase tracking-wider hidden md:block">
+                输入 JSON
+              </h2>
             </div>
             <div className="flex items-center gap-2">
               <SaveJsonDialog content={input} disabled={!input.trim() || !!error} />
@@ -99,17 +103,19 @@ export default function JsonFormatterPage() {
                   setJsonData(null);
                   setError(null);
                 }}
-                className="h-8"
+                className="h-8 px-2 xl:px-3"
+                title="清空"
               >
-                清空
+                <Trash2 className="h-3.5 w-3.5 xl:hidden" />
+                <span className="hidden xl:inline">清空</span>
               </Button>
-              <Button size="sm" onClick={() => processJson(true)} className="h-8 gap-2">
+              <Button size="sm" onClick={() => processJson(true)} className="h-8 gap-2 px-2 xl:px-3" title="压缩">
                 <Minimize2 className="h-3.5 w-3.5" />
-                压缩
+                <span className="hidden xl:inline">压缩</span>
               </Button>
-              <Button size="sm" onClick={() => processJson(false)} className="h-8 gap-2">
+              <Button size="sm" onClick={() => processJson(false)} className="h-8 gap-2 px-2 xl:px-3" title="格式化">
                 <Braces className="h-3.5 w-3.5" />
-                格式化
+                <span className="hidden xl:inline">格式化</span>
               </Button>
             </div>
           </header>
@@ -135,11 +141,13 @@ export default function JsonFormatterPage() {
         </Card>
 
         {/* Output Section */}
-        <Card className="flex flex-col p-3 lg:p-4 gap-3 lg:gap-4 h-full min-h-[300px]">
+        <Card className="flex flex-col p-3 lg:p-4 gap-3 lg:gap-4 h-[500px] lg:h-full min-h-[300px]">
           <header className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Braces className="h-5 w-5 text-muted-foreground" />
-              <h2 className="font-medium text-sm text-muted-foreground uppercase tracking-wider">格式化结果</h2>
+              <h2 className="font-medium text-sm text-muted-foreground uppercase tracking-wider hidden md:block">
+                格式化结果
+              </h2>
             </div>
             <div className="flex items-center gap-1">
               <JsonSettings />
