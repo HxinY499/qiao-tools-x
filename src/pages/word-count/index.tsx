@@ -20,7 +20,7 @@ const calculateReadingTime = (cjkCount: number, nonCjkCount: number) => {
   const ceilMinutes = Math.ceil(minutes);
 
   return {
-    text: ceilMinutes < 1 ? 'Less than 1 min' : `${ceilMinutes} min`,
+    text: ceilMinutes < 1 ? '少于 1 分钟' : `${ceilMinutes} 分钟`,
     minutes,
   };
 };
@@ -118,11 +118,11 @@ export default function WordCountPage() {
     <div className="max-w-5xl w-full mx-auto px-4 pb-5 lg:py-8 space-y-6">
       {/* 统计卡片区 */}
       <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
-        <StatCard title="字数" value={stats.words} sub="Words" />
+        <StatCard title="字数" value={stats.words} />
         <StatCard title="字符数" value={stats.chars} sub={`无空格: ${stats.charsNoSpaces}`} />
-        <StatCard title="阅读时间" value={stats.readingTime.text} sub="Reading Time" />
-        <StatCard title="段落" value={stats.paragraphs} sub="Paragraphs" />
-        <StatCard title="句子" value={stats.sentences} sub="Sentences" />
+        <StatCard title="阅读时间" value={stats.readingTime.text} />
+        <StatCard title="段落" value={stats.paragraphs} />
+        <StatCard title="句子" value={stats.sentences} />
       </div>
 
       {/* 目标设定 & 进度条 */}
