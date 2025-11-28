@@ -33,7 +33,7 @@ pnpm lint         # 运行 ESLint 并自动修复问题
   - `title/subtitle`: 页面标题与副标题
   - `icon`: Lucide React 图标
   - `component`: 懒加载的页面组件
-  - `category`: 工具分类 (image, css, dev, other)
+  - `category`: 工具分类
 
 ### 添加新工具的步骤
 

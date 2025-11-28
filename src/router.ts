@@ -24,7 +24,7 @@ const TimestampConverterPage = lazy(() => import('@/pages/timestamp-converter'))
 const UrlEncoderPage = lazy(() => import('@/pages/url-encoder'));
 const UUIDGeneratorPage = lazy(() => import('@/pages/uuid-generator'));
 
-export type ToolCategory = 'image' | 'css' | 'dev' | 'other';
+export type ToolCategory = 'image' | 'css' | 'dev' | 'text' | 'life' | 'other';
 
 export type ToolRoute = {
   path: string;
@@ -37,10 +37,12 @@ export type ToolRoute = {
 };
 
 export const CATEGORY_LABELS: Record<ToolCategory, string> = {
-  image: '图片工具',
-  css: '样式工具',
-  dev: '开发工具',
-  other: '其他工具',
+  image: '图片类',
+  css: '样式类',
+  dev: '开发类',
+  text: '文本类',
+  life: '生活实用类',
+  other: '其他',
 };
 
 export const toolRoutes: ToolRoute[] = [
