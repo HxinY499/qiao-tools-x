@@ -59,6 +59,7 @@ function ImageCompressorPage() {
   const [originalHeight, setOriginalHeight] = useState<number | null>(null);
   const [originalType, setOriginalType] = useState<string | null>(null);
   const [originalPlaceholder, setOriginalPlaceholder] = useState('上传后在此处显示原图预览');
+  const [hasAlpha, setHasAlpha] = useState<boolean | null>(null);
 
   const [compressedBlob, setCompressedBlob] = useState<Blob | null>(null);
   const [compressedUrl, setCompressedUrl] = useState<string | null>(null);
@@ -91,6 +92,7 @@ function ImageCompressorPage() {
     setOriginalHeight(null);
     setOriginalType(null);
     setOriginalPlaceholder('上传后在此处显示原图预览');
+    setHasAlpha(null);
 
     setCompressedBlob(null);
     setCompressedUrl(null);
@@ -134,16 +136,10 @@ function ImageCompressorPage() {
 
         // PNG 智能提示逻辑
         if (file.type === 'image/png') {
-          const hasAlpha = await checkImageHasAlpha(url);
-          if (hasAlpha) {
-            toast.warning('你上传的是 PNG 图片，并且检测到透明背景，建议保持 PNG 格式或选择 WebP 以减小体积', {
-              duration: 5000,
-            });
-          } else {
-            toast.info('你上传的是 PNG 图片，但未检测到透明背景，建议切换为 JPEG 或 WebP 格式以大幅减小体积', {
-              duration: 5000,
-            });
-          }
+          const alphaDetected = await checkImageHasAlpha(url);
+          setHasAlpha(alphaDetected);
+        } else {
+          setHasAlpha(null);
         }
       };
       img.onerror = () => {
@@ -374,6 +370,31 @@ function ImageCompressorPage() {
                 </SelectItem>
               </SelectContent>
             </Select>
+            {(() => {
+              // 计算当前实际输出格式
+              const currentFormat = formatValue === 'auto' ? originalType : formatValue;
+              // 只有原图是 PNG 且检测过透明度，并且当前格式也是 PNG 时才显示提示
+              if (originalType === 'image/png' && hasAlpha !== null && currentFormat === 'image/png') {
+                return (
+                  <div className="mt-2 rounded-md bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 px-3 py-2">
+                    <p className="text-[11px] leading-relaxed text-blue-700 dark:text-blue-300">
+                      {hasAlpha ? (
+                        <>
+                          💡 你上传了 <strong>PNG</strong> 图片，检测到透明背景，建议保持 <strong>PNG</strong>{' '}
+                          格式或切换为 <strong>WebP</strong> 以减小体积
+                        </>
+                      ) : (
+                        <>
+                          💡 你上传了 <strong>PNG</strong> 图片，但未检测到透明背景，建议切换为 <strong>JPEG</strong> 或{' '}
+                          <strong>WebP</strong> 格式以大幅减小体积
+                        </>
+                      )}
+                    </p>
+                  </div>
+                );
+              }
+              return null;
+            })()}
           </div>
         </div>
       </Card>
@@ -470,7 +491,6 @@ function ImageCompressorPage() {
           <div className="mt-2 border-t border-border pt-3">
             <h3 className="text-xs font-semibold mb-2">使用说明与注意事项</h3>
             <ul className="list-disc pl-4 text-[11px] text-muted-foreground space-y-1">
-              <li>本工具在浏览器本地完成压缩处理，图片不会上传到服务器，安全可靠。</li>
               <li>质量过低会导致明显失真，建议逐步调节并通过右侧预览对比效果。</li>
               <li>PNG 格式适合保留透明背景但不支持质量调节，JPEG 更适合照片类图片，WebP 兼顾两者优势。</li>
               <li>超大尺寸图片压缩可能耗时稍长，请耐心等待进度提示。</li>
