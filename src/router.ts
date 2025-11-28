@@ -9,6 +9,7 @@ import {
   Palette,
   Rainbow,
   ScrollText,
+  Shield,
   Square,
 } from 'lucide-react';
 import { lazy } from 'react';
@@ -159,14 +160,14 @@ export const toolRoutes: ToolRoute[] = [
     component: WordCountAndProcessPage,
     category: 'text',
   },
-  // {
-  //   key: ToolKey.PasswordGenerator,
-  //   path: '/password-generator',
-  //   label: '密码生成器',
-  //   title: 'Password Generator',
-  //   subtitle: '根据长度与字符类型选项生成高强度随机密码，适用于网站账号和重要服务',
-  //   icon: Shield,
-  //   component: PasswordGeneratorPage,
-  //   category: 'text',
-  // },
+  {
+    key: ToolKey.PasswordGenerator,
+    path: '/password-generator',
+    label: '密码生成器',
+    title: 'Password Generator',
+    subtitle: '根据长度与字符类型选项生成高强度随机密码，适用于网站账号和重要服务',
+    icon: Shield,
+    component: PasswordGeneratorPage,
+    category: 'text',
+  },
 ];
