@@ -1,7 +1,10 @@
-import type { ChangeEvent, DragEvent } from 'react';
+import type { ChangeEvent } from 'react';
 import { useMemo, useState } from 'react';
+import { toast } from 'sonner';
 
 import { CopyButton } from '@/components/copy-button';
+import { FileDragUploader } from '@/components/file-drag-uploader';
+import { Image as ImageComponent } from '@/components/image';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -9,7 +12,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
-import { ImagePreview } from '@/pages/base64/image-preview';
 import { PasteImageDialog } from '@/pages/base64/paste-image-dialog';
 
 function encodeTextToBase64(value: string): string {
@@ -44,9 +46,7 @@ function Base64ToolPage() {
   const [textInput, setTextInput] = useState('');
   const [textError, setTextError] = useState('');
 
-  const [dragOver, setDragOver] = useState(false);
   const [fileName, setFileName] = useState('尚未选择图片文件');
-  const [fileError, setFileError] = useState('');
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   const [dataUrl, setDataUrl] = useState('');
   const [stripDataUrlPrefix, setStripDataUrlPrefix] = useState(false);
@@ -92,44 +92,10 @@ function Base64ToolPage() {
     setTextInput(event.target.value);
   }
 
-  function handleFileInputChange(event: ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    processFile(file);
-  }
-
-  function handleDrop(event: DragEvent<HTMLDivElement>) {
-    event.preventDefault();
-    event.stopPropagation();
-    setDragOver(false);
-    const file = event.dataTransfer.files?.[0];
-    if (!file) return;
-    processFile(file);
-  }
-
-  function handleDragOver(event: DragEvent<HTMLDivElement>) {
-    event.preventDefault();
-    event.stopPropagation();
-    if (!dragOver) setDragOver(true);
-  }
-
-  function handleDragLeave(event: DragEvent<HTMLDivElement>) {
-    event.preventDefault();
-    event.stopPropagation();
-    setDragOver(false);
-  }
-
   function processFile(file: File) {
-    setFileError('');
-
-    if (!file.type.startsWith('image/')) {
-      setFileError('请选择图片文件（如 PNG、JPG 等）');
-      return;
-    }
-
     const fileSizeLimit = 8 * 1024 * 1024;
     if (file.size > fileSizeLimit) {
-      setFileError('图片过大，请选择 8MB 以内的文件');
+      toast.error('图片过大，请选择 8MB 以内的文件');
       return;
     }
 
@@ -139,18 +105,17 @@ function Base64ToolPage() {
     reader.onload = () => {
       const result = reader.result;
       if (typeof result !== 'string') {
-        setFileError('读取图片失败，请重试或更换文件');
+        toast.error('读取图片失败，请重试或更换文件');
         setImagePreviewUrl(null);
         setDataUrl('');
         return;
       }
       setImagePreviewUrl(result);
       setDataUrl(result);
-      setFileError('');
     };
 
     reader.onerror = () => {
-      setFileError('读取图片失败，请重试或更换文件');
+      toast.error('读取图片失败，请重试或更换文件');
       setImagePreviewUrl(null);
       setDataUrl('');
     };
@@ -167,14 +132,12 @@ function Base64ToolPage() {
     setImagePreviewUrl(null);
     setDataUrl('');
     setFileName('尚未选择图片文件');
-    setFileError('');
   }
 
   function handleImageFromBase64(imageUrl: string, description: string) {
     setImagePreviewUrl(imageUrl);
     setDataUrl(imageUrl);
     setFileName(description);
-    setFileError('');
   }
 
   const isTextToBase64 = textMode === 'text-to-base64';
@@ -329,35 +292,21 @@ function Base64ToolPage() {
                     清空当前图片
                   </Button>
                 </div>
-                <div
-                  className={`relative border border-dashed rounded-lg bg-muted/60 px-4 py-6 sm:py-8 flex flex-col items-center justify-center gap-2 text-center cursor-pointer transition-colors ${
-                    dragOver ? 'border-primary/60 bg-muted/80' : 'border-border'
-                  }`}
-                  onDrop={handleDrop}
-                  onDragOver={handleDragOver}
-                  onDragEnter={handleDragOver}
-                  onDragLeave={handleDragLeave}
-                  onClick={() => {
-                    const inputElement = document.getElementById('base64-image-input') as HTMLInputElement | null;
-                    if (inputElement) inputElement.click();
+                <FileDragUploader
+                  onFileSelect={processFile}
+                  onError={(error) => toast.error(error)}
+                  validation={{
+                    accept: ['image/*'],
+                    maxSize: 8 * 1024 * 1024,
                   }}
-                >
-                  <div className="text-3xl mb-1">🖼️</div>
-                  <p className="text-sm font-medium">拖拽图片到此处，或点击选择文件</p>
-                  <p className="text-[11px] text-muted-foreground">
-                    支持常见图片格式（PNG / JPG / JPEG / GIF 等），单张不超过 8MB。
-                  </p>
-                  <Input
-                    id="base64-image-input"
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleFileInputChange}
-                  />
-                </div>
-                <p className={`text-[11px] mt-1 ${fileError ? 'text-destructive' : 'text-muted-foreground'}`}>
-                  {fileError || fileName}
-                </p>
+                  className="border-dashed bg-muted/60 px-4 py-6 sm:py-8"
+                  icon="🖼️"
+                  title="拖拽图片到此处，或点击选择文件"
+                  hint="支持常见图片格式（PNG / JPG / JPEG / GIF 等），单张不超过 8MB。"
+                  showButton={false}
+                  accept="image/*"
+                />
+                <p className={`text-[11px] mt-1 text-muted-foreground`}>{fileName}</p>
                 <div className="mt-3 flex items-center justify-between gap-2">
                   <PasteImageDialog onConfirm={handleImageFromBase64} />
                 </div>
@@ -365,7 +314,14 @@ function Base64ToolPage() {
 
               <div className="flex flex-col gap-3">
                 <Label className="text-xs font-medium">预览与 Data URL</Label>
-                <ImagePreview imageUrl={imagePreviewUrl} placeholder="预览" />
+                <ImageComponent
+                  src={imagePreviewUrl}
+                  alt="图片预览"
+                  placeholder="预览"
+                  canPreview
+                  imgClassName="max-h-60 max-w-full object-contain"
+                  className="p-3"
+                />
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center justify-between gap-2">
                     <Label className="text-xs font-medium">Base64 Data URL</Label>

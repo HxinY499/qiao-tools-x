@@ -5,6 +5,7 @@ export type ToolCategory = 'image' | 'css' | 'dev' | 'text' | 'life' | 'other';
 
 export enum ToolKey {
   ImageCompressor = 'image-compressor',
+  ImageWatermark = 'image-watermark',
   ScrollBar = 'scroll-bar',
   BoxShadow = 'box-shadow',
   GradientGenerator = 'gradient-generator',

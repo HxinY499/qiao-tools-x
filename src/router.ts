@@ -9,7 +9,6 @@ import {
   Palette,
   Rainbow,
   ScrollText,
-  Shield,
   Square,
 } from 'lucide-react';
 import { lazy } from 'react';
@@ -17,6 +16,7 @@ import { lazy } from 'react';
 import { ToolKey, ToolRoute } from './type';
 
 const ImageCompressorPage = lazy(() => import('@/pages/image-compressor'));
+const ImageWatermarkPage = lazy(() => import('@/pages/image-watermark'));
 const ScrollBarPage = lazy(() => import('@/pages/scroll-bar'));
 const ColorConverterPage = lazy(() => import('@/pages/color-converter'));
 const BoxShadowPage = lazy(() => import('@/pages/box-shadow'));
@@ -32,11 +32,21 @@ export const toolRoutes: ToolRoute[] = [
   {
     key: ToolKey.ImageCompressor,
     path: '/image-compressor',
-    label: '图片压缩工具',
+    label: '图片压缩',
     title: 'Image Compressor',
     subtitle: '在线图片压缩与尺寸调整工具，支持实时预览与参数调节',
     icon: ImageIcon,
     component: ImageCompressorPage,
+    category: 'image',
+  },
+  {
+    key: ToolKey.ImageWatermark,
+    path: '/image-watermark',
+    label: '图片水印添加',
+    title: 'Image Watermark',
+    subtitle: '在图片上添加文字或图片水印，支持位置、透明度、字体和大小调节，处理全程在本地完成',
+    icon: ImageIcon,
+    component: ImageWatermarkPage,
     category: 'image',
   },
   {
@@ -149,14 +159,14 @@ export const toolRoutes: ToolRoute[] = [
     component: WordCountAndProcessPage,
     category: 'text',
   },
-  {
-    key: ToolKey.PasswordGenerator,
-    path: '/password-generator',
-    label: '密码生成器',
-    title: 'Password Generator',
-    subtitle: '根据长度与字符类型选项生成高强度随机密码，适用于网站账号和重要服务',
-    icon: Shield,
-    component: PasswordGeneratorPage,
-    category: 'text',
-  },
+  // {
+  //   key: ToolKey.PasswordGenerator,
+  //   path: '/password-generator',
+  //   label: '密码生成器',
+  //   title: 'Password Generator',
+  //   subtitle: '根据长度与字符类型选项生成高强度随机密码，适用于网站账号和重要服务',
+  //   icon: Shield,
+  //   component: PasswordGeneratorPage,
+  //   category: 'text',
+  // },
 ];

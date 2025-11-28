@@ -1,12 +1,14 @@
-import { type ChangeEvent, type DragEvent, useEffect, useRef, useState } from 'react';
+import { Image as ImageIcon } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
+import { FileDragUploader } from '@/components/file-drag-uploader';
+import { Image as ImageComponent } from '@/components/image';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
-
-type MessageType = 'info' | 'error' | 'success';
 
 function formatBytes(bytes: number | null | undefined) {
   if (!bytes) return '-';
@@ -17,15 +19,39 @@ function formatBytes(bytes: number | null | undefined) {
   return `${value.toFixed(index === 0 ? 0 : 2)} ${units[index]}`;
 }
 
+async function checkImageHasAlpha(imageUrl: string): Promise<boolean> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        resolve(false);
+        return;
+      }
+
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0);
+
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const data = imageData.data;
+
+      // 检查是否有任何像素的 alpha 通道不是 255（完全不透明）
+      for (let i = 3; i < data.length; i += 4) {
+        if (data[i] < 255) {
+          resolve(true);
+          return;
+        }
+      }
+      resolve(false);
+    };
+    img.onerror = () => resolve(false);
+    img.src = imageUrl;
+  });
+}
+
 function ImageCompressorPage() {
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-
-  const [isDragOver, setIsDragOver] = useState(false);
-  const [uploadStatus, setUploadStatus] = useState('尚未选择图片');
-
-  const [message, setMessage] = useState('');
-  const [messageType, setMessageType] = useState<MessageType>('info');
-
   const [originalFile, setOriginalFile] = useState<File | null>(null);
   const [originalUrl, setOriginalUrl] = useState<string | null>(null);
   const [originalSize, setOriginalSize] = useState<number | null>(null);
@@ -41,10 +67,10 @@ function ImageCompressorPage() {
   const [compressedHeight, setCompressedHeight] = useState<number | null>(null);
   const [compressedPlaceholder, setCompressedPlaceholder] = useState('调整参数并执行压缩后显示效果');
 
-  const [quality, setQuality] = useState(80);
-  const [formatValue, setFormatValue] = useState<'auto' | 'image/jpeg' | 'image/png'>('auto');
+  const [formatValue, setFormatValue] = useState<'auto' | 'image/jpeg' | 'image/png' | 'image/webp'>('auto');
 
   const [isProcessing, setIsProcessing] = useState(false);
+  const [quality, setQuality] = useState(80);
 
   useEffect(() => {
     return () => {
@@ -53,11 +79,6 @@ function ImageCompressorPage() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  function showMessage(text: string, type: MessageType = 'info') {
-    setMessage(text);
-    setMessageType(type);
-  }
 
   function resetAll() {
     if (originalUrl) URL.revokeObjectURL(originalUrl);
@@ -78,50 +99,15 @@ function ImageCompressorPage() {
     setCompressedHeight(null);
     setCompressedPlaceholder('调整参数并执行压缩后显示效果');
 
-    setUploadStatus('尚未选择图片');
-
     setQuality(80);
     setFormatValue('auto');
 
     setIsProcessing(false);
-    showMessage('');
   }
 
-  function handleFileChange(e: ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    handleFile(file);
-  }
-
-  function handleDrop(e: DragEvent<HTMLDivElement>) {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragOver(false);
-    const file = e.dataTransfer.files?.[0];
-    handleFile(file);
-  }
-
-  function handleDragOver(e: DragEvent<HTMLDivElement>) {
-    e.preventDefault();
-    e.stopPropagation();
-    if (!isDragOver) setIsDragOver(true);
-  }
-
-  function handleDragLeave(e: DragEvent<HTMLDivElement>) {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragOver(false);
-  }
-
-  function handleFile(file: File | undefined) {
-    if (!file) return;
-
-    if (!file.type.startsWith('image/')) {
-      showMessage('请选择图片文件（JPG / PNG 等）', 'error');
-      return;
-    }
-
+  function handleFile(file: File) {
     if (file.size > 20 * 1024 * 1024) {
-      showMessage('图片过大，请选择 20MB 以内的文件', 'error');
+      toast.error('图片过大，请选择 20MB 以内的文件');
       return;
     }
 
@@ -130,34 +116,45 @@ function ImageCompressorPage() {
     setOriginalFile(file);
     setOriginalSize(file.size);
     setOriginalType(file.type);
-    setUploadStatus(`已选择：${file.name}（${formatBytes(file.size)}）`);
-    showMessage('正在读取图片，请稍候...');
 
     const reader = new FileReader();
     reader.onload = () => {
       const url = typeof reader.result === 'string' ? reader.result : '';
       if (!url) {
         setOriginalPlaceholder('原图加载失败，请重试或更换文件');
-        showMessage('图片加载失败，请尝试更换文件。', 'error');
+        toast.error('图片加载失败，请尝试更换文件。');
         return;
       }
       const img = new Image();
-      img.onload = () => {
+      img.onload = async () => {
         setOriginalUrl(url);
         setOriginalWidth(img.width);
         setOriginalHeight(img.height);
         setOriginalPlaceholder('上传后在此处显示原图预览');
-        showMessage('图片加载完成，可开始调整参数并压缩。', 'success');
+
+        // PNG 智能提示逻辑
+        if (file.type === 'image/png') {
+          const hasAlpha = await checkImageHasAlpha(url);
+          if (hasAlpha) {
+            toast.warning('你上传的是 PNG 图片，并且检测到透明背景，建议保持 PNG 格式或选择 WebP 以减小体积', {
+              duration: 5000,
+            });
+          } else {
+            toast.info('你上传的是 PNG 图片，但未检测到透明背景，建议切换为 JPEG 或 WebP 格式以大幅减小体积', {
+              duration: 5000,
+            });
+          }
+        }
       };
       img.onerror = () => {
         setOriginalPlaceholder('原图加载失败，请重试或更换文件');
-        showMessage('图片加载失败，请尝试更换文件。', 'error');
+        toast.error('图片加载失败，请尝试更换文件。');
       };
       img.src = url;
     };
     reader.onerror = () => {
       setOriginalPlaceholder('原图加载失败，请重试或更换文件');
-      showMessage('文件读取失败，请重试。', 'error');
+      toast.error('文件读取失败，请重试。');
     };
 
     reader.readAsDataURL(file);
@@ -173,7 +170,6 @@ function ImageCompressorPage() {
     try {
       if (showProgress) {
         setIsProcessing(true);
-        showMessage('正在根据参数压缩图片，请稍候...');
       }
 
       // 质量 100% 且保持原格式：直接使用原图，不做重新编码
@@ -187,7 +183,6 @@ function ImageCompressorPage() {
 
         if (showProgress) {
           setIsProcessing(false);
-          showMessage('质量为 100%，已直接使用原图，未进行额外压缩。', 'info');
         }
         return;
       }
@@ -249,24 +244,8 @@ function ImageCompressorPage() {
       setCompressedHeight(finalHeight);
       setCompressedPlaceholder('调整参数并执行压缩后显示效果');
 
-      if (originalFile.size > 0) {
-        const ratio = (finalBlob.size / originalFile.size) * 100;
-        const delta = 100 - ratio;
-        const text = `${delta >= 0 ? '减少' : '增大'} ${Math.abs(delta).toFixed(1)}%（${ratio.toFixed(1)}% 原始体积）`;
-
-        if (useOriginalForSize) {
-          setMessage(`由于压缩后体积反而更大，已自动使用原图，确保不超过原始大小。${text}`);
-        } else {
-          setMessage((prev) => prev || text);
-        }
-      }
-
       if (showProgress) {
         setIsProcessing(false);
-        showMessage(
-          useOriginalForSize ? '压缩后体积大于原图，已自动使用原图。' : '压缩完成，可下载压缩后的图片。',
-          useOriginalForSize ? 'info' : 'success',
-        );
       }
     } catch (error) {
       console.error(error);
@@ -274,7 +253,7 @@ function ImageCompressorPage() {
       if (showProgress) {
         setIsProcessing(false);
       }
-      showMessage('压缩过程中出现错误，请尝试降低尺寸或更换图片。', 'error');
+      toast.error('压缩过程中出现错误，请尝试降低尺寸或更换图片。');
     }
   }
 
@@ -300,6 +279,7 @@ function ImageCompressorPage() {
     const mime = compressedBlob.type;
     if (mime === 'image/png') ext = '.png';
     else if (mime === 'image/webp') ext = '.webp';
+    else if (mime === 'image/jpeg') ext = '.jpg';
 
     a.href = url;
     a.download = `${baseName}-compressed${ext}`;
@@ -307,8 +287,6 @@ function ImageCompressorPage() {
     a.click();
     document.body.removeChild(a);
     setTimeout(() => URL.revokeObjectURL(url), 1000);
-
-    showMessage('已触发下载，如未自动下载请检查浏览器设置。', 'success');
   }
 
   const canCompress = Boolean(originalFile && originalUrl && originalWidth && originalHeight);
@@ -323,42 +301,24 @@ function ImageCompressorPage() {
 
   const isCompressedSmaller = Boolean(originalSize && compressedSize && compressedSize <= originalSize);
 
-  const hasFile = Boolean(originalFile);
-
   return (
     <div className="max-w-5xl w-full mx-auto px-4 pb-5 lg:py-8 grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
       <Card className="shadow-sm p-4 lg:p-5">
         <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">上传图片</h2>
-        <div
-          className={`relative mt-3 border border-dashed rounded-lg bg-muted/60 transition-colors cursor-pointer overflow-hidden h-4/5 flex items-center justify-center px-4 py-6 sm:py-8 ${
-            isDragOver ? 'border-primary/60 bg-muted/80 shadow-sm' : 'border-border'
-          }`}
-          onClick={() => fileInputRef.current?.click()}
-          onDrop={handleDrop}
-          onDragOver={handleDragOver}
-          onDragEnter={handleDragOver}
-          onDragLeave={handleDragLeave}
-        >
-          <div className="relative z-10 flex flex-col items-center text-center gap-1.5">
-            <div className="text-3xl mb-1">📷</div>
-            <p className="text-sm font-medium">拖拽图片到此处，或</p>
-            <Button
-              type="button"
-              className="rounded-full px-3.5 py-1.5 h-auto text-xs"
-              onClick={(e) => {
-                e.stopPropagation();
-                fileInputRef.current?.click();
-              }}
-            >
-              选择图片文件
-            </Button>
-            <p className="mt-1 text-[11px] text-muted-foreground">支持 JPG、PNG 等常见格式，单张不超过 20MB</p>
-          </div>
-          <input ref={fileInputRef} id="fileInput" type="file" accept="image/*" hidden onChange={handleFileChange} />
-        </div>
-        <p className={`mt-2 text-xs ${hasFile ? 'text-emerald-600 font-medium' : 'text-muted-foreground'}`}>
-          {uploadStatus}
-        </p>
+        <FileDragUploader
+          onFileSelect={handleFile}
+          onError={(error) => toast.error(error)}
+          validation={{
+            accept: ['image/*'],
+            maxSize: 20 * 1024 * 1024,
+          }}
+          className="mt-3 bg-muted/60 overflow-hidden h-4/5"
+          icon={<ImageIcon />}
+          title="拖拽图片到此处，或"
+          buttonText="选择图片文件"
+          hint="支持 JPG、PNG 等常见格式，单张不超过 20MB"
+          accept="image/*"
+        />
       </Card>
 
       <Card className="shadow-sm p-4 lg:p-5">
@@ -372,10 +332,23 @@ function ImageCompressorPage() {
                 {quality}%
               </span>
             </Label>
-            <Slider value={[quality]} min={10} max={100} step={1} onValueChange={([v]) => setQuality(v)} />
-            <p className="mt-1.5 text-[11px] leading-relaxed text-muted-foreground">
-              数值越低，体积越小，但画质会降低。建议在 60% - 90% 之间调整。
-            </p>
+            <Slider
+              value={[quality]}
+              min={10}
+              max={100}
+              step={1}
+              onValueChange={([v]) => setQuality(v)}
+              disabled={formatValue === 'image/png' || (formatValue === 'auto' && originalType === 'image/png')}
+            />
+            {formatValue === 'image/png' || (formatValue === 'auto' && originalType === 'image/png') ? (
+              <p className="mt-1.5 text-[11px] leading-relaxed text-red-600 dark:text-red-400 font-medium">
+                ⚠️ PNG 格式为无损压缩，不支持质量调节。请切换为 JPEG 或 WebP 格式。
+              </p>
+            ) : (
+              <p className="mt-1.5 text-[11px] leading-relaxed text-muted-foreground">
+                数值越低，体积越小，但画质会降低。建议在 60% - 90% 之间调整。
+              </p>
+            )}
           </div>
 
           <div className="rounded-lg border bg-muted/60 px-3 py-3">
@@ -394,7 +367,10 @@ function ImageCompressorPage() {
                   JPEG（适合照片，体积小）
                 </SelectItem>
                 <SelectItem value="image/png" className="text-xs">
-                  PNG（适合透明图）
+                  PNG（无损压缩，不支持质量调节）
+                </SelectItem>
+                <SelectItem value="image/webp" className="text-xs">
+                  WebP（体积最小，支持透明）
                 </SelectItem>
               </SelectContent>
             </Select>
@@ -412,15 +388,7 @@ function ImageCompressorPage() {
                 <span className="text-[11px] text-muted-foreground">{formatBytes(originalSize)}</span>
               ) : null}
             </h3>
-            <div className="relative rounded-lg border bg-background min-h-[180px] flex items-center justify-center overflow-hidden">
-              {originalUrl ? (
-                <img src={originalUrl} alt="原始图片预览" className="max-h-72 object-contain" />
-              ) : (
-                <div className="absolute inset-0 flex items-center justify-center text-xs text-muted-foreground px-4 text-center">
-                  {originalPlaceholder}
-                </div>
-              )}
-            </div>
+            <ImageComponent src={originalUrl} alt="原始图片预览" placeholder={originalPlaceholder} />
             <ul className="mt-2 text-[11px] text-muted-foreground space-y-1">
               <li className="flex justify-between gap-2">
                 <span className="opacity-80">文件大小：</span>
@@ -446,21 +414,7 @@ function ImageCompressorPage() {
                 <span className="text-[11px] text-muted-foreground">{formatBytes(compressedSize)}</span>
               ) : null}
             </h3>
-            <div className="relative rounded-lg border bg-background min-h-[180px] flex items-center justify-center overflow-hidden">
-              {compressedUrl ? (
-                <img src={compressedUrl} alt="压缩后图片预览" className="max-h-72 object-contain" />
-              ) : (
-                <div className="absolute inset-0 flex items-center justify-center text-xs text-muted-foreground px-4 text-center">
-                  {compressedPlaceholder}
-                </div>
-              )}
-              {isProcessing && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 backdrop-blur-sm bg-background/80">
-                  <div className="w-7 h-7 rounded-full border-2 border-muted border-t-primary animate-spin" />
-                  <p className="text-[11px]">正在压缩图片...</p>
-                </div>
-              )}
-            </div>
+            <ImageComponent src={compressedUrl} alt="压缩后图片预览" placeholder={compressedPlaceholder} canPreview />
             <ul className="mt-2 text-[11px] text-muted-foreground space-y-1">
               <li className="flex justify-between gap-2">
                 <span className="opacity-80">压缩后大小：</span>
@@ -504,7 +458,7 @@ function ImageCompressorPage() {
             <Button
               type="button"
               onClick={() => {
-                if (fileInputRef.current) fileInputRef.current.value = '';
+                // We just need to reset the state, the uploader component handles its own input reset
                 resetAll();
               }}
               variant="ghost"
@@ -512,26 +466,13 @@ function ImageCompressorPage() {
               重新上传
             </Button>
           </div>
-          <p
-            className={`text-[11px] min-h-[1.25rem] ${
-              messageType === 'error'
-                ? 'text-destructive'
-                : messageType === 'success'
-                  ? 'text-emerald-600'
-                  : 'text-muted-foreground'
-            }`}
-            role="status"
-            aria-live="polite"
-          >
-            {message}
-          </p>
 
           <div className="mt-2 border-t border-border pt-3">
             <h3 className="text-xs font-semibold mb-2">使用说明与注意事项</h3>
             <ul className="list-disc pl-4 text-[11px] text-muted-foreground space-y-1">
               <li>本工具在浏览器本地完成压缩处理，图片不会上传到服务器，安全可靠。</li>
               <li>质量过低会导致明显失真，建议逐步调节并通过右侧预览对比效果。</li>
-              <li>PNG 格式适合保留透明背景，JPEG 更适合照片类图片以减小体积。</li>
+              <li>PNG 格式适合保留透明背景但不支持质量调节，JPEG 更适合照片类图片，WebP 兼顾两者优势。</li>
               <li>超大尺寸图片压缩可能耗时稍长，请耐心等待进度提示。</li>
               <li>建议在桌面端浏览器获得最佳体验，移动端同样支持基础操作。</li>
             </ul>
