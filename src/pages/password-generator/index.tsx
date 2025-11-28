@@ -76,6 +76,56 @@ function generatePassword(
   return passwordChars.join('');
 }
 
+type StrengthLevel = 'weak' | 'medium' | 'strong';
+
+function evaluatePasswordStrength(password: string): { score: number; level: StrengthLevel } {
+  if (!password) {
+    return { score: 0, level: 'weak' };
+  }
+
+  let score = 0;
+
+  if (password.length >= 16) {
+    score += 30;
+  } else if (password.length >= 12) {
+    score += 20;
+  } else if (password.length >= 8) {
+    score += 10;
+  }
+
+  const hasLower = /[a-z]/.test(password);
+  const hasUpper = /[A-Z]/.test(password);
+  const hasNumber = /[0-9]/.test(password);
+  const hasSymbol = /[^a-zA-Z0-9]/.test(password);
+
+  if (hasLower) score += 10;
+  if (hasUpper) score += 10;
+  if (hasNumber) score += 10;
+  if (hasSymbol) score += 10;
+
+  const varietyCount = [hasLower, hasUpper, hasNumber, hasSymbol].filter(Boolean).length;
+
+  if (varietyCount >= 3 && password.length >= 12) {
+    score += 10;
+  }
+
+  if (varietyCount === 1) {
+    score *= 0.5;
+  }
+
+  if (score > 100) score = 100;
+  if (score < 0) score = 0;
+
+  let level: StrengthLevel = 'weak';
+  if (score >= 60) {
+    level = 'strong';
+  } else if (score >= 30) {
+    level = 'medium';
+  }
+
+  return { score, level };
+}
+
 function PasswordGeneratorPage() {
   const [length, setLength] = useState(16);
   const [hasLowercase, setHasLowercase] = useState(true);
@@ -90,6 +140,19 @@ function PasswordGeneratorPage() {
     () => !hasLowercase && !hasUppercase && !hasNumbers && !hasSymbols,
     [hasLowercase, hasUppercase, hasNumbers, hasSymbols],
   );
+
+  const { score: strengthScore, level: strengthLevel } = useMemo(
+    () => evaluatePasswordStrength(password),
+    [password],
+  );
+
+  const strengthLabel = strengthLevel === 'strong' ? '强' : strengthLevel === 'medium' ? '中' : '弱';
+  const strengthBarClassName =
+    strengthLevel === 'strong'
+      ? 'bg-emerald-500'
+      : strengthLevel === 'medium'
+        ? 'bg-amber-500'
+        : 'bg-red-500';
 
   const handleGenerate = () => {
     if (disabled) {
@@ -239,6 +302,24 @@ function PasswordGeneratorPage() {
               placeholder="点击生成按钮开始..."
               className="h-[200px] font-mono text-sm resize-none bg-muted/30"
             />
+
+            {password && (
+              <div className="mt-4 space-y-1">
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span>密码强度</span>
+                  <span>{strengthLabel}</span>
+                </div>
+                <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
+                  <div
+                    className={`h-full rounded-full transition-all ${strengthBarClassName}`}
+                    style={{ width: `${strengthScore}%` }}
+                  />
+                </div>
+                <p className="text-[11px] text-muted-foreground">
+                  本强度评估仅供参考，建议为不同网站使用唯一且足够复杂的密码。
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -261,6 +342,9 @@ function PasswordGeneratorPage() {
               </Button>
             )}
           </CardTitle>
+          <p className="mt-1 text-xs text-muted-foreground">
+            提示：所有生成的密码仅保存在当前浏览器本地，不会上传到任何远程服务器。
+          </p>
         </CardHeader>
         <CardContent>
           {history.length === 0 ? (
