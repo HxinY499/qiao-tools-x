@@ -52,7 +52,7 @@ function App() {
       pinned: pinnedRoutes,
       categories: CATEGORY_ORDER.filter((cat) => groups[cat] && groups[cat].length > 0).map((cat) => ({
         id: cat,
-        label: CATEGORY_LABELS[cat],
+        title: CATEGORY_LABELS[cat],
         routes: groups[cat],
       })),
     };
@@ -74,7 +74,7 @@ function App() {
         <SidebarMenuButton asChild isActive={isActive}>
           <NavLink to={route.path}>
             <Icon />
-            <span>{route.label}</span>
+            <span>{route.title}</span>
           </NavLink>
         </SidebarMenuButton>
         <SidebarMenuAction
@@ -118,7 +118,7 @@ function App() {
           {/* 常规分类分组 */}
           {groupedRoutes.categories.map((category) => (
             <SidebarGroup key={category.id}>
-              <SidebarGroupLabel>{category.label}</SidebarGroupLabel>
+              <SidebarGroupLabel>{category.title}</SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>{category.routes.map((route) => renderMenuItem(route))}</SidebarMenu>
               </SidebarGroupContent>

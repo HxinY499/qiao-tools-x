@@ -23,7 +23,6 @@ export enum ToolKey {
 export type ToolRoute = {
   key: ToolKey;
   path: string;
-  label: string;
   title: string;
   subtitle?: string;
   icon: LucideIcon;

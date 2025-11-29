@@ -22,8 +22,7 @@ pnpm lint         # 运行 ESLint 并自动修复问题
 - 所有工具路由在 [src/router.ts](src/router.ts) 中使用 `toolRoutes` 数组统一管理
 - 每个工具路由包含:
   - `path`: URL 路径
-  - `label`: 侧边栏显示名称
-  - `title/subtitle`: 页面标题与副标题
+  - `title/subtitle`: 页面标题(侧边栏显示名称)与副标题
   - `icon`: Lucide React 图标
   - `component`: 懒加载的页面组件
   - `category`: 工具分类
@@ -260,8 +259,7 @@ import YourToolPage from '@/pages/your-tool'; // 新增
 export type ToolRoute = {
   key: ToolKey; // 工具唯一标识
   path: string; // 路由路径 & 左侧 NavLink 的 to
-  label: string; // 左侧菜单显示的名称
-  title: string; // 右侧工具页 Header 大标题
+  title: string; // 工具标题
   subtitle?: string; // 右侧工具页 Header 副标题
   icon: LucideIcon; // 左侧菜单图标（lucide-react）
   component: ComponentType; // 工具页面组件
@@ -281,8 +279,7 @@ export const toolRoutes: ToolRoute[] = [
   {
     key: ToolKey.YourTool,
     path: '/your-tool', // 新工具路由
-    label: '你的工具名称', // 左侧菜单文案
-    title: 'Your Tool Title', // 右侧大标题
+    title: '你的工具名称', // 左侧菜单文案和工具标题
     subtitle: '一句话说明这个工具用途', // （可选）副标题
     icon: ScrollText, // 任选一个 lucide 图标
     component: YourToolPage, // 对应页面组件

@@ -33,8 +33,7 @@ export const toolRoutes: ToolRoute[] = [
   {
     key: ToolKey.ImageCompressor,
     path: '/image-compressor',
-    label: '图片压缩',
-    title: 'Image Compressor',
+    title: '图片压缩',
     subtitle: '在线图片压缩与尺寸调整工具，支持实时预览与参数调节',
     icon: ImageIcon,
     component: ImageCompressorPage,
@@ -48,8 +47,7 @@ export const toolRoutes: ToolRoute[] = [
   {
     key: ToolKey.ImageWatermark,
     path: '/image-watermark',
-    label: '图片水印添加',
-    title: 'Image Watermark',
+    title: '图片水印添加',
     subtitle: '在图片上添加文字或图片水印，支持位置、透明度、字体和大小调节，处理全程在本地完成',
     icon: ImageIcon,
     component: ImageWatermarkPage,
@@ -63,8 +61,7 @@ export const toolRoutes: ToolRoute[] = [
   {
     key: ToolKey.ScrollBar,
     path: '/scroll-bar',
-    label: '滚动条生成器',
-    title: 'Scorllbar Style Generator',
+    title: '滚动条生成器',
     subtitle: '可视化调整滚动条样式，并生成可复制的 CSS 代码',
     icon: ScrollText,
     component: ScrollBarPage,
@@ -78,8 +75,7 @@ export const toolRoutes: ToolRoute[] = [
   {
     key: ToolKey.BoxShadow,
     path: '/box-shadow',
-    label: '阴影生成器',
-    title: 'Box Shadow Generator',
+    title: '阴影生成器',
     subtitle: '可视化叠加多层阴影，并一键生成 CSS 与 Tailwind 代码',
     icon: Square,
     component: BoxShadowPage,
@@ -93,8 +89,7 @@ export const toolRoutes: ToolRoute[] = [
   {
     key: ToolKey.GradientGenerator,
     path: '/gradient-generator',
-    label: '渐变生成器',
-    title: 'CSS Gradient Generator',
+    title: '渐变生成器',
     subtitle: '可视化创建 linear/radial 渐变，支持多色断点与角度调整，并生成 CSS 与 Tailwind 类名',
     icon: Rainbow,
     component: GradientGeneratorPage,
@@ -108,8 +103,7 @@ export const toolRoutes: ToolRoute[] = [
   {
     key: ToolKey.ColorConverter,
     path: '/color-converter',
-    label: '颜色格式转换',
-    title: 'Color Converter',
+    title: '颜色格式转换',
     subtitle: '在线颜色格式转换工具，支持 Hex、RGB/RGBA、HSL/HSLA 格式互转',
     icon: Palette,
     component: ColorConverterPage,
@@ -123,8 +117,7 @@ export const toolRoutes: ToolRoute[] = [
   {
     key: ToolKey.TimestampConverter,
     path: '/timestamp-converter',
-    label: '时间戳转换',
-    title: 'Timestamp Converter',
+    title: '时间戳转换',
     subtitle: '时间戳与日期时间互转，支持多种常用格式并可快速复制当前时间',
     icon: CalendarClock,
     component: TimestampConverterPage,
@@ -138,8 +131,7 @@ export const toolRoutes: ToolRoute[] = [
   {
     key: ToolKey.JsonFormatter,
     path: '/json-formatter',
-    label: 'JSON 格式化',
-    title: 'JSON Formatter',
+    title: 'JSON 格式化',
     subtitle: 'JSON 美化、压缩、语法高亮与错误检测工具，也可以存储 JSON',
     icon: Braces,
     component: lazy(() => import('@/pages/json-formatter')),
@@ -153,8 +145,7 @@ export const toolRoutes: ToolRoute[] = [
   {
     key: ToolKey.BorderRadius,
     path: '/border-radius',
-    title: 'Border Radius Generator',
-    label: '圆角生成器',
+    title: '圆角生成器',
     component: lazy(() => import('./pages/border-radius')),
     icon: Circle,
     category: 'css',
@@ -167,8 +158,7 @@ export const toolRoutes: ToolRoute[] = [
   {
     key: ToolKey.UrlEncoder,
     path: '/url-encoder',
-    label: 'URL 编解码',
-    title: 'URL Encoder / Decoder',
+    title: 'URL 编解码',
     subtitle: 'URL 编码/解码工具，支持 URL 参数解析与可视化展示',
     icon: Link,
     component: UrlEncoderPage,
@@ -181,7 +171,6 @@ export const toolRoutes: ToolRoute[] = [
   {
     key: ToolKey.Base64,
     path: '/base64',
-    label: 'Base64 编解码',
     title: 'Base64 编解码',
     subtitle:
       '在文本模式下支持普通文本与 Base64 间互转，在图片模式下可将本地图片转换为 Base64 Data URL，方便内联到 CSS 或 HTML 中',
@@ -197,8 +186,7 @@ export const toolRoutes: ToolRoute[] = [
   {
     key: ToolKey.UuidGenerator,
     path: '/uuid-generator',
-    label: 'UUID 生成器',
-    title: 'UUID Generator',
+    title: 'UUID 生成器',
     subtitle: '在线批量生成 UUID/GUID，支持自定义格式（大小写、连字符）与历史记录功能',
     icon: Fingerprint,
     component: UUIDGeneratorPage,
@@ -212,8 +200,7 @@ export const toolRoutes: ToolRoute[] = [
   {
     key: ToolKey.WordCount,
     path: '/word-count',
-    label: '文本处理和字数统计',
-    title: 'Text Process Word Count',
+    title: '文本处理和字数统计',
     subtitle: '字数、字符数统计工具，支持段落、句子分析与目标字数进度追踪，支持各种格式处理',
     icon: AlignLeft,
     component: WordCountAndProcessPage,
@@ -227,8 +214,7 @@ export const toolRoutes: ToolRoute[] = [
   {
     key: ToolKey.PasswordGenerator,
     path: '/password-generator',
-    label: '密码生成器',
-    title: 'Password Generator',
+    title: '密码生成器',
     subtitle: '根据长度与字符类型选项生成高强度随机密码，适用于网站账号和重要服务',
     icon: Shield,
     component: PasswordGeneratorPage,

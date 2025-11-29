@@ -27,8 +27,7 @@
 {
   key: ToolKey.NewToolName, // 对应步骤 1 中的 Key
   path: '/new-tool-path',   // URL 路径 (kebab-case)
-  label: '中文菜单名',       // 侧边栏显示的短名称
-  title: 'English Title',   // 浏览器标签页标题 (仅前缀)
+  title: '工具名',   // 浏览器标签页标题 (仅前缀)
   subtitle: '中文页面副标题', // 页面顶部显示的详细标题
   category: 'dev',          // 必须对应 ToolCategory 类型
   seo: {
@@ -93,8 +92,7 @@ export enum ToolKey {
 {
   key: ToolKey.MarkdownPreview,
   path: '/markdown-preview',
-  label: 'Markdown 预览',
-  title: 'Markdown Preview',
+  title: 'Markdown 预览',
   subtitle: '实时 Markdown 编辑与预览工具，支持导出 HTML',
   icon: FileText, // 从 lucide-react 导入图标
   component: MarkdownPage,
