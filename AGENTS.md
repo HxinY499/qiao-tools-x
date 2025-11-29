@@ -266,6 +266,11 @@ export type ToolRoute = {
   icon: LucideIcon; // 左侧菜单图标（lucide-react）
   component: ComponentType; // 工具页面组件
   category: ToolCategory; // 工具分类
+  seo: {
+    // seo 配置
+    description: string;
+    keywords?: string;
+  };
 };
 ```
 

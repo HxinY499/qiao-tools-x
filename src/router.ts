@@ -219,8 +219,9 @@ export const toolRoutes: ToolRoute[] = [
     component: WordCountAndProcessPage,
     category: 'text',
     seo: {
-      description: '免费在线字数统计工具，支持字数、字符数、段落、句子统计，目标字数进度追踪，支持多种文本格式处理。',
-      keywords: '字数统计,字符统计,文本统计,段落统计,句子统计,文本处理工具',
+      description:
+        '免费在线字数统计工具，支持字数、字符数、段落、句子统计，目标字数进度追踪，支持多种文本格式处理，快速格式化文本，快速去除转义字符。',
+      keywords: '文本处理工具,文本格式化,去除转义,字数统计,字符统计,文本统计,段落统计,句子统计',
     },
   },
   {

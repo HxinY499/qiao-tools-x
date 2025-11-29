@@ -55,9 +55,14 @@ export function ToolPage({ route }: { route: ToolRoute }) {
 
   return (
     <>
-      {/* SEO 组件 */}
       {route.seo && (
-        <SEO title={route.title} description={route.seo.description} keywords={route.seo.keywords} path={route.path} />
+        <SEO
+          title={route.title}
+          description={route.seo.description}
+          keywords={route.seo.keywords}
+          path={route.path}
+          category={route.category}
+        />
       )}
 
       <div className="flex flex-col min-h-screen">
