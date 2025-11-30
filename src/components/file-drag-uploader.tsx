@@ -512,7 +512,7 @@ export function FileDragUploader(props: FileDragUploaderProps) {
       onDragLeave={handleDragLeave}
       onClick={handleAreaClick}
     >
-      <div className="relative z-10 flex flex-col items-center text-center gap-1.5 px-4 py-6 sm:py-8">
+      <div className="relative size-full z-10 flex flex-col items-center justify-center text-center gap-1.5 px-4 py-6 sm:py-8">
         {icon && <div className="text-3xl mb-1">{icon}</div>}
         {title && <p className="text-sm font-medium">{title}</p>}
         {description && <p className="text-sm font-medium">{description}</p>}

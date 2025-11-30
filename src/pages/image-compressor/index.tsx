@@ -1,4 +1,5 @@
-import { Image as ImageIcon } from 'lucide-react';
+import imageCompression from 'browser-image-compression';
+import { Image as ImageIcon, Lock, Unlock } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -6,9 +7,11 @@ import { FileDragUploader } from '@/components/file-drag-uploader';
 import { Image as ImageComponent } from '@/components/image';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
 function formatBytes(bytes: number | null | undefined) {
   if (!bytes) return '-';
@@ -19,6 +22,7 @@ function formatBytes(bytes: number | null | undefined) {
   return `${value.toFixed(index === 0 ? 0 : 2)} ${units[index]}`;
 }
 
+// 检测图片是否有透明通道（仅用于 PNG 智能提示）
 async function checkImageHasAlpha(imageUrl: string): Promise<boolean> {
   return new Promise((resolve) => {
     const img = new Image();
@@ -51,6 +55,47 @@ async function checkImageHasAlpha(imageUrl: string): Promise<boolean> {
   });
 }
 
+// 压缩预设配置
+type PresetType = 'custom' | 'social' | 'web' | 'extreme';
+
+interface PresetConfig {
+  label: string;
+  description: string;
+  quality: number;
+  format: 'auto' | 'image/jpeg' | 'image/png' | 'image/webp';
+  maxWidth?: number;
+}
+
+const PRESETS: Record<PresetType, PresetConfig> = {
+  custom: {
+    label: '自定义',
+    description: '手动调整所有参数',
+    quality: 80,
+    format: 'auto',
+  },
+  social: {
+    label: '社交媒体',
+    description: '适合微信、微博等分享（质量 85%）',
+    quality: 85,
+    format: 'image/jpeg',
+    maxWidth: 1920,
+  },
+  web: {
+    label: '网页优化',
+    description: '平衡质量与加载速度（质量 75%）',
+    quality: 75,
+    format: 'image/webp',
+    maxWidth: 1200,
+  },
+  extreme: {
+    label: '极致压缩',
+    description: '最小体积，质量有所损失（质量 60%）',
+    quality: 60,
+    format: 'image/webp',
+    maxWidth: 1024,
+  },
+};
+
 function ImageCompressorPage() {
   const [originalFile, setOriginalFile] = useState<File | null>(null);
   const [originalUrl, setOriginalUrl] = useState<string | null>(null);
@@ -70,8 +115,22 @@ function ImageCompressorPage() {
 
   const [formatValue, setFormatValue] = useState<'auto' | 'image/jpeg' | 'image/png' | 'image/webp'>('auto');
 
-  const [isProcessing, setIsProcessing] = useState(false);
   const [quality, setQuality] = useState(80);
+
+  // 尺寸调整相关
+  const [targetWidth, setTargetWidth] = useState<string>('');
+  const [targetHeight, setTargetHeight] = useState<string>('');
+  const [keepAspectRatio, setKeepAspectRatio] = useState(true);
+  const [scalePercentage, setScalePercentage] = useState(100);
+
+  // 预设模板
+  const [currentPreset, setCurrentPreset] = useState<PresetType>('custom');
+
+  // 是否正在压缩（用于显示加载状态）
+  const [isCompressing, setIsCompressing] = useState(false);
+
+  // 是否禁用压缩（直接使用原图）
+  const [skipCompression, setSkipCompression] = useState(false);
 
   useEffect(() => {
     return () => {
@@ -103,16 +162,16 @@ function ImageCompressorPage() {
 
     setQuality(80);
     setFormatValue('auto');
-
-    setIsProcessing(false);
+    setTargetWidth('');
+    setTargetHeight('');
+    setKeepAspectRatio(true);
+    setScalePercentage(100);
+    setCurrentPreset('custom');
+    setIsCompressing(false);
+    setSkipCompression(false);
   }
 
   function handleFile(file: File) {
-    if (file.size > 20 * 1024 * 1024) {
-      toast.error('图片过大，请选择 20MB 以内的文件');
-      return;
-    }
-
     resetAll();
 
     setOriginalFile(file);
@@ -133,6 +192,10 @@ function ImageCompressorPage() {
         setOriginalWidth(img.width);
         setOriginalHeight(img.height);
         setOriginalPlaceholder('上传后在此处显示原图预览');
+
+        // 初始化目标尺寸为原始尺寸
+        setTargetWidth(img.width.toString());
+        setTargetHeight(img.height.toString());
 
         // PNG 智能提示逻辑
         if (file.type === 'image/png') {
@@ -156,111 +219,211 @@ function ImageCompressorPage() {
     reader.readAsDataURL(file);
   }
 
-  async function compress(showProgress: boolean) {
-    if (!originalUrl || !originalFile || !originalWidth || !originalHeight) return;
-    if (isProcessing && showProgress) return;
+  // 处理宽度变化
+  function handleWidthChange(value: string) {
+    const numValue = parseInt(value) || 0;
+    setTargetWidth(value);
 
-    const targetWidth = originalWidth;
-    const targetHeight = originalHeight;
+    if (keepAspectRatio && originalWidth && originalHeight && numValue > 0) {
+      const ratio = originalHeight / originalWidth;
+      const newHeight = Math.round(numValue * ratio);
+      setTargetHeight(newHeight.toString());
+
+      // 同步更新百分比
+      const percentage = Math.round((numValue / originalWidth) * 100);
+      setScalePercentage(percentage);
+    }
+
+    // 切换到自定义模式
+    setCurrentPreset('custom');
+  }
+
+  // 处理高度变化
+  function handleHeightChange(value: string) {
+    const numValue = parseInt(value) || 0;
+    setTargetHeight(value);
+
+    if (keepAspectRatio && originalWidth && originalHeight && numValue > 0) {
+      const ratio = originalWidth / originalHeight;
+      const newWidth = Math.round(numValue * ratio);
+      setTargetWidth(newWidth.toString());
+
+      // 同步更新百分比
+      const percentage = Math.round((numValue / originalHeight) * 100);
+      setScalePercentage(percentage);
+    }
+
+    // 切换到自定义模式
+    setCurrentPreset('custom');
+  }
+
+  // 处理百分比缩放
+  function handleScaleChange(percentage: number) {
+    setScalePercentage(percentage);
+
+    if (originalWidth && originalHeight) {
+      const newWidth = Math.round((originalWidth * percentage) / 100);
+      const newHeight = Math.round((originalHeight * percentage) / 100);
+      setTargetWidth(newWidth.toString());
+      setTargetHeight(newHeight.toString());
+    }
+
+    // 切换到自定义模式
+    setCurrentPreset('custom');
+  }
+
+  // 切换宽高比锁定
+  function toggleAspectRatio() {
+    setKeepAspectRatio(!keepAspectRatio);
+  }
+
+  // 应用预设
+  function applyPreset(preset: PresetType) {
+    setCurrentPreset(preset);
+    const config = PRESETS[preset];
+
+    setQuality(config.quality);
+    setFormatValue(config.format);
+
+    if (config.maxWidth && originalWidth && originalHeight) {
+      // 如果原图宽度大于预设最大宽度，则缩放
+      if (originalWidth > config.maxWidth) {
+        const ratio = originalHeight / originalWidth;
+        const newWidth = config.maxWidth;
+        const newHeight = Math.round(newWidth * ratio);
+        setTargetWidth(newWidth.toString());
+        setTargetHeight(newHeight.toString());
+        setScalePercentage(Math.round((newWidth / originalWidth) * 100));
+      } else {
+        // 否则保持原尺寸
+        setTargetWidth(originalWidth.toString());
+        setTargetHeight(originalHeight.toString());
+        setScalePercentage(100);
+      }
+    }
+  }
+
+  async function compress() {
+    if (!originalFile || !originalWidth || !originalHeight) return;
+
+    // 使用目标尺寸，如果没有设置则使用原尺寸
+    const finalWidth = parseInt(targetWidth) || originalWidth;
+    const finalHeight = parseInt(targetHeight) || originalHeight;
+
+    // 验证尺寸有效性
+    if (finalWidth <= 0 || finalHeight <= 0) {
+      toast.error('图片尺寸无效');
+      return;
+    }
 
     try {
-      if (showProgress) {
-        setIsProcessing(true);
-      }
+      setIsCompressing(true);
+      setCompressedPlaceholder('正在压缩中，请稍候...');
 
-      // 质量 100% 且保持原格式：直接使用原图，不做重新编码
-      if (quality === 100 && formatValue === 'auto') {
+      // 如果启用了"不压缩"且尺寸未变：直接使用原图
+      if (skipCompression && finalWidth === originalWidth && finalHeight === originalHeight) {
         setCompressedBlob(originalFile);
         setCompressedUrl(originalUrl);
         setCompressedSize(originalFile.size);
         setCompressedWidth(originalWidth);
         setCompressedHeight(originalHeight);
         setCompressedPlaceholder('调整参数并执行压缩后显示效果');
-
-        if (showProgress) {
-          setIsProcessing(false);
-        }
+        setIsCompressing(false);
         return;
       }
 
-      const image = await new Promise<HTMLImageElement>((resolve, reject) => {
-        const img = new Image();
-        img.onload = () => resolve(img);
-        img.onerror = () => reject(new Error('image-load'));
-        img.src = originalUrl;
-      });
-
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      if (!ctx) throw new Error('no-context');
-
-      canvas.width = targetWidth;
-      canvas.height = targetHeight;
-      ctx.drawImage(image, 0, 0, targetWidth, targetHeight);
-
-      let mimeType: string = formatValue;
-      if (mimeType === 'auto') {
-        mimeType = originalFile.type || 'image/jpeg';
+      // 确定输出格式
+      let fileType: string = formatValue;
+      if (fileType === 'auto') {
+        fileType = originalFile.type || 'image/jpeg';
       }
 
-      const encodedBlob: Blob = await new Promise((resolve, reject) => {
-        canvas.toBlob(
-          (b) => {
-            if (!b) reject(new Error('blob-error'));
-            else resolve(b);
-          },
-          mimeType,
-          quality / 100,
-        );
+      // 构建 browser-image-compression 的配置
+      const options: {
+        maxWidthOrHeight: number;
+        initialQuality: number;
+        fileType: string;
+        useWebWorker: boolean;
+      } = {
+        maxWidthOrHeight: Math.max(finalWidth, finalHeight),
+        initialQuality: quality / 100,
+        fileType,
+        useWebWorker: true, // 关键：启用 Web Worker，避免阻塞主线程
+      };
+
+      // 执行压缩（在 Web Worker 中运行，不会阻塞页面）
+      const compressedFile = await imageCompression(originalFile, options);
+
+      // 读取压缩后的图片尺寸
+      const compressedImage = await imageCompression.getDataUrlFromFile(compressedFile);
+      const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+        const image = new Image();
+        image.onload = () => resolve(image);
+        image.onerror = () => reject(new Error('image-load'));
+        image.src = compressedImage;
       });
 
-      // 保证不会比原图更大：如果重编码后更大，则回退到原图
-      let finalBlob: Blob = encodedBlob;
-      let finalWidth = targetWidth;
-      let finalHeight = targetHeight;
-      let useOriginalForSize = false;
+      // 如果设置了精确的目标尺寸，需要进行二次裁剪
+      let finalBlob: Blob = compressedFile;
+      let finalCompressedWidth = img.width;
+      let finalCompressedHeight = img.height;
 
-      if (encodedBlob.size > originalFile.size) {
-        finalBlob = originalFile;
-        finalWidth = originalWidth;
-        finalHeight = originalHeight;
-        useOriginalForSize = true;
+      if (finalWidth !== finalCompressedWidth || finalHeight !== finalCompressedHeight) {
+        // 使用 canvas 进行精确尺寸调整
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        if (!ctx) throw new Error('no-context');
+
+        canvas.width = finalWidth;
+        canvas.height = finalHeight;
+        ctx.drawImage(img, 0, 0, finalWidth, finalHeight);
+
+        finalBlob = await new Promise((resolve, reject) => {
+          canvas.toBlob(
+            (b) => {
+              if (!b) reject(new Error('blob-error'));
+              else resolve(b);
+            },
+            fileType,
+            quality / 100,
+          );
+        });
+
+        finalCompressedWidth = finalWidth;
+        finalCompressedHeight = finalHeight;
       }
 
-      const previewUrl = useOriginalForSize ? originalUrl : URL.createObjectURL(finalBlob);
+      // 生成预览 URL
+      const previewUrl = URL.createObjectURL(finalBlob);
 
-      if (compressedUrl && !useOriginalForSize) {
+      // 释放旧的 URL（优化内存）
+      if (compressedUrl && compressedUrl !== originalUrl) {
         URL.revokeObjectURL(compressedUrl);
       }
 
       setCompressedBlob(finalBlob);
       setCompressedUrl(previewUrl);
       setCompressedSize(finalBlob.size);
-      setCompressedWidth(finalWidth);
-      setCompressedHeight(finalHeight);
+      setCompressedWidth(finalCompressedWidth);
+      setCompressedHeight(finalCompressedHeight);
       setCompressedPlaceholder('调整参数并执行压缩后显示效果');
-
-      if (showProgress) {
-        setIsProcessing(false);
-      }
     } catch (error) {
       console.error(error);
       setCompressedPlaceholder('压缩预览生成失败，请调整参数后重试');
-      if (showProgress) {
-        setIsProcessing(false);
-      }
       toast.error('压缩过程中出现错误，请尝试降低尺寸或更换图片。');
+    } finally {
+      setIsCompressing(false);
     }
   }
 
   useEffect(() => {
     if (!originalUrl || !originalFile) return;
     const timer = window.setTimeout(() => {
-      compress(false);
+      compress();
     }, 260);
     return () => window.clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [quality, formatValue, originalUrl, originalFile]);
+  }, [quality, formatValue, targetWidth, targetHeight, skipCompression, originalUrl, originalFile]);
 
   function handleDownload() {
     if (!compressedBlob || !originalFile) return;
@@ -285,7 +448,6 @@ function ImageCompressorPage() {
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
-  const canCompress = Boolean(originalFile && originalUrl && originalWidth && originalHeight);
   const canDownload = Boolean(compressedBlob);
 
   const compressRatioText = (() => {
@@ -299,20 +461,16 @@ function ImageCompressorPage() {
 
   return (
     <div className="max-w-5xl w-full mx-auto px-4 pb-5 lg:py-8 grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
-      <Card className="shadow-sm p-4 lg:p-5">
-        <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">上传图片</h2>
+      <Card className="shadow-sm p-4 lg:p-5 flex flex-col">
+        <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase shrink-0">上传图片</h2>
         <FileDragUploader
           onFileSelect={handleFile}
           onError={(error) => toast.error(error)}
-          validation={{
-            accept: ['image/*'],
-            maxSize: 20 * 1024 * 1024,
-          }}
-          className="mt-3 bg-muted/60 overflow-hidden h-4/5"
+          className="mt-3 bg-muted/60 overflow-hidden flex-1 min-h-0"
           icon={<ImageIcon />}
           title="拖拽图片到此处，或"
           buttonText="选择图片文件"
-          hint="支持 JPG、PNG 等常见格式，单张不超过 20MB"
+          hint=""
           accept="image/*"
         />
       </Card>
@@ -320,29 +478,72 @@ function ImageCompressorPage() {
       <Card className="shadow-sm p-4 lg:p-5">
         <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">设置压缩参数</h2>
         <div className="mt-3 grid gap-3">
+          {/* 预设模板选择 */}
           <div className="rounded-lg border bg-muted/60 px-3 py-3">
-            <Label className="mb-1.5 flex items-center justify-between text-xs">
-              <span>压缩质量</span>
-              <span className="ml-1 inline-flex items-center gap-1 rounded-full bg-primary/5 px-2 py-0.5 text-[11px] font-medium text-primary">
-                <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-                {quality}%
-              </span>
-            </Label>
-            <Slider
-              value={[quality]}
-              min={10}
-              max={100}
-              step={1}
-              onValueChange={([v]) => setQuality(v)}
-              disabled={formatValue === 'image/png' || (formatValue === 'auto' && originalType === 'image/png')}
-            />
-            {formatValue === 'image/png' || (formatValue === 'auto' && originalType === 'image/png') ? (
-              <p className="mt-1.5 text-[11px] leading-relaxed text-red-600 dark:text-red-400 font-medium">
-                ⚠️ PNG 格式为无损压缩，不支持质量调节。请切换为 JPEG 或 WebP 格式。
-              </p>
-            ) : (
+            <Label className="mb-1.5 block text-xs">预设参数</Label>
+            <ToggleGroup
+              type="single"
+              value={currentPreset}
+              onValueChange={(val) => val && applyPreset(val as PresetType)}
+              className="grid grid-cols-2 gap-2"
+            >
+              <ToggleGroupItem value="custom" className="text-xs h-auto py-2 px-3 flex flex-col items-start gap-0.5">
+                <span className="font-medium">自定义</span>
+                <span className="text-[10px] text-muted-foreground">手动调整</span>
+              </ToggleGroupItem>
+              <ToggleGroupItem value="social" className="text-xs h-auto py-2 px-3 flex flex-col items-start gap-0.5">
+                <span className="font-medium">社交媒体</span>
+                <span className="text-[10px] text-muted-foreground">质量 85%</span>
+              </ToggleGroupItem>
+              <ToggleGroupItem value="web" className="text-xs h-auto py-2 px-3 flex flex-col items-start gap-0.5">
+                <span className="font-medium">网页优化</span>
+                <span className="text-[10px] text-muted-foreground">质量 75%</span>
+              </ToggleGroupItem>
+              <ToggleGroupItem value="extreme" className="text-xs h-auto py-2 px-3 flex flex-col items-start gap-0.5">
+                <span className="font-medium">极致压缩</span>
+                <span className="text-[10px] text-muted-foreground">质量 60%</span>
+              </ToggleGroupItem>
+            </ToggleGroup>
+            <p className="mt-1.5 text-[11px] leading-relaxed text-muted-foreground">
+              {PRESETS[currentPreset].description}
+            </p>
+          </div>
+
+          <div className="rounded-lg border bg-muted/60 px-3 py-3">
+            <div className="mb-1.5 flex items-center justify-between text-xs">
+              <Label className="text-xs">压缩质量</Label>
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant={skipCompression ? 'default' : 'secondary'}
+                  size="sm"
+                  className="h-6 px-2 text-[10px]"
+                  onClick={() => {
+                    setSkipCompression(!skipCompression);
+                    setCurrentPreset('custom');
+                  }}
+                >
+                  {skipCompression ? '✓ 不压缩' : '不压缩'}
+                </Button>
+                {!skipCompression && (
+                  <span className="ml-1 inline-flex items-center gap-1 rounded-full bg-primary/5 px-2 py-0.5 text-[11px] font-medium text-primary">
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                    {quality}%
+                  </span>
+                )}
+              </div>
+            </div>
+            {!skipCompression && (
+              <>
+                <Slider value={[quality]} min={10} max={100} step={1} onValueChange={([v]) => setQuality(v)} />
+                <p className="mt-1.5 text-[11px] leading-relaxed text-muted-foreground">
+                  数值越低，体积越小，但画质会降低
+                </p>
+              </>
+            )}
+            {skipCompression && (
               <p className="mt-1.5 text-[11px] leading-relaxed text-muted-foreground">
-                数值越低，体积越小，但画质会降低。建议在 60% - 90% 之间调整。
+                已启用"不压缩"模式，将直接使用原图（仅当尺寸未调整时生效）
               </p>
             )}
           </div>
@@ -363,7 +564,7 @@ function ImageCompressorPage() {
                   JPEG（适合照片，体积小）
                 </SelectItem>
                 <SelectItem value="image/png" className="text-xs">
-                  PNG（无损压缩，不支持质量调节）
+                  PNG（支持透明背景与色彩量化压缩）
                 </SelectItem>
                 <SelectItem value="image/webp" className="text-xs">
                   WebP（体积最小，支持透明）
@@ -371,22 +572,18 @@ function ImageCompressorPage() {
               </SelectContent>
             </Select>
             {(() => {
-              // 计算当前实际输出格式
-              const currentFormat = formatValue === 'auto' ? originalType : formatValue;
-              // 只有原图是 PNG 且检测过透明度，并且当前格式也是 PNG 时才显示提示
-              if (originalType === 'image/png' && hasAlpha !== null && currentFormat === 'image/png') {
+              // 只有原图是 PNG 且检测过透明度时才显示智能提示
+              if (originalType === 'image/png' && hasAlpha !== null) {
                 return (
                   <div className="mt-2 rounded-md bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 px-3 py-2">
                     <p className="text-[11px] leading-relaxed text-blue-700 dark:text-blue-300">
                       {hasAlpha ? (
                         <>
-                          💡 你上传了 <strong>PNG</strong> 图片，检测到透明背景，建议保持 <strong>PNG</strong>{' '}
-                          格式或切换为 <strong>WebP</strong> 以减小体积
+                          💡 检测到透明背景，建议保持 <strong>PNG</strong> 或切换为 <strong>WebP</strong> 格式
                         </>
                       ) : (
                         <>
-                          💡 你上传了 <strong>PNG</strong> 图片，但未检测到透明背景，建议切换为 <strong>JPEG</strong> 或{' '}
-                          <strong>WebP</strong> 格式以大幅减小体积
+                          💡 未检测到透明背景，建议切换为 <strong>JPEG</strong> 或 <strong>WebP</strong> 以获得更小体积
                         </>
                       )}
                     </p>
@@ -395,6 +592,79 @@ function ImageCompressorPage() {
               }
               return null;
             })()}
+          </div>
+
+          {/* 尺寸调整 */}
+          <div className="rounded-lg border bg-muted/60 px-3 py-3">
+            <Label className="mb-1.5 flex items-center justify-between text-xs">
+              <span>图片尺寸调整</span>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-auto p-1 hover:bg-transparent"
+                onClick={toggleAspectRatio}
+              >
+                {keepAspectRatio ? (
+                  <Lock className="w-3.5 h-3.5 text-primary" />
+                ) : (
+                  <Unlock className="w-3.5 h-3.5 text-muted-foreground" />
+                )}
+              </Button>
+            </Label>
+
+            <div className="grid grid-cols-2 gap-2 mb-2">
+              <div>
+                <Label htmlFor="targetWidth" className="text-[10px] text-muted-foreground mb-1 block">
+                  宽度 (px)
+                </Label>
+                <Input
+                  id="targetWidth"
+                  type="number"
+                  min="1"
+                  max="10000"
+                  value={targetWidth}
+                  onChange={(e) => handleWidthChange(e.target.value)}
+                  className="h-8 text-xs"
+                  disabled={!originalFile}
+                />
+              </div>
+              <div>
+                <Label htmlFor="targetHeight" className="text-[10px] text-muted-foreground mb-1 block">
+                  高度 (px)
+                </Label>
+                <Input
+                  id="targetHeight"
+                  type="number"
+                  min="1"
+                  max="10000"
+                  value={targetHeight}
+                  onChange={(e) => handleHeightChange(e.target.value)}
+                  className="h-8 text-xs"
+                  disabled={!originalFile}
+                />
+              </div>
+            </div>
+
+            <div>
+              <Label className="mb-1.5 flex items-center justify-between text-[10px] text-muted-foreground">
+                <span>按百分比缩放</span>
+                <span className="font-medium text-primary">{scalePercentage}%</span>
+              </Label>
+              <Slider
+                value={[scalePercentage]}
+                min={10}
+                max={200}
+                step={5}
+                onValueChange={([v]) => handleScaleChange(v)}
+                disabled={!originalFile}
+              />
+            </div>
+
+            <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">
+              原始尺寸：
+              {originalWidth && originalHeight ? `${originalWidth} × ${originalHeight}` : '—'}
+            </p>
           </div>
         </div>
       </Card>
@@ -409,7 +679,7 @@ function ImageCompressorPage() {
                 <span className="text-[11px] text-muted-foreground">{formatBytes(originalSize)}</span>
               ) : null}
             </h3>
-            <ImageComponent src={originalUrl} alt="原始图片预览" placeholder={originalPlaceholder} />
+            <ImageComponent src={originalUrl} alt="原始图片预览" placeholder={originalPlaceholder} canPreview />
             <ul className="mt-2 text-[11px] text-muted-foreground space-y-1">
               <li className="flex justify-between gap-2">
                 <span className="opacity-80">文件大小：</span>
@@ -431,11 +701,26 @@ function ImageCompressorPage() {
           <div className="rounded-lg border bg-muted/40 p-3 sm:p-4">
             <h3 className="text-sm font-medium mb-2 flex items-center justify-between">
               <span>压缩后图片</span>
-              {compressedSize ? (
+              {isCompressing ? (
+                <span className="text-[11px] text-blue-600 dark:text-blue-400 animate-pulse">正在压缩...</span>
+              ) : compressedSize ? (
                 <span className="text-[11px] text-muted-foreground">{formatBytes(compressedSize)}</span>
               ) : null}
             </h3>
             <ImageComponent src={compressedUrl} alt="压缩后图片预览" placeholder={compressedPlaceholder} canPreview />
+
+            {/* 文件大小警告提示 */}
+            {/* {compressedSize && originalSize && compressedSize > originalSize && (
+              <div className="mt-2 rounded-md bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 px-3 py-2">
+                <p className="text-[11px] leading-relaxed text-amber-900 dark:text-amber-200 font-medium">
+                  ⚠️ 处理后文件反而增大了 {formatBytes(compressedSize - originalSize)}
+                </p>
+                <p className="mt-1 text-[10px] leading-relaxed text-amber-700 dark:text-amber-300">
+                  建议调整压缩参数、输出格式或图片尺寸
+                </p>
+              </div>
+            )} */}
+
             <ul className="mt-2 text-[11px] text-muted-foreground space-y-1">
               <li className="flex justify-between gap-2">
                 <span className="opacity-80">压缩后大小：</span>
@@ -470,19 +755,15 @@ function ImageCompressorPage() {
         <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">操作 & 使用说明</h2>
         <div className="mt-3 flex flex-col gap-3">
           <div className="flex flex-wrap gap-2">
-            <Button type="button" disabled={!canCompress || isProcessing} onClick={() => compress(true)}>
-              开始压缩
-            </Button>
-            <Button type="button" disabled={!canDownload} onClick={handleDownload} variant="secondary">
+            <Button type="button" disabled={!canDownload} onClick={handleDownload} variant="default">
               下载压缩图片
             </Button>
             <Button
               type="button"
               onClick={() => {
-                // We just need to reset the state, the uploader component handles its own input reset
                 resetAll();
               }}
-              variant="ghost"
+              variant="outline"
             >
               重新上传
             </Button>
@@ -491,10 +772,10 @@ function ImageCompressorPage() {
           <div className="mt-2 border-t border-border pt-3">
             <h3 className="text-xs font-semibold mb-2">使用说明与注意事项</h3>
             <ul className="list-disc pl-4 text-[11px] text-muted-foreground space-y-1">
+              <li>支持 PNG 格式的色彩量化压缩，可有效减小 PNG 文件体积。</li>
               <li>质量过低会导致明显失真，建议逐步调节并通过右侧预览对比效果。</li>
-              <li>PNG 格式适合保留透明背景但不支持质量调节，JPEG 更适合照片类图片，WebP 兼顾两者优势。</li>
-              <li>超大尺寸图片压缩可能耗时稍长，请耐心等待进度提示。</li>
-              <li>建议在桌面端浏览器获得最佳体验，移动端同样支持基础操作。</li>
+              <li>JPEG 适合照片，WebP 兼顾小体积与透明背景，PNG 适合需要透明的图形。</li>
+              <li>压缩过程在独立线程中运行，不会卡顿页面（即使处理大图）。</li>
             </ul>
           </div>
         </div>
