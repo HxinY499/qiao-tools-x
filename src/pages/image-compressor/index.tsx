@@ -1,5 +1,5 @@
 import imageCompression from 'browser-image-compression';
-import { Image as ImageIcon, Lock, Unlock } from 'lucide-react';
+import { HelpCircle, Image as ImageIcon, Lock, Unlock } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 function formatBytes(bytes: number | null | undefined) {
   if (!bytes) return '-';
@@ -515,18 +516,41 @@ function ImageCompressorPage() {
             <div className="mb-1.5 flex items-center justify-between text-xs">
               <Label className="text-xs">压缩质量</Label>
               <div className="flex items-center gap-2">
-                <Button
-                  type="button"
-                  variant={skipCompression ? 'default' : 'secondary'}
-                  size="sm"
-                  className="h-6 px-2 text-[10px]"
-                  onClick={() => {
-                    setSkipCompression(!skipCompression);
-                    setCurrentPreset('custom');
-                  }}
-                >
-                  {skipCompression ? '✓ 不压缩' : '不压缩'}
-                </Button>
+                <div className="flex items-center gap-1">
+                  <Button
+                    type="button"
+                    variant={skipCompression ? 'default' : 'secondary'}
+                    size="sm"
+                    className="h-6 px-2 text-[10px]"
+                    onClick={() => {
+                      setSkipCompression(!skipCompression);
+                      setCurrentPreset('custom');
+                    }}
+                  >
+                    {skipCompression ? (
+                      '✓ 不压缩'
+                    ) : (
+                      <>
+                        <span>不压缩</span>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <button
+                                type="button"
+                                className="inline-flex items-center justify-center w-4 h-4 rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                              >
+                                <HelpCircle />
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent side="top" className="max-w-[200px] text-xs">
+                              <p>如果你只想修改图片格式或调整尺寸，可以选择不压缩模式</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </>
+                    )}
+                  </Button>
+                </div>
                 {!skipCompression && (
                   <span className="ml-1 inline-flex items-center gap-1 rounded-full bg-primary/5 px-2 py-0.5 text-[11px] font-medium text-primary">
                     <span className="w-1.5 h-1.5 rounded-full bg-primary" />
