@@ -64,14 +64,15 @@ export const toolRoutes: ToolRoute[] = [
     key: ToolKey.SvgConverter,
     path: '/svg-converter',
     title: 'SVG 转图片',
-    subtitle: 'SVG 转 PNG/JPG/WebP 工具，支持自定义尺寸、背景色和质量，实时预览效果',
+    subtitle: 'SVG 转 PNG/JPG/WebP 工具，支持批量转换、自定义尺寸、背景色和透明度',
     icon: FileImage,
     component: SvgConverterPage,
     category: 'image',
     seo: {
       description:
-        '免费在线 SVG 转图片工具，支持转换为 PNG、JPG、WebP 格式，可自定义导出尺寸、背景色和质量，实时预览效果。所有处理在本地完成，保护您的隐私。',
-      keywords: 'SVG转PNG,SVG转JPG,SVG转图片,SVG转换器,矢量图转位图,SVG导出,在线SVG工具',
+        '免费在线 SVG 转图片工具，支持批量转换为 PNG、JPG、WebP 格式，可自定义导出尺寸、背景色、透明度，支持独立参数模式与预设尺寸。所有处理在浏览器本地完成，保护您的隐私。',
+      keywords:
+        'SVG转PNG,SVG转JPG,SVG转WebP,SVG转图片,SVG转换器,矢量图转位图,SVG导出,批量SVG转换,在线SVG工具,SVG格式转换',
     },
   },
   {
