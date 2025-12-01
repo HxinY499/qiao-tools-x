@@ -463,15 +463,11 @@ function ImageWatermarkPage() {
               <FileDragUploader
                 onFileSelect={handleBaseImageFile}
                 onError={(error) => toast.error(error)}
-                validation={{
-                  accept: ['image/*'],
-                  maxSize: 20 * 1024 * 1024,
-                }}
                 className="mt-3 bg-muted/60 overflow-hidden h-4/5"
                 icon={<ImageIcon />}
                 title="拖拽图片到此处，或"
                 buttonText="选择图片文件"
-                hint="支持 JPG、PNG 等常见格式，单张不超过 20MB"
+                hint=""
                 accept="image/*"
               />
               <p className={`mt-2 text-xs ${baseImageFile ? 'text-emerald-600 font-medium' : 'text-muted-foreground'}`}>
