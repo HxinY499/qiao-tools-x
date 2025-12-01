@@ -75,24 +75,24 @@ const PRESETS: Record<PresetType, PresetConfig> = {
   },
   social: {
     label: '社交媒体',
-    description: '适合微信、微博等分享（质量 85%）',
-    quality: 85,
+    description: '适合微信、朋友圈分享（质量 75%，宽度 1280px）',
+    quality: 75,
     format: 'image/jpeg',
-    maxWidth: 1920,
+    maxWidth: 1280,
   },
   web: {
     label: '网页优化',
-    description: '平衡质量与加载速度（质量 75%）',
+    description: '响应式友好，兼顾移动与PC（质量 75%，宽度 1080px）',
     quality: 75,
     format: 'image/webp',
-    maxWidth: 1200,
+    maxWidth: 1080,
   },
   extreme: {
     label: '极致压缩',
-    description: '最小体积，质量有所损失（质量 60%）',
-    quality: 60,
+    description: '最小体积，适合批量上传（质量 65%，宽度 800px）',
+    quality: 65,
     format: 'image/webp',
-    maxWidth: 1024,
+    maxWidth: 800,
   },
 };
 
@@ -196,6 +196,8 @@ function ImageCompressorPage() {
         // 初始化目标尺寸为原始尺寸
         setTargetWidth(img.width.toString());
         setTargetHeight(img.height.toString());
+
+        toast.success('图片上传成功');
 
         // PNG 智能提示逻辑
         if (file.type === 'image/png') {
@@ -479,32 +481,32 @@ function ImageCompressorPage() {
         <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">设置压缩参数</h2>
         <div className="mt-3 grid gap-3">
           {/* 预设模板选择 */}
-          <div className="rounded-lg border bg-muted/60 px-3 py-3">
-            <Label className="mb-1.5 block text-xs">预设参数</Label>
+          <div className="rounded-lg border bg-muted/60 px-2.5 py-2.5">
+            <Label className="mb-1 block text-xs">预设参数</Label>
             <ToggleGroup
               type="single"
               value={currentPreset}
               onValueChange={(val) => val && applyPreset(val as PresetType)}
-              className="grid grid-cols-2 gap-2"
+              className="grid grid-cols-2 gap-1.5"
             >
-              <ToggleGroupItem value="custom" className="text-xs h-auto py-2 px-3 flex flex-col items-start gap-0.5">
+              <ToggleGroupItem value="custom" className="text-xs h-auto py-1.5 px-2 flex flex-col items-start gap-0.5">
                 <span className="font-medium">自定义</span>
                 <span className="text-[10px] text-muted-foreground">手动调整</span>
               </ToggleGroupItem>
-              <ToggleGroupItem value="social" className="text-xs h-auto py-2 px-3 flex flex-col items-start gap-0.5">
+              <ToggleGroupItem value="social" className="text-xs h-auto py-1.5 px-2 flex flex-col items-start gap-0.5">
                 <span className="font-medium">社交媒体</span>
-                <span className="text-[10px] text-muted-foreground">质量 85%</span>
+                <span className="text-[10px] text-muted-foreground">质量 75%</span>
               </ToggleGroupItem>
-              <ToggleGroupItem value="web" className="text-xs h-auto py-2 px-3 flex flex-col items-start gap-0.5">
+              <ToggleGroupItem value="web" className="text-xs h-auto py-1.5 px-2 flex flex-col items-start gap-0.5">
                 <span className="font-medium">网页优化</span>
                 <span className="text-[10px] text-muted-foreground">质量 75%</span>
               </ToggleGroupItem>
-              <ToggleGroupItem value="extreme" className="text-xs h-auto py-2 px-3 flex flex-col items-start gap-0.5">
+              <ToggleGroupItem value="extreme" className="text-xs h-auto py-1.5 px-2 flex flex-col items-start gap-0.5">
                 <span className="font-medium">极致压缩</span>
-                <span className="text-[10px] text-muted-foreground">质量 60%</span>
+                <span className="text-[10px] text-muted-foreground">质量 65%</span>
               </ToggleGroupItem>
             </ToggleGroup>
-            <p className="mt-1.5 text-[11px] leading-relaxed text-muted-foreground">
+            <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
               {PRESETS[currentPreset].description}
             </p>
           </div>
@@ -567,7 +569,7 @@ function ImageCompressorPage() {
                   PNG（支持透明背景与色彩量化压缩）
                 </SelectItem>
                 <SelectItem value="image/webp" className="text-xs">
-                  WebP（体积最小，支持透明）
+                  WebP（支持透明）
                 </SelectItem>
               </SelectContent>
             </Select>

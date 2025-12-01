@@ -33,7 +33,7 @@ export const toolRoutes: ToolRoute[] = [
   {
     key: ToolKey.ImageCompressor,
     path: '/image-compressor',
-    title: '图片压缩与裁剪',
+    title: '图片压缩',
     subtitle: '在线图片压缩与尺寸调整工具，支持实时预览与参数调节',
     icon: ImageIcon,
     component: ImageCompressorPage,
