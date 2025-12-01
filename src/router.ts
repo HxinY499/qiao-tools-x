@@ -3,6 +3,7 @@ import {
   Braces,
   CalendarClock,
   Circle,
+  FileImage,
   Fingerprint,
   ImageIcon,
   Link,
@@ -18,6 +19,7 @@ import { ToolKey, ToolRoute } from './type';
 
 const ImageCompressorPage = lazy(() => import('@/pages/image-compressor'));
 const ImageWatermarkPage = lazy(() => import('@/pages/image-watermark'));
+const SvgConverterPage = lazy(() => import('@/pages/svg-converter'));
 const ScrollBarPage = lazy(() => import('@/pages/scroll-bar'));
 const ColorConverterPage = lazy(() => import('@/pages/color-converter'));
 const BoxShadowPage = lazy(() => import('@/pages/box-shadow'));
@@ -56,6 +58,20 @@ export const toolRoutes: ToolRoute[] = [
       description:
         '免费在线图片水印工具，支持添加文字或图片水印，可自定义位置、透明度、字体和大小，批量处理图片。所有处理在本地完成，保护您的隐私。',
       keywords: '图片水印,添加水印,在线水印工具,图片批量水印,文字水印,图片水印,水印制作',
+    },
+  },
+  {
+    key: ToolKey.SvgConverter,
+    path: '/svg-converter',
+    title: 'SVG 转图片',
+    subtitle: 'SVG 转 PNG/JPG/WebP 工具，支持自定义尺寸、背景色和质量，实时预览效果',
+    icon: FileImage,
+    component: SvgConverterPage,
+    category: 'image',
+    seo: {
+      description:
+        '免费在线 SVG 转图片工具，支持转换为 PNG、JPG、WebP 格式，可自定义导出尺寸、背景色和质量，实时预览效果。所有处理在本地完成，保护您的隐私。',
+      keywords: 'SVG转PNG,SVG转JPG,SVG转图片,SVG转换器,矢量图转位图,SVG导出,在线SVG工具',
     },
   },
   {
