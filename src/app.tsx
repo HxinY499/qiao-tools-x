@@ -151,7 +151,7 @@ function App() {
 
       {/* 右侧内容区 */}
       <SidebarInset>
-        <Routes>
+        <Routes key={location.pathname}>
           {toolRoutes.map((route) => (
             <Route key={route.path} path={route.path} element={<ToolPage route={route} />} />
           ))}
