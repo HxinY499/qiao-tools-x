@@ -81,7 +81,7 @@ function ImageWatermarkPage() {
 
   const [mode, setMode] = useState<WatermarkMode>('text');
 
-  const [textWatermark, setTextWatermark] = useState('© qiao-tools-x');
+  const [textWatermark, setTextWatermark] = useState('© qiao-tools');
   const [fontSize, setFontSize] = useState(32);
   const [fontFamily, setFontFamily] = useState<FontFamilyOption>('system');
   const [fontWeight, setFontWeight] = useState<'normal' | 'bold'>('bold');
