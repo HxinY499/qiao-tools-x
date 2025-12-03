@@ -257,7 +257,7 @@ function HeadingsPanel({ headings }: { headings: SeoAnalysisResult['headings'] }
 // 图片列表
 function ImagesPanel({ images, baseUrl }: { images: SeoAnalysisResult['images']; baseUrl?: string }) {
   const [previewSrc, setPreviewSrc] = useState<string | null>(null);
-  const [previewAlt, setPreviewAlt] = useState<string>('');
+  const [previewAlt, setPreviewAlt] = useState<string | null>();
 
   if (images.length === 0) {
     return <p className="py-8 text-center text-xs text-muted-foreground">页面没有图片</p>;
@@ -283,11 +283,11 @@ function ImagesPanel({ images, baseUrl }: { images: SeoAnalysisResult['images'];
     }
   };
 
-  const handlePreview = (rawSrc: string | undefined | null, alt: string) => {
+  const handlePreview = (rawSrc: string | undefined | null, alt?: string | null) => {
     const src = resolveSrc(rawSrc);
     if (!src) return;
     setPreviewSrc(src);
-    setPreviewAlt(alt || '图片预览');
+    setPreviewAlt(alt);
   };
 
   const ImageRow = ({ index, style }: { index: number; style: React.CSSProperties }) => {
@@ -302,7 +302,7 @@ function ImagesPanel({ images, baseUrl }: { images: SeoAnalysisResult['images'];
           'flex items-center gap-2 rounded px-2 py-1.5 text-xs',
           hasPreview && 'cursor-zoom-in hover:bg-muted/50',
         )}
-        onClick={() => hasPreview && handlePreview(img.src as string | undefined, img.alt || img.src || '')}
+        onClick={() => hasPreview && handlePreview(img.src as string | undefined, img.alt)}
       >
         {img.hasAlt ? (
           <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-green-500" />
@@ -345,8 +345,20 @@ function ImagesPanel({ images, baseUrl }: { images: SeoAnalysisResult['images'];
       <Dialog open={!!previewSrc} onOpenChange={(open) => !open && setPreviewSrc(null)}>
         <DialogContent className="max-w-4xl border bg-background/95">
           {previewSrc && (
-            <div className="flex w-full items-center justify-center">
-              <img src={previewSrc} alt={previewAlt} className="max-h-[80vh] w-full object-contain" />
+            <div className="space-y-3">
+              <div className="flex w-full items-center justify-center">
+                <img src={previewSrc} className="max-h-[70vh] w-full object-contain" />
+              </div>
+              <div className="rounded-md bg-muted/50 px-3 py-2">
+                <p className="text-xs">
+                  <span className="font-medium text-muted-foreground">Alt:</span>{' '}
+                  {previewAlt ? (
+                    <span className="text-foreground">{previewAlt}</span>
+                  ) : (
+                    <span className="text-yellow-600 dark:text-yellow-500">缺少 alt 属性</span>
+                  )}
+                </p>
+              </div>
             </div>
           )}
         </DialogContent>

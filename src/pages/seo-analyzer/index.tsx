@@ -1,16 +1,19 @@
-import { Code2, FileUp, Globe, Loader2, Search } from 'lucide-react';
+import { Clock, Code2, FileUp, Globe, Loader2, Search, X } from 'lucide-react';
 import { useCallback, useState } from 'react';
 
 import { FileDragUploader } from '@/components/file-drag-uploader';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { API_BASE } from '@/constant';
 
 import { SeoResultView } from './result-view';
+import { useSeoAnalyzerStore } from './store';
 import type { FetchHtmlResponse, InputSource, SeoAnalysisResult } from './types';
 import { analyzeHtml } from './utils';
 
@@ -22,6 +25,9 @@ function SeoAnalyzerPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<SeoAnalysisResult | null>(null);
+  const [historyOpen, setHistoryOpen] = useState(false);
+
+  const { urlHistory, addUrlToHistory, removeUrlFromHistory } = useSeoAnalyzerStore();
 
   // 判断用户输入是否已包含协议
   const urlHasProtocol = url.trim().startsWith('http://') || url.trim().startsWith('https://');
@@ -57,12 +63,15 @@ function SeoAnalyzerPage() {
       analysisResult.url = targetUrl;
       analysisResult.finalUrl = data.finalUrl;
       setResult(analysisResult);
+
+      // 添加到历史记录
+      addUrlToHistory(targetUrl);
     } catch (err) {
       setError(err instanceof Error ? err.message : '请求失败');
     } finally {
       setIsLoading(false);
     }
-  }, [url, protocol, urlHasProtocol]);
+  }, [url, protocol, urlHasProtocol, addUrlToHistory]);
 
   // 分析粘贴的 HTML 代码
   const analyzeCode = useCallback(() => {
@@ -112,6 +121,21 @@ function SeoAnalyzerPage() {
     setError(null);
   }, []);
 
+  // 选择历史记录
+  const handleSelectHistory = useCallback((historyUrl: string) => {
+    setUrl(historyUrl);
+    setHistoryOpen(false);
+  }, []);
+
+  // 删除历史记录
+  const handleDeleteHistory = useCallback(
+    (historyUrl: string, e: React.MouseEvent) => {
+      e.stopPropagation();
+      removeUrlFromHistory(historyUrl);
+    },
+    [removeUrlFromHistory],
+  );
+
   return (
     <div className="mx-auto w-full max-w-5xl space-y-4 px-4 pb-5 lg:space-y-6 lg:py-8">
       {!result ? (
@@ -153,14 +177,57 @@ function SeoAnalyzerPage() {
                     </SelectContent>
                   </Select>
                 )}
-                <Input
-                  placeholder={urlHasProtocol ? '输入完整网址' : 'example.com/page'}
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleAnalyze()}
-                  disabled={isLoading}
-                  className="h-9 flex-1 text-sm"
-                />
+                <div className="relative flex-1">
+                  <Input
+                    placeholder={urlHasProtocol ? '输入完整网址' : 'example.com/page'}
+                    value={url}
+                    onChange={(e) => setUrl(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleAnalyze()}
+                    disabled={isLoading}
+                    className="h-9 flex-1 pr-9 text-sm"
+                  />
+                  {urlHistory.length > 0 && (
+                    <Popover open={historyOpen} onOpenChange={setHistoryOpen}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="absolute right-0 top-0 h-9 w-9 p-0 hover:bg-transparent"
+                          disabled={isLoading}
+                        >
+                          <Clock className="h-4 w-4 text-muted-foreground" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[400px] p-0" align="end">
+                        <div className="border-b px-3 py-2">
+                          <span className="text-xs font-medium text-muted-foreground">历史记录</span>
+                        </div>
+                        <ScrollArea className="max-h-[300px]">
+                          <div className="p-1">
+                            {urlHistory.map((item) => (
+                              <button
+                                key={item.url}
+                                onClick={() => handleSelectHistory(item.url)}
+                                className="group flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-xs transition-colors hover:bg-muted"
+                              >
+                                <Globe className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                                <span className="min-w-0 flex-1 truncate">{item.url}</span>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-5 w-5 shrink-0 p-0 opacity-0 transition-opacity group-hover:opacity-100"
+                                  onClick={(e) => handleDeleteHistory(item.url, e)}
+                                >
+                                  <X className="h-3 w-3" />
+                                </Button>
+                              </button>
+                            ))}
+                          </div>
+                        </ScrollArea>
+                      </PopoverContent>
+                    </Popover>
+                  )}
+                </div>
                 <Button onClick={handleAnalyze} disabled={isLoading || !url.trim()} size="sm" className="h-9 gap-1.5">
                   {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
                   <span className="hidden sm:inline">分析</span>
