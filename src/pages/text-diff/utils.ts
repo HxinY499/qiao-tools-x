@@ -100,12 +100,14 @@ export function buildDiffLines(leftText: string, rightText: string): DiffLine[] 
       const next = diffParts[index + 1];
       const removedLines = splitIntoLines(part.value);
       const cleanedRemoved = removedLines.filter((line, lineIndex) => {
+        void line;
         return !shouldSkipLastEmptyLine(removedLines, part.value, lineIndex);
       });
 
       if (next && next.added) {
         const addedLines = splitIntoLines(next.value);
         const cleanedAdded = addedLines.filter((line, lineIndex) => {
+          void line;
           return !shouldSkipLastEmptyLine(addedLines, next.value, lineIndex);
         });
 
@@ -194,6 +196,7 @@ export function buildDiffLines(leftText: string, rightText: string): DiffLine[] 
     if (part.added) {
       const addedLines = splitIntoLines(part.value);
       const cleanedAdded = addedLines.filter((line, lineIndex) => {
+        void line;
         return !shouldSkipLastEmptyLine(addedLines, part.value, lineIndex);
       });
 
