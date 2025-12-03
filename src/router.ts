@@ -3,6 +3,7 @@ import {
   Braces,
   CalendarClock,
   Circle,
+  FileDiff,
   FileImage,
   Fingerprint,
   ImageIcon,
@@ -30,6 +31,7 @@ const TimestampConverterPage = lazy(() => import('@/pages/timestamp-converter'))
 const UrlEncoderPage = lazy(() => import('@/pages/url-encoder'));
 const UUIDGeneratorPage = lazy(() => import('@/pages/uuid-generator'));
 const WordCountAndProcessPage = lazy(() => import('@/pages/word-count-and-process'));
+const TextDiffPage = lazy(() => import('@/pages/text-diff'));
 const PasswordGeneratorPage = lazy(() => import('@/pages/password-generator'));
 const SeoAnalyzerPage = lazy(() => import('@/pages/seo-analyzer'));
 
@@ -228,6 +230,20 @@ export const toolRoutes: ToolRoute[] = [
       description:
         '免费在线字数统计工具，支持字数、字符数、段落、句子统计，目标字数进度追踪，支持多种文本格式处理，快速格式化文本，快速去除转义字符。',
       keywords: '文本处理工具,文本格式化,去除转义,字数统计,字符统计,文本统计,段落统计,句子统计',
+    },
+  },
+  {
+    key: ToolKey.TextDiff,
+    path: '/text-diff',
+    title: '文本 Diff 对比',
+    subtitle: '左右对比两段文本或代码的差异，支持行级与行内高亮显示',
+    icon: FileDiff,
+    component: TextDiffPage,
+    category: 'text',
+    seo: {
+      description:
+        '免费在线文本 Diff 对比工具，支持左右两栏对比代码或配置差异，提供行级与行内高亮显示，适合代码审查与配置变更检查。',
+      keywords: '文本Diff,代码对比,文本对比工具,配置文件对比,行级Diff,行内Diff,差异对比',
     },
   },
   {

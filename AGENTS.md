@@ -83,6 +83,9 @@ pnpm lint         # 运行 ESLint 并自动修复问题
 - 使用 `@/` 路径别名指向 `src/`
 - 组件使用 CVA (class-variance-authority) 管理变体样式
 
+#### 一些样式规则
+- 如果一个元素可以滚动（overflow-auto），请加上custom-scrollbar类名，这是一个全局类名，可以美化滚动条样式
+
 #### 暗色模式支持
 
 项目全面支持暗色模式，开发时**必须确保所有工具在亮色和暗色模式下都完美显示**。

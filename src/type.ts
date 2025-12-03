@@ -18,6 +18,7 @@ export enum ToolKey {
   Base64 = 'base64',
   UuidGenerator = 'uuid-generator',
   WordCount = 'word-count',
+  TextDiff = 'text-diff',
   PasswordGenerator = 'password-generator',
   SeoAnalyzer = 'seo-analyzer',
 }
