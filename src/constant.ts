@@ -17,3 +17,7 @@ export const CATEGORY_LABELS: Record<ToolCategory, string> = {
   life: '生活实用类',
   other: '其他',
 };
+
+// api 基础地址
+// 开发环境下使用本地 API 服务器
+export const API_BASE = import.meta.env.DEV ? 'http://localhost:3001' : '';

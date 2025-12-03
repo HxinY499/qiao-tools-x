@@ -187,6 +187,139 @@ import { Input } from '@/components/ui/input';
 - 使用 Suspense + lazy() 进行代码分割
 - 路由系统自动处理加载状态(RouteLoadingFallback)
 
+## Serverless Function 开发
+
+项目使用 Vercel Serverless Functions 实现后端 API,所有 API 函数放在 `api/` 目录下。
+
+### API 开发流程
+
+#### 1. 创建 API 函数
+
+在 `api/` 目录下创建 TypeScript 文件,例如 `api/your-api.ts`:
+
+```ts
+import type { VercelRequest, VercelResponse } from '@vercel/node';
+
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // 设置 CORS 头
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  // 处理 OPTIONS 预检请求
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
+  try {
+    // 从请求中获取参数
+    const { param } = req.method === 'GET' ? req.query : req.body;
+
+    // 业务逻辑处理
+    const result = await processData(param);
+
+    // 返回 JSON 响应
+    return res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      error: error instanceof Error ? error.message : '服务器错误',
+    });
+  }
+}
+```
+
+#### 2. 本地开发调试
+
+**启动本地 API 服务器:**
+
+```bash
+pnpm dev:api
+```
+
+这会在 `http://localhost:3001` 启动本地 API 服务器,模拟 Vercel Serverless Functions 环境。
+
+**同时启动前端开发服务器:**
+
+```bash
+pnpm dev
+```
+
+前端会在 `http://localhost:3000` (或其他端口)运行。
+
+#### 3. 前端调用 API
+
+前端通过 `src/constant.ts` 中的 `API_BASE` 获取 API 基础地址:
+
+```ts
+import { API_BASE } from '@/constant';
+
+// 调用 API
+const response = await fetch(`${API_BASE}/api/your-api`, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({ param: 'value' }),
+});
+
+const data = await response.json();
+```
+
+**API_BASE 说明:**
+
+- **开发环境** (`import.meta.env.DEV`)：指向本地 API 服务器 `http://localhost:3001`
+- **生产环境**：为空字符串 `''`,使用相对路径调用同域 API
+
+#### 4. 更新本地 API 服务器配置
+
+如果新增了 API 函数,需要在 `scripts/dev-api.js` 中注册路由:
+
+```js
+// 导入新的 API handler
+const { default: yourApiHandler } = await import('../api/your-api.ts');
+
+// 在路由处理中添加
+if (url.pathname === '/api/your-api') {
+  await yourApiHandler(mockReq, mockRes);
+}
+```
+
+### API 开发注意事项
+
+1. **Vercel 限制**
+   - **超时时间**: Hobby 版最大 10 秒,Pro 版最大 60 秒
+   - **响应体大小**: 最大 4.5MB(所有版本相同)
+   - **内存**: Hobby 版 1GB,Pro 版可配置
+
+2. **安全性**
+   - 始终验证和清理用户输入
+   - 防止 SSRF 攻击:禁止访问内网 IP、localhost、云元数据端点
+   - 设置合理的请求超时和大小限制
+   - 使用 CORS 头控制跨域访问
+
+3. **错误处理**
+   - 捕获所有可能的异常
+   - 返回标准化的错误响应格式
+   - 避免泄露敏感信息到错误消息中
+
+4. **性能优化**
+   - 尽量减少冷启动时间(避免大量依赖)
+   - 复用连接和资源
+   - 设置适当的缓存策略
+
+### 示例: 现有 API
+
+**`api/fetch-html.ts`** - 获取网页 HTML 内容
+
+- 支持 GET/POST 请求
+- 防止 SSRF 攻击
+- 限制响应大小和超时时间
+- 用于 SEO 分析器等工具
+
 # 如何在创建一个新的工具
 
 ## 1. 创建页面文件

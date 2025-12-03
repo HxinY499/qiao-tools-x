@@ -10,6 +10,7 @@ import {
   Palette,
   Rainbow,
   ScrollText,
+  Search,
   Shield,
   Square,
 } from 'lucide-react';
@@ -30,6 +31,7 @@ const UrlEncoderPage = lazy(() => import('@/pages/url-encoder'));
 const UUIDGeneratorPage = lazy(() => import('@/pages/uuid-generator'));
 const WordCountAndProcessPage = lazy(() => import('@/pages/word-count-and-process'));
 const PasswordGeneratorPage = lazy(() => import('@/pages/password-generator'));
+const SeoAnalyzerPage = lazy(() => import('@/pages/seo-analyzer'));
 
 export const toolRoutes: ToolRoute[] = [
   {
@@ -240,6 +242,20 @@ export const toolRoutes: ToolRoute[] = [
       description:
         '免费在线密码生成器，支持自定义密码长度和字符类型，生成高强度随机密码，保护账号安全。所有处理在本地完成。',
       keywords: '密码生成器,随机密码,强密码生成,安全密码,密码工具,在线密码生成',
+    },
+  },
+  {
+    key: ToolKey.SeoAnalyzer,
+    path: '/seo-analyzer',
+    title: 'SEO 分析',
+    subtitle: '分析网页 SEO 状况，检测 Meta 标签、标题结构、图片优化、结构化数据等',
+    icon: Search,
+    component: SeoAnalyzerPage,
+    category: 'dev',
+    seo: {
+      description:
+        '免费在线 SEO 分析工具，支持 URL 抓取、HTML 代码分析，检测 Meta 标签、Open Graph、标题结构、图片 Alt、结构化数据等，生成详细的 SEO 优化报告。',
+      keywords: 'SEO分析,SEO检测,网页SEO,Meta标签检测,Open Graph,结构化数据,SEO优化,网站分析',
     },
   },
 ];

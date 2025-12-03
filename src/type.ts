@@ -19,6 +19,7 @@ export enum ToolKey {
   UuidGenerator = 'uuid-generator',
   WordCount = 'word-count',
   PasswordGenerator = 'password-generator',
+  SeoAnalyzer = 'seo-analyzer',
 }
 
 export type ToolRoute = {

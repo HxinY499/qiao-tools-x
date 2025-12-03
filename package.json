@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:api": "npx tsx scripts/dev-api.js",
     "build": "tsc -b && vite build",
     "lint": "eslint . --fix",
     "preview": "vite preview",
@@ -57,6 +58,7 @@
     "react-hook-form": "^7.66.1",
     "react-resizable-panels": "^3.0.6",
     "react-router-dom": "^7.9.0",
+    "react-window": "^1.8.11",
     "recharts": "2.15.4",
     "shiki": "^3.15.0",
     "sonner": "^2.0.7",
@@ -70,6 +72,8 @@
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
+    "@types/react-window": "^1.8.8",
+    "@vercel/node": "^5.5.14",
     "@vitejs/plugin-react": "^5.1.1",
     "autoprefixer": "^10.4.20",
     "eslint": "^9.9.0",
@@ -83,6 +87,7 @@
     "postcss": "^8.4.41",
     "prettier": "^3.6.2",
     "tailwindcss": "^3.4.14",
+    "tsx": "^4.21.0",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.0.1",
     "vite": "^7.2.0"
