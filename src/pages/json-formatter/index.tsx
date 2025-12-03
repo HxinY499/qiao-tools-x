@@ -1,6 +1,7 @@
 import { defaultTheme, githubDarkTheme, JsonEditor } from 'json-edit-react';
-import { Braces, FileJson, Maximize2, Minimize2, Trash2, XCircle } from 'lucide-react';
-import { useState } from 'react';
+import { Braces, Eraser, FileJson, Maximize2, Minimize2, Trash2, XCircle } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { toast } from 'sonner';
 
 import { CodeArea } from '@/components/code-area';
 import { Button } from '@/components/ui/button';
@@ -21,6 +22,9 @@ export default function JsonFormatterPage() {
   const [isExpanded, setIsExpanded] = useState(false);
   const { effectiveTheme } = useThemeStore();
   const settings = useJsonFormatterStore();
+
+  // 派生状态：是否有输入内容
+  const hasInput = useMemo(() => input.trim().length > 0, [input]);
 
   const processJson = (minify: boolean) => {
     if (!input.trim()) {
@@ -67,6 +71,34 @@ export default function JsonFormatterPage() {
     }
   };
 
+  // 去除转义符
+  const removeEscapes = () => {
+    if (!input) return;
+    // 去除常见转义符：\' -> ', \" -> ", \\ -> \, \/ -> /
+    // 保留 \n, \t, \r, \uXXXX 等特殊转义
+    const controlChars = ['n', 't', 'r', 'b', 'f', 'v', '0', 'u', 'x'];
+    const newText = input.replace(/\\(.)/g, (match, char) => {
+      if (controlChars.includes(char)) return match;
+      return char;
+    });
+
+    if (newText === input) {
+      toast.info('未找到可去除的转义符');
+    } else {
+      setInput(newText);
+      toast.success('已去除转义符');
+      // 尝试解析去除转义后的 JSON
+      try {
+        const parsed = JSON.parse(newText);
+        setJsonData(parsed);
+        setError(null);
+      } catch (e) {
+        setJsonData(null);
+        setError((e as Error).message);
+      }
+    }
+  };
+
   return (
     <div className="container mx-auto p-2 lg:p-4 lg:h-[calc(100vh-4rem)] flex flex-col gap-2 lg:gap-4">
       <div
@@ -92,9 +124,20 @@ export default function JsonFormatterPage() {
               </h2>
             </div>
             <div className="flex items-center gap-2">
-              <SaveJsonDialog content={input} disabled={!input.trim() || !!error} />
+              <SaveJsonDialog content={input} disabled={!hasInput || !!error} />
               <HistoryDialog onLoad={handleLoadHistory} />
               <div className="w-px h-4 bg-border mx-1" />
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={removeEscapes}
+                disabled={!hasInput}
+                className="h-8 px-2 xl:px-3"
+                title="去除转义符"
+              >
+                <Eraser className="h-3.5 w-3.5 xl:hidden" />
+                <span className="hidden xl:inline">去除转义</span>
+              </Button>
               <Button
                 size="sm"
                 variant="secondary"
@@ -103,18 +146,31 @@ export default function JsonFormatterPage() {
                   setJsonData(null);
                   setError(null);
                 }}
+                disabled={!hasInput}
                 className="h-8 px-2 xl:px-3"
                 title="清空"
               >
                 <Trash2 className="h-3.5 w-3.5 xl:hidden" />
                 <span className="hidden xl:inline">清空</span>
               </Button>
-              <Button size="sm" onClick={() => processJson(true)} className="h-8 gap-2 px-2 xl:px-3" title="压缩">
-                <Minimize2 className="h-3.5 w-3.5" />
+              <Button
+                size="sm"
+                onClick={() => processJson(true)}
+                disabled={!hasInput}
+                className="h-8 gap-2 px-2 xl:px-3"
+                title="压缩"
+              >
+                <Minimize2 className="h-3.5 w-3.5 xl:hidden" />
                 <span className="hidden xl:inline">压缩</span>
               </Button>
-              <Button size="sm" onClick={() => processJson(false)} className="h-8 gap-2 px-2 xl:px-3" title="格式化">
-                <Braces className="h-3.5 w-3.5" />
+              <Button
+                size="sm"
+                onClick={() => processJson(false)}
+                disabled={!hasInput}
+                className="h-8 gap-2 px-2 xl:px-3"
+                title="格式化"
+              >
+                <Braces className="h-3.5 w-3.5 xl:hidden" />
                 <span className="hidden xl:inline">格式化</span>
               </Button>
             </div>
@@ -125,7 +181,7 @@ export default function JsonFormatterPage() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="在此粘贴 JSON 代码..."
-              className="h-full font-mono text-xs resize-none p-3 lg:p-4 leading-relaxed"
+              className="h-full font-mono !text-xs resize-none p-3 lg:p-4 leading-relaxed"
               spellCheck={false}
             />
             {error && (

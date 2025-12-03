@@ -66,8 +66,8 @@ export function HistoryDialog({ onLoad }: HistoryDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" variant="outline" className="h-8 gap-2 px-2 xl:px-3" title="仓库">
-          <Archive className="h-3.5 w-3.5" />
+        <Button size="sm" variant="outline" className="h-8 gap-2 px-2" title="仓库">
+          <Archive className="h-3.5 w-3.5 xl:hidden" />
           <span className="hidden xl:inline">仓库</span>
         </Button>
       </DialogTrigger>
