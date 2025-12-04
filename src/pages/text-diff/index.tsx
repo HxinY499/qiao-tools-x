@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 import { CopyButton } from '@/components/copy-button';
 import { FileDragUploader } from '@/components/file-drag-uploader';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 
@@ -112,15 +112,6 @@ export default function TextDiffPage() {
   return (
     <div className="max-w-6xl w-full mx-auto px-4 pb-5 lg:py-8 space-y-4">
       <Card className="shadow-sm border bg-card/80 backdrop-blur">
-        <CardHeader className="pb-3 border-b border-border/60">
-          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <div className="flex items-center gap-2">
-              <FileDiff className="h-5 w-5 text-muted-foreground" />
-              <CardTitle className="text-base lg:text-lg">文本 Diff 工具</CardTitle>
-            </div>
-          </div>
-        </CardHeader>
-
         <CardContent className="pt-4 space-y-4">
           <div className="flex flex-wrap items-center gap-2 justify-between">
             <div className="flex flex-wrap items-center gap-2">
