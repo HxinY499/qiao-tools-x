@@ -11,12 +11,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 
 import { useSidebar } from './components/ui/sidebar';
 import { LOADING_MESSAGES } from './constant';
@@ -50,8 +44,7 @@ function RouteLoadingFallback() {
 export function ToolPage({ route }: { route: ToolRoute }) {
   const { open } = useSidebar();
   const isMobile = useIsMobile();
-  const { themeSetting, effectiveTheme, setThemeSetting } = useThemeStore();
-  const isDark = effectiveTheme === 'dark';
+  const { themeSetting, setThemeSetting } = useThemeStore();
 
   return (
     <>
@@ -100,33 +93,44 @@ export function ToolPage({ route }: { route: ToolRoute }) {
                   </DialogHeader>
                 </DialogContent>
               </Dialog>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-10 bg-muted/60 hover:bg-muted">
-                    {themeSetting === 'system' ? (
-                      <Laptop className="h-3.5 w-3.5" />
-                    ) : isDark ? (
-                      <Moon className="h-3.5 w-3.5" />
-                    ) : (
-                      <Sun className="h-3.5 w-3.5" />
-                    )}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => setThemeSetting('system')}>
-                    <Laptop className="mr-2 h-3.5 w-3.5" />
-                    <span>跟随系统</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setThemeSetting('light')}>
-                    <Sun className="mr-2 h-3.5 w-3.5" />
-                    <span>浅色模式</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setThemeSetting('dark')}>
-                    <Moon className="mr-2 h-3.5 w-3.5" />
-                    <span>深色模式</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <div className="flex items-center gap-0.5 p-0.5 bg-muted/60 rounded-lg border border-border/40 h-8">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={cn(
+                    'h-6 w-8 rounded-md hover:bg-background/50 text-muted-foreground',
+                    themeSetting === 'light' && 'bg-background shadow-sm text-primary hover:bg-background',
+                  )}
+                  onClick={() => setThemeSetting('light')}
+                  title="浅色模式"
+                >
+                  <Sun className="h-3.5 w-3.5" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={cn(
+                    'h-6 w-8 rounded-md hover:bg-background/50 text-muted-foreground',
+                    themeSetting === 'dark' && 'bg-background shadow-sm text-primary hover:bg-background',
+                  )}
+                  onClick={() => setThemeSetting('dark')}
+                  title="深色模式"
+                >
+                  <Moon className="h-3.5 w-3.5" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={cn(
+                    'h-6 w-8 rounded-md hover:bg-background/50 text-muted-foreground',
+                    themeSetting === 'system' && 'bg-background shadow-sm text-primary hover:bg-background',
+                  )}
+                  onClick={() => setThemeSetting('system')}
+                  title="跟随系统"
+                >
+                  <Laptop className="h-3.5 w-3.5" />
+                </Button>
+              </div>
             </div>
           </div>
         </header>
