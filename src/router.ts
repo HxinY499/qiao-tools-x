@@ -1,5 +1,6 @@
 import {
   AlignLeft,
+  Binary,
   Braces,
   CalendarClock,
   Circle,
@@ -8,7 +9,9 @@ import {
   Fingerprint,
   ImageIcon,
   Link,
+  Monitor,
   Palette,
+  QrCode,
   Rainbow,
   ScrollText,
   Search,
@@ -32,8 +35,11 @@ const UrlEncoderPage = lazy(() => import('@/pages/url-encoder'));
 const UUIDGeneratorPage = lazy(() => import('@/pages/uuid-generator'));
 const WordCountAndProcessPage = lazy(() => import('@/pages/word-count-and-process'));
 const TextDiffPage = lazy(() => import('@/pages/text-diff'));
+const TextEscaperPage = lazy(() => import('@/pages/text-escaper'));
+const UserAgentParserPage = lazy(() => import('@/pages/user-agent-parser'));
 const PasswordGeneratorPage = lazy(() => import('@/pages/password-generator'));
 const SeoAnalyzerPage = lazy(() => import('@/pages/seo-analyzer'));
+const QRCodeToolPage = lazy(() => import('@/pages/qrcode-tool'));
 
 export const toolRoutes: ToolRoute[] = [
   {
@@ -247,6 +253,20 @@ export const toolRoutes: ToolRoute[] = [
     },
   },
   {
+    key: ToolKey.TextEscaper,
+    path: '/text-escaper',
+    title: '文本转义工具',
+    subtitle: 'HTML 实体、Unicode、JS 字符串的转义与反转义',
+    icon: Binary,
+    component: TextEscaperPage,
+    category: 'text',
+    seo: {
+      description:
+        '免费在线文本转义工具，支持 HTML 实体、Unicode 编码、JavaScript 字符串的转义与反转义，解决乱码和特殊字符处理问题。',
+      keywords: 'HTML转义,Unicode转义,JS转义,文本转义,反转义,HTML实体,Unicode编码,字符串转义',
+    },
+  },
+  {
     key: ToolKey.PasswordGenerator,
     path: '/password-generator',
     title: '密码生成器',
@@ -261,6 +281,20 @@ export const toolRoutes: ToolRoute[] = [
     },
   },
   {
+    key: ToolKey.UserAgentParser,
+    path: '/user-agent-parser',
+    title: 'User-Agent 解析',
+    subtitle: '解析 User-Agent 字符串，识别浏览器、操作系统、设备信息',
+    icon: Monitor,
+    component: UserAgentParserPage,
+    category: 'dev',
+    seo: {
+      description:
+        '免费在线 User-Agent 解析工具，支持识别浏览器、操作系统、设备型号、引擎版本等信息，方便开发者排查问题。',
+      keywords: 'User-Agent解析,UA解析,浏览器识别,设备识别,在线UA工具',
+    },
+  },
+  {
     key: ToolKey.SeoAnalyzer,
     path: '/seo-analyzer',
     title: 'SEO 分析',
@@ -272,6 +306,20 @@ export const toolRoutes: ToolRoute[] = [
       description:
         '免费在线 SEO 分析工具，支持 URL 抓取、HTML 代码分析，检测 Meta 标签、Open Graph、标题结构、图片 Alt、结构化数据等，生成详细的 SEO 优化报告。',
       keywords: 'SEO分析,SEO检测,网页SEO,Meta标签检测,Open Graph,结构化数据,SEO优化,网站分析',
+    },
+  },
+  {
+    key: ToolKey.QRCodeTool,
+    path: '/qrcode-tool',
+    title: '二维码工具',
+    subtitle: '生成与解析二维码，支持 WiFi、联系人、短信、位置等快捷模板',
+    icon: QrCode,
+    component: QRCodeToolPage,
+    category: 'life',
+    seo: {
+      description:
+        '免费在线二维码生成与解析工具，支持自由文本、WiFi 连接、联系人名片、短信、地理位置等多种模板，可上传图片识别二维码内容。',
+      keywords: '二维码生成,二维码解析,QR码,WiFi二维码,vCard二维码,在线二维码工具',
     },
   },
 ];

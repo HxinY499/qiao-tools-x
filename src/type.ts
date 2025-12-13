@@ -19,8 +19,11 @@ export enum ToolKey {
   UuidGenerator = 'uuid-generator',
   WordCount = 'word-count',
   TextDiff = 'text-diff',
+  TextEscaper = 'text-escaper',
   PasswordGenerator = 'password-generator',
   SeoAnalyzer = 'seo-analyzer',
+  UserAgentParser = 'user-agent-parser',
+  QRCodeTool = 'qrcode-tool',
 }
 
 export type ToolRoute = {

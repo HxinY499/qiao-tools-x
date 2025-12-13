@@ -75,7 +75,8 @@ export function CodeArea({
   const containerClassName = cn('rounded-lg flex flex-col min-h-[180px]', className);
 
   const contentClassName = cn(
-    'code-area text-[11px] font-mono border rounded-md bg-background/80 h-full overflow-auto px-3 py-2 dark:bg-[#1E1E1E]',
+    'code-area text-[11px] font-mono border rounded-md bg-background/80 h-full overflow-auto px-3 py-2 dark:bg-[#1E1E1E] max-w-full',
+    '[&_pre]:whitespace-pre-wrap [&_pre]:break-words [&_pre]:max-w-full [&_code]:whitespace-pre-wrap [&_code]:break-words [&_code]:max-w-full',
     codeClassName,
   );
 
