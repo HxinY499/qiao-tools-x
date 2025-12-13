@@ -1,3 +1,5 @@
+import './index.css';
+
 import { type ChangeEvent, useEffect, useMemo, useState } from 'react';
 
 import { CodeArea } from '@/components/code-area';
@@ -31,27 +33,27 @@ function generateCss(config: ConfigType, hasHorizontal: boolean, showWhenHover: 
   const thumbVisibility = showWhenHover ? '\n    visibility: hidden;' : '';
 
   const hoverPart = showWhenHover
-    ? `\n.code-area:hover::-webkit-scrollbar-track,\n.code-area:hover::-webkit-scrollbar-thumb,\n.code-area:hover::-webkit-scrollbar {\n  visibility: visible;\n}\n`
+    ? `\n.scrollbar-code-area:hover::-webkit-scrollbar-track,\n.scrollbar-code-area:hover::-webkit-scrollbar-thumb,\n.scrollbar-code-area:hover::-webkit-scrollbar {\n  visibility: visible;\n}\n`
     : '';
 
   return `
-  .code-area::-webkit-scrollbar {
+  .scrollbar-code-area::-webkit-scrollbar {
       width: ${width}px;${heightLine}${baseVisibility}
   }
 
-  .code-area::-webkit-scrollbar-track {
+  .scrollbar-code-area::-webkit-scrollbar-track {
       border: ${config.track['border-width']}px ${config.track['border-style']} ${config.track['border-color']};
       border-radius: ${config.track['border-radius']}px;
       background-color: ${config.track['background-color']};${trackVisibility}
   }
 
-  .code-area::-webkit-scrollbar-thumb {
+  .scrollbar-code-area::-webkit-scrollbar-thumb {
       border: ${config.thumb['border-width']}px ${config.thumb['border-style']} ${config.thumb['border-color']};
       border-radius: ${config.thumb['border-radius']}px;
       background-color: ${config.thumb['background-color']};${thumbVisibility}
   }
 
-  .code-area::-webkit-scrollbar-corner {
+  .scrollbar-code-area::-webkit-scrollbar-corner {
       background-color: ${config.corner['background-color']};
   }
 
@@ -338,7 +340,7 @@ function ScrollBarPage() {
             </div>
           </div>
           <div
-            className="code-area border rounded-md bg-background text-[11px] leading-relaxed h-48 overflow-auto px-3 py-2"
+            className="scrollbar-code-area border rounded-md bg-background text-[11px] leading-relaxed h-48 overflow-auto px-3 py-2"
             style={scrollVars}
           >
             <div style={{ width: hasHorizontal ? '1000px' : '100%' }}>
@@ -362,7 +364,7 @@ function ScrollBarPage() {
         <div className="border-t border-border pt-3 mt-1">
           <h3 className="text-xs font-semibold mb-1.5">使用小贴士</h3>
           <ul className="list-disc pl-4 text-[11px] text-muted-foreground space-y-1">
-            <li>生成的 CSS 默认使用选择器 .code-area，你可以根据实际项目修改为自己的类名。</li>
+            <li>生成的 CSS 默认使用选择器 .scrollbar-code-area，你可以根据实际项目修改为自己的类名。</li>
             <li>如果只想在 hover 时显示滚动条，请勾选「仅 hover 时显示」。</li>
             <li>横向滚动开关只影响预览区域的内容宽度，方便你同时预览横向滚动条样式。</li>
           </ul>

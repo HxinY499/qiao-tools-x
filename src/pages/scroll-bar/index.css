@@ -1,0 +1,32 @@
+/* scroll-bar 工具预览用的滚动条样式（通过 CSS 变量驱动） */
+.scrollbar-code-area::-webkit-scrollbar {
+  width: var(--sb-width, 8px);
+  height: var(--sb-width, 8px);
+  visibility: var(--sb-visibility, visible);
+}
+
+.scrollbar-code-area::-webkit-scrollbar-track {
+  background-color: var(--sb-track-background-color, #f3f3f3);
+  border: var(--sb-track-border-width, 0px) var(--sb-track-border-style, solid)
+    var(--sb-track-border-color, transparent);
+  border-radius: var(--sb-track-border-radius, 0px);
+  visibility: var(--sb-visibility, visible);
+}
+
+.scrollbar-code-area::-webkit-scrollbar-thumb {
+  background-color: var(--sb-thumb-background-color, #888);
+  border: var(--sb-thumb-border-width, 0px) var(--sb-thumb-border-style, solid)
+    var(--sb-thumb-border-color, transparent);
+  border-radius: var(--sb-thumb-border-radius, 0px);
+  visibility: var(--sb-visibility, visible);
+}
+
+.scrollbar-code-area::-webkit-scrollbar-corner {
+  background-color: var(--sb-corner-background-color, transparent);
+}
+
+.scrollbar-code-area:hover::-webkit-scrollbar-track,
+.scrollbar-code-area:hover::-webkit-scrollbar-thumb,
+.scrollbar-code-area:hover::-webkit-scrollbar {
+  visibility: visible;
+}
