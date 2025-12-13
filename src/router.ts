@@ -6,6 +6,7 @@ import {
   Circle,
   FileDiff,
   FileImage,
+  FileType2,
   Fingerprint,
   ImageIcon,
   Link,
@@ -40,6 +41,7 @@ const UserAgentParserPage = lazy(() => import('@/pages/user-agent-parser'));
 const PasswordGeneratorPage = lazy(() => import('@/pages/password-generator'));
 const SeoAnalyzerPage = lazy(() => import('@/pages/seo-analyzer'));
 const QRCodeToolPage = lazy(() => import('@/pages/qrcode-tool'));
+const JsonSchemaConverterPage = lazy(() => import('@/pages/json-schema-converter'));
 
 export const toolRoutes: ToolRoute[] = [
   {
@@ -320,6 +322,20 @@ export const toolRoutes: ToolRoute[] = [
       description:
         '免费在线二维码生成与解析工具，支持自由文本、WiFi 连接、联系人名片、短信、地理位置等多种模板，可上传图片识别二维码内容。',
       keywords: '二维码生成,二维码解析,QR码,WiFi二维码,vCard二维码,在线二维码工具',
+    },
+  },
+  {
+    key: ToolKey.JsonSchemaConverter,
+    path: '/json-schema-converter',
+    title: 'JSON Schema 转 TS',
+    subtitle: 'JSON Schema 与 TypeScript 类型互转，支持 interface/type 输出与多种选项配置',
+    icon: FileType2,
+    component: JsonSchemaConverterPage,
+    category: 'dev',
+    seo: {
+      description:
+        '免费在线 JSON Schema 与 TypeScript 类型互转工具，支持 interface/type 输出、Draft-07/Draft-04 版本选择，快速生成类型定义或 Schema。',
+      keywords: 'JSON Schema,TypeScript,类型转换,Schema转TS,TS转Schema,interface生成,type生成,JSON Schema转换器',
     },
   },
 ];
