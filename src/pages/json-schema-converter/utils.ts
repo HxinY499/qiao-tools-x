@@ -27,13 +27,7 @@ function indent(level: number): string {
 /**
  * 将 JSON Schema 类型转换为 TypeScript 类型
  */
-function schemaTypeToTs(
-  schema: any,
-  options: ConvertOptions,
-  level: number = 0,
-  parentRequired: string[] = [],
-  propName?: string,
-): string {
+function schemaTypeToTs(schema: any, options: ConvertOptions, level: number = 0): string {
   if (!schema) return 'unknown';
 
   // 处理 $ref
@@ -121,7 +115,7 @@ function generateObjectType(schema: any, options: ConvertOptions, level: number)
     const isRequired = required.includes(propName);
     const isOptional = options.optionalByDefault ? !isRequired : !isRequired;
     const optionalMark = isOptional ? '?' : '';
-    const propType = schemaTypeToTs(propSchema, options, level + 1, required, propName);
+    const propType = schemaTypeToTs(propSchema, options, level + 1);
 
     // 添加注释
     if (propSchema.description) {
@@ -172,7 +166,7 @@ function generateInterfaceBody(schema: any, options: ConvertOptions, level: numb
     const isRequired = required.includes(propName);
     const isOptional = options.optionalByDefault ? !isRequired : !isRequired;
     const optionalMark = isOptional ? '?' : '';
-    const propType = schemaTypeToTs(propSchema, options, level + 1, required, propName);
+    const propType = schemaTypeToTs(propSchema, options, level + 1);
 
     // 添加注释
     if (propSchema.description) {
