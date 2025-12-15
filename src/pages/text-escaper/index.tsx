@@ -22,10 +22,10 @@ export default function TextEscaperPage() {
   const fillSample = () => {
     switch (activeTab) {
       case 'html':
-        setInput('<div><h1>Hello World</h1><p>This is a "test".</p></div>');
+        setInput('<div><h1>Hello  World</h1><p>This is a "test" & demo.</p></div>');
         break;
       case 'unicode':
-        setInput('你好，世界！\nHello World!');
+        setInput('你好，世界！😀\nHello World!');
         break;
       case 'js':
         setInput('const greeting = "Hello World";\nconsole.log(greeting);');

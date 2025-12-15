@@ -104,9 +104,9 @@ export function CodeArea({
         </div>
       )}
 
-      <div className="relative flex-1">
+      <div className="relative flex-1 min-h-0 overflow-hidden">
         <div
-          className={contentClassName}
+          className={cn(contentClassName, 'custom-scrollbar')}
           style={codeStyle}
           dangerouslySetInnerHTML={{ __html: highlightedHtml || fallbackHtml }}
         />

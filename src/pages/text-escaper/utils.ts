@@ -4,7 +4,9 @@ import jsesc from 'jsesc';
 export type EscapeType = 'html' | 'unicode' | 'js';
 
 export function escapeHtml(text: string): string {
-  return he.encode(text, { useNamedReferences: true });
+  // 先用 he 转义 HTML 特殊字符，再把空格转成 &nbsp; 以保留多个连续空格
+  const encoded = he.encode(text, { useNamedReferences: true });
+  return encoded.replace(/ /g, '&nbsp;');
 }
 
 export function unescapeHtml(text: string): string {
@@ -12,19 +14,32 @@ export function unescapeHtml(text: string): string {
 }
 
 export function escapeUnicode(text: string): string {
-  return text
-    .split('')
-    .map((char) => {
-      const code = char.charCodeAt(0);
-      return code > 127 ? '\\u' + code.toString(16).padStart(4, '0') : char;
-    })
-    .join('');
+  const result: string[] = [];
+  for (const char of text) {
+    const code = char.codePointAt(0)!;
+    if (code > 127) {
+      // 对于 BMP 内的字符使用 \uXXXX，超出 BMP 的使用 \u{XXXXX}
+      if (code <= 0xffff) {
+        result.push('\\u' + code.toString(16).padStart(4, '0'));
+      } else {
+        result.push('\\u{' + code.toString(16) + '}');
+      }
+    } else {
+      result.push(char);
+    }
+  }
+  return result.join('');
 }
 
 export function unescapeUnicode(text: string): string {
-  return text.replace(/\\u[\dA-F]{4}/gi, (match) => {
-    return String.fromCharCode(parseInt(match.replace(/\\u/g, ''), 16));
-  });
+  // 先处理 \u{XXXXX} 格式（ES6），再处理 \uXXXX 格式
+  return text
+    .replace(/\\u\{([\dA-F]+)\}/gi, (_, hex) => {
+      return String.fromCodePoint(parseInt(hex, 16));
+    })
+    .replace(/\\u([\dA-F]{4})/gi, (_, hex) => {
+      return String.fromCharCode(parseInt(hex, 16));
+    });
 }
 
 export function escapeJs(text: string): string {

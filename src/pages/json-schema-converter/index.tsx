@@ -100,9 +100,9 @@ export default function JsonSchemaConverterPage() {
   };
 
   return (
-    <div className="container mx-auto p-2 lg:p-4 lg:h-[calc(100vh-4rem)] flex flex-col gap-3 lg:gap-4">
+    <div className="container mx-auto p-2 lg:p-4 flex flex-col gap-3 lg:gap-4">
       {/* 控制面板 */}
-      <Card className="p-3 lg:p-4">
+      <Card className="p-3 lg:p-4 shrink-0">
         <div className="flex flex-col lg:flex-row lg:items-center gap-4">
           {/* 方向切换 */}
           <div className="flex items-center gap-3">
@@ -214,9 +214,9 @@ export default function JsonSchemaConverterPage() {
       </Card>
 
       {/* 编辑器区域 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-4 flex-1 min-h-0">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-4">
         {/* 输入区 */}
-        <Card className="flex flex-col p-3 lg:p-4 gap-3 h-[350px] lg:h-full">
+        <Card className="flex flex-col p-3 lg:p-4 gap-3 h-[350px] lg:h-[500px]">
           <header className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               {isSchemaToTs ? (
@@ -261,7 +261,7 @@ export default function JsonSchemaConverterPage() {
         </Card>
 
         {/* 输出区 */}
-        <Card className="flex flex-col p-3 lg:p-4 gap-3 h-[350px] lg:h-full">
+        <Card className="flex flex-col p-3 lg:p-4 gap-3 h-[350px] lg:h-[500px]">
           <header className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               {isSchemaToTs ? (
@@ -295,6 +295,31 @@ export default function JsonSchemaConverterPage() {
           </div>
         </Card>
       </div>
+
+      {/* 使用说明 */}
+      <Card className="p-3 lg:p-4 shrink-0">
+        <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase mb-3">使用说明</h2>
+        <ul className="list-disc pl-4 text-xs text-muted-foreground space-y-1.5 leading-relaxed">
+          <li>
+            <span className="font-medium text-foreground">Schema → TS</span>
+            ：将 JSON Schema 转换为 TypeScript interface 或 type，支持嵌套对象、数组、枚举、联合类型等。
+          </li>
+          <li>
+            <span className="font-medium text-foreground">TS → Schema</span>
+            ：将 TypeScript interface/type 转换为 JSON Schema，支持 Draft-04 和 Draft-07 版本。
+          </li>
+          <li>
+            <span className="font-medium text-foreground">交换按钮</span>
+            ：将输出结果作为新的输入，方便双向校验转换结果。
+          </li>
+          <li>
+            支持的类型：基本类型、数组、嵌套对象、联合类型（<code className="bg-muted px-1 rounded">|</code>
+            ）、交叉类型（
+            <code className="bg-muted px-1 rounded">&</code>）、枚举、
+            <code className="bg-muted px-1 rounded">$ref</code> 引用等。
+          </li>
+        </ul>
+      </Card>
     </div>
   );
 }

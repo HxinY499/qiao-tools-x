@@ -113,7 +113,9 @@ function generateObjectType(schema: any, options: ConvertOptions, level: number)
   for (const propName of propNames) {
     const propSchema = properties[propName];
     const isRequired = required.includes(propName);
-    const isOptional = options.optionalByDefault ? !isRequired : !isRequired;
+    // optionalByDefault=true 时，只有 required 数组中的字段才是必填的，其他都可选
+    // optionalByDefault=false 时，不在 required 数组中的字段可选
+    const isOptional = !isRequired;
     const optionalMark = isOptional ? '?' : '';
     const propType = schemaTypeToTs(propSchema, options, level + 1);
 
@@ -164,7 +166,9 @@ function generateInterfaceBody(schema: any, options: ConvertOptions, level: numb
   for (const propName of propNames) {
     const propSchema = properties[propName];
     const isRequired = required.includes(propName);
-    const isOptional = options.optionalByDefault ? !isRequired : !isRequired;
+    // optionalByDefault=true 时，只有 required 数组中的字段才是必填的，其他都可选
+    // optionalByDefault=false 时，不在 required 数组中的字段可选
+    const isOptional = !isRequired;
     const optionalMark = isOptional ? '?' : '';
     const propType = schemaTypeToTs(propSchema, options, level + 1);
 
@@ -268,6 +272,19 @@ function parseProperties(body: string): ParsedProperty[] {
  */
 function tsTypeToSchema(tsType: string, options: ConvertOptions): any {
   tsType = tsType.trim();
+
+  // 处理括号包裹的类型，如 (string | number)[]
+  if (tsType.startsWith('(') && tsType.includes(')')) {
+    const closeParenIndex = tsType.lastIndexOf(')');
+    const suffix = tsType.slice(closeParenIndex + 1);
+    if (suffix === '[]') {
+      const innerType = tsType.slice(1, closeParenIndex);
+      return {
+        type: 'array',
+        items: tsTypeToSchema(innerType, options),
+      };
+    }
+  }
 
   // 处理联合类型
   if (tsType.includes(' | ')) {

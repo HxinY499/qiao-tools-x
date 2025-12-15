@@ -5,27 +5,46 @@ import { CopyButton } from '@/components/copy-button';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 
 type Mode = 'encode' | 'decode';
+type EncodeMethod = 'component' | 'uri';
 
 const EXAMPLE_URL =
-  'https://www.example.com:8080/search/results?q=hello%20world&category=dev%20tools&tags=react,typescript&ref=codebuddy#top-section';
+  'https://www.example.com:8080/search/results?q=hello%20world&category=dev%20tools&tags=react,typescript#top-section';
+
+const EXAMPLE_ENCODE_COMPONENT = '你好 世界 & test=value';
+const EXAMPLE_ENCODE_URI = 'https://example.com/搜索?q=你好 世界&name=张三';
 
 function UrlEncoderPage() {
   const [input, setInput] = useState('');
   const [mode, setMode] = useState<Mode>('decode');
+  const [encodeMethod, setEncodeMethod] = useState<EncodeMethod>('component');
 
   const output = useMemo(() => {
     if (!input) return '';
     try {
-      return mode === 'encode' ? encodeURIComponent(input) : decodeURIComponent(input);
+      if (mode === 'encode') {
+        return encodeMethod === 'component' ? encodeURIComponent(input) : encodeURI(input);
+      } else {
+        // 解码时自动尝试两种方式
+        return decodeURIComponent(input);
+      }
     } catch (e) {
       return 'Error: Invalid URI';
     }
-  }, [input, mode]);
+  }, [input, mode, encodeMethod]);
+
+  const fillSample = () => {
+    if (mode === 'decode') {
+      setInput(EXAMPLE_URL);
+    } else {
+      setInput(encodeMethod === 'component' ? EXAMPLE_ENCODE_COMPONENT : EXAMPLE_ENCODE_URI);
+    }
+  };
 
   const urlAnalysis = useMemo(() => {
     if (mode !== 'decode') return null;
@@ -58,16 +77,33 @@ function UrlEncoderPage() {
           <div>
             <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">URL 编解码</h2>
           </div>
-          <Tabs value={mode} onValueChange={(v) => setMode(v as Mode)}>
-            <TabsList>
-              <TabsTrigger value="decode" className="text-xs">
-                Decode (解码)
-              </TabsTrigger>
-              <TabsTrigger value="encode" className="text-xs">
-                Encode (编码)
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
+          <div className="flex items-center gap-3">
+            {mode === 'encode' && (
+              <Select value={encodeMethod} onValueChange={(v) => setEncodeMethod(v as EncodeMethod)}>
+                <SelectTrigger className="h-8 w-[180px] text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="component" className="text-xs">
+                    encodeURIComponent
+                  </SelectItem>
+                  <SelectItem value="uri" className="text-xs">
+                    encodeURI
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            )}
+            <Tabs value={mode} onValueChange={(v) => setMode(v as Mode)}>
+              <TabsList>
+                <TabsTrigger value="decode" className="text-xs">
+                  Decode (解码)
+                </TabsTrigger>
+                <TabsTrigger value="encode" className="text-xs">
+                  Encode (编码)
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
         </div>
 
         <div className="mt-4 grid gap-4 lg:grid-cols-2">
@@ -75,16 +111,9 @@ function UrlEncoderPage() {
             <div className="flex items-center justify-between">
               <Label className="text-xs font-medium">输入</Label>
               <div className="flex items-center gap-2">
-                {mode === 'decode' && (
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="h-6 px-2 text-[11px]"
-                    onClick={() => setInput(EXAMPLE_URL)}
-                  >
-                    示例
-                  </Button>
-                )}
+                <Button variant="secondary" size="sm" className="h-6 px-2 text-[11px]" onClick={fillSample}>
+                  示例
+                </Button>
                 <Button variant="secondary" size="sm" className="h-6 px-2 text-[11px]" onClick={() => setInput('')}>
                   清空
                 </Button>
@@ -186,6 +215,26 @@ function UrlEncoderPage() {
           )}
         </Card>
       )}
+
+      {/* 使用说明 */}
+      <Card className="shadow-sm p-4 lg:p-5">
+        <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase mb-3">使用说明</h2>
+        <ul className="list-disc pl-4 text-xs text-muted-foreground space-y-1.5 leading-relaxed">
+          <li>
+            <span className="font-medium text-foreground">encodeURIComponent</span>
+            ：编码所有特殊字符，包括 <code className="bg-muted px-1 rounded">/ ? & =</code> 等。适合编码 URL 参数值。
+          </li>
+          <li>
+            <span className="font-medium text-foreground">encodeURI</span>
+            ：保留 URL 结构字符（<code className="bg-muted px-1 rounded">/ ? & = : #</code>
+            ），只编码非 ASCII 字符和空格。适合编码完整 URL。
+          </li>
+          <li>
+            <span className="font-medium text-foreground">解码模式</span>
+            ：自动解析 URL 结构，提取协议、主机、路径、查询参数等信息。
+          </li>
+        </ul>
+      </Card>
     </div>
   );
 }
