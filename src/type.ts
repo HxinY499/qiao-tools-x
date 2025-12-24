@@ -25,6 +25,7 @@ export enum ToolKey {
   UserAgentParser = 'user-agent-parser',
   QRCodeTool = 'qrcode-tool',
   JsonSchemaConverter = 'json-schema-converter',
+  RegexVisualizer = 'regex-visualizer',
 }
 
 export type ToolRoute = {

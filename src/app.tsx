@@ -104,7 +104,7 @@ function App() {
         </SidebarHeader>
 
         {/* Sidebar Content */}
-        <SidebarContent>
+        <SidebarContent className="custom-scrollbar">
           {/* 置顶分组 - 仅当有置顶项时显示 */}
           {groupedRoutes.pinned.length > 0 && (
             <SidebarGroup>

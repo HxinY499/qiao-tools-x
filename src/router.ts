@@ -14,6 +14,7 @@ import {
   Palette,
   QrCode,
   Rainbow,
+  Regex,
   ScrollText,
   Search,
   Shield,
@@ -42,6 +43,7 @@ const PasswordGeneratorPage = lazy(() => import('@/pages/password-generator'));
 const SeoAnalyzerPage = lazy(() => import('@/pages/seo-analyzer'));
 const QRCodeToolPage = lazy(() => import('@/pages/qrcode-tool'));
 const JsonSchemaConverterPage = lazy(() => import('@/pages/json-schema-converter'));
+const RegexVisualizerPage = lazy(() => import('@/pages/regex-visualizer'));
 
 export const toolRoutes: ToolRoute[] = [
   {
@@ -336,6 +338,20 @@ export const toolRoutes: ToolRoute[] = [
       description:
         '免费在线 JSON Schema 与 TypeScript 类型互转工具，支持 interface/type 输出、Draft-07/Draft-04 版本选择，快速生成类型定义或 Schema。',
       keywords: 'JSON Schema,TypeScript,类型转换,Schema转TS,TS转Schema,interface生成,type生成,JSON Schema转换器',
+    },
+  },
+  {
+    key: ToolKey.RegexVisualizer,
+    path: '/regex-visualizer',
+    title: '正则可视化',
+    subtitle: '正则表达式可视化工具，支持铁路图、实时匹配、解释说明与替换预览',
+    icon: Regex,
+    component: RegexVisualizerPage,
+    category: 'dev',
+    seo: {
+      description:
+        '免费在线正则表达式可视化工具，将正则渲染为铁路图，支持实时匹配测试、捕获组展示、正则解释、替换预览，内置常用正则模板。',
+      keywords: '正则可视化,正则表达式,regex,铁路图,正则测试,正则解释,正则匹配,正则替换',
     },
   },
 ];

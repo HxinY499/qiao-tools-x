@@ -340,6 +340,7 @@ function ScrollBarPage() {
             </div>
           </div>
           <div
+            id="scrollbar-code-area"
             className="scrollbar-code-area border rounded-md bg-background text-[11px] leading-relaxed h-48 overflow-auto px-3 py-2"
             style={scrollVars}
           >
