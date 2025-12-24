@@ -133,32 +133,32 @@ function renderDot(x: number, y: number, key: string): React.ReactNode {
 }
 
 // 渲染分支弧线
-function renderArc(
-  x: number,
-  y: number,
-  direction: 'down-right' | 'right-down' | 'up-right' | 'right-up',
-  key: string,
-): React.ReactNode {
-  const r = CONFIG.arcRadius;
-  let d = '';
+// function renderArc(
+//   x: number,
+//   y: number,
+//   direction: 'down-right' | 'right-down' | 'up-right' | 'right-up',
+//   key: string,
+// ): React.ReactNode {
+//   const r = CONFIG.arcRadius;
+//   let d = '';
 
-  switch (direction) {
-    case 'down-right':
-      d = `M ${x} ${y} Q ${x} ${y + r} ${x + r} ${y + r}`;
-      break;
-    case 'right-down':
-      d = `M ${x} ${y} Q ${x + r} ${y} ${x + r} ${y + r}`;
-      break;
-    case 'up-right':
-      d = `M ${x} ${y} Q ${x} ${y - r} ${x + r} ${y - r}`;
-      break;
-    case 'right-up':
-      d = `M ${x} ${y} Q ${x + r} ${y} ${x + r} ${y - r}`;
-      break;
-  }
+//   switch (direction) {
+//     case 'down-right':
+//       d = `M ${x} ${y} Q ${x} ${y + r} ${x + r} ${y + r}`;
+//       break;
+//     case 'right-down':
+//       d = `M ${x} ${y} Q ${x + r} ${y} ${x + r} ${y + r}`;
+//       break;
+//     case 'up-right':
+//       d = `M ${x} ${y} Q ${x} ${y - r} ${x + r} ${y - r}`;
+//       break;
+//     case 'right-up':
+//       d = `M ${x} ${y} Q ${x + r} ${y} ${x + r} ${y - r}`;
+//       break;
+//   }
 
-  return <path key={key} d={d} fill="none" stroke={CONFIG.colors.line} strokeWidth={1.5} />;
-}
+//   return <path key={key} d={d} fill="none" stroke={CONFIG.colors.line} strokeWidth={1.5} />;
+// }
 
 // 渲染 AST 节点
 function renderNode(node: ASTNode, x: number, y: number, keyPrefix: string): RenderResult {
