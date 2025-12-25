@@ -1,8 +1,8 @@
+import { useDebounceFn, useLatest } from 'ahooks';
 import { defaultTheme, githubDarkTheme, JsonEditor } from 'json-edit-react';
 import { Braces, Eraser, FileJson, Maximize2, Minimize2, Trash2, XCircle } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
-import { useDebounceFn, useLatest } from 'ahooks';
 
 import { CodeArea } from '@/components/code-area';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,7 @@ import { HistoryDialog } from './history-dialog';
 import { SaveJsonDialog } from './save-dialog';
 import { JsonSettings } from './settings';
 import { useJsonFormatterStore } from './store';
+import { parseJsonWithBetterError } from './utils';
 
 export default function JsonFormatterPage() {
   const [input, setInput] = useState('');
@@ -39,7 +40,7 @@ export default function JsonFormatterPage() {
     }
 
     try {
-      const parsed = JSON.parse(jsonStr);
+      const parsed = parseJsonWithBetterError(jsonStr);
       setJsonData(parsed);
       setError(null);
       return parsed;
@@ -59,9 +60,12 @@ export default function JsonFormatterPage() {
   };
 
   // 自动格式化（防抖）- 只更新 jsonData 和 error，不更新 input
-  const { run: autoFormat } = useDebounceFn(() => {
-    parseJson(inputRef.current);
-  }, { wait: 300 });
+  const { run: autoFormat } = useDebounceFn(
+    () => {
+      parseJson(inputRef.current);
+    },
+    { wait: 300 },
+  );
 
   // 监听输入变化，自动触发格式化
   useEffect(() => {
@@ -199,11 +203,11 @@ export default function JsonFormatterPage() {
               spellCheck={false}
             />
             {error && (
-              <div className="absolute bottom-4 left-4 right-4 bg-destructive/15 border border-destructive text-destructive rounded-md p-3 flex items-start gap-2 text-xs animate-in slide-in-from-bottom-2 shadow-sm backdrop-blur-sm">
+              <div className="absolute bottom-4 left-4 right-4 bg-destructive/80 border border-destructive text-white rounded-md p-3 flex items-start gap-2 text-xs animate-in slide-in-from-bottom-2 shadow-sm backdrop-blur-sm">
                 <XCircle className="h-4 w-4 mt-0.5 shrink-0" />
                 <div className="flex-1">
                   <p className="font-semibold mb-1">解析错误</p>
-                  <p className="font-mono break-all opacity-90">{error}</p>
+                  <p className="font-mono break-all opacity-90 whitespace-pre-wrap">{error}</p>
                 </div>
               </div>
             )}
