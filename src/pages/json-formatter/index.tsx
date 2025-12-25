@@ -1,7 +1,8 @@
 import { defaultTheme, githubDarkTheme, JsonEditor } from 'json-edit-react';
 import { Braces, Eraser, FileJson, Maximize2, Minimize2, Trash2, XCircle } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
+import { useDebounceFn, useLatest } from 'ahooks';
 
 import { CodeArea } from '@/components/code-area';
 import { Button } from '@/components/ui/button';
@@ -23,30 +24,52 @@ export default function JsonFormatterPage() {
   const { effectiveTheme } = useThemeStore();
   const settings = useJsonFormatterStore();
 
+  // 使用 useLatest 保存当前 input 值，用于防抖函数内部访问
+  const inputRef = useLatest(input);
+
   // 派生状态：是否有输入内容
   const hasInput = useMemo(() => input.trim().length > 0, [input]);
 
-  const processJson = (minify: boolean) => {
-    if (!input.trim()) {
+  // 解析 JSON 核心函数
+  const parseJson = (jsonStr: string) => {
+    if (!jsonStr.trim()) {
       setJsonData(null);
       setError(null);
-      return;
+      return null;
     }
 
     try {
-      const parsed = JSON.parse(input);
+      const parsed = JSON.parse(jsonStr);
       setJsonData(parsed);
-      setInput(JSON.stringify(parsed, null, minify ? 0 : 2));
       setError(null);
+      return parsed;
     } catch (e) {
+      setJsonData(null);
       setError((e as Error).message);
+      return null;
     }
   };
 
+  const processJson = (minify: boolean) => {
+    const parsed = parseJson(input);
+    if (parsed) {
+      // 手动点击按钮时才更新 input（带格式化或压缩）
+      setInput(JSON.stringify(parsed, null, minify ? 0 : 2));
+    }
+  };
+
+  // 自动格式化（防抖）- 只更新 jsonData 和 error，不更新 input
+  const { run: autoFormat } = useDebounceFn(() => {
+    parseJson(inputRef.current);
+  }, { wait: 300 });
+
+  // 监听输入变化，自动触发格式化
+  useEffect(() => {
+    autoFormat();
+  }, [input]);
+
   const handleTreeUpdate = (newData: any) => {
     setJsonData(newData);
-    // Optional: sync back to input text
-    // setInput(JSON.stringify(newData, null, 2));
   };
 
   // 简易模式下，使用当前 jsonData 重新格式化为字符串，如果没有 jsonData 则尝试使用 input
@@ -87,15 +110,6 @@ export default function JsonFormatterPage() {
     } else {
       setInput(newText);
       toast.success('已去除转义符');
-      // 尝试解析去除转义后的 JSON
-      try {
-        const parsed = JSON.parse(newText);
-        setJsonData(parsed);
-        setError(null);
-      } catch (e) {
-        setJsonData(null);
-        setError((e as Error).message);
-      }
     }
   };
 
@@ -185,7 +199,7 @@ export default function JsonFormatterPage() {
               spellCheck={false}
             />
             {error && (
-              <div className="absolute bottom-4 left-4 right-4 bg-destructive/10 border border-destructive/20 text-destructive rounded-md p-3 flex items-start gap-2 text-xs animate-in slide-in-from-bottom-2">
+              <div className="absolute bottom-4 left-4 right-4 bg-destructive/15 border border-destructive text-destructive rounded-md p-3 flex items-start gap-2 text-xs animate-in slide-in-from-bottom-2 shadow-sm backdrop-blur-sm">
                 <XCircle className="h-4 w-4 mt-0.5 shrink-0" />
                 <div className="flex-1">
                   <p className="font-semibold mb-1">解析错误</p>
