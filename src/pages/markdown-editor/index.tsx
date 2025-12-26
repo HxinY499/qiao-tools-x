@@ -1,4 +1,4 @@
-import { Download, FileText, Globe, Image, Import, Maximize2, Menu, Minimize2, Palette } from 'lucide-react';
+import { Download, FileText, Globe, Image, Import, Maximize2, Menu, Minimize2, Moon, Palette, Sun } from 'lucide-react';
 import { Marked } from 'marked';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { codeToHtml } from 'shiki';
@@ -366,6 +366,11 @@ export default function MarkdownEditorPage() {
                 onClick={() => setPreviewTheme(theme.name as ThemeName)}
                 className={previewTheme === theme.name ? 'bg-accent' : ''}
               >
+                {theme.isDark ? (
+                  <Moon className="h-3.5 w-3.5 mr-2 text-indigo-400" />
+                ) : (
+                  <Sun className="h-3.5 w-3.5 mr-2 text-amber-500" />
+                )}
                 {theme.label}
               </DropdownMenuItem>
             ))}

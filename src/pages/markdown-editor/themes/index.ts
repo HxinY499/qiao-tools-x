@@ -1,26 +1,50 @@
 // 主题配置 - 按需加载
 
-export type ThemeName = 'github' | 'newsprint' | 'night' | 'vercel';
+export type ThemeName =
+  | 'github'
+  | 'newsprint'
+  | 'night'
+  | 'vercel'
+  | 'jetbrains-dark'
+  | 'konayuki'
+  | 'notion-style'
+  | 'notion-style-dark'
+  | 'scrolls'
+  | 'scrolls-dark';
 
 export interface ThemeMeta {
   name: ThemeName;
   label: string;
+  /** 是否为暗色主题 */
+  isDark: boolean;
 }
 
 // 主题元数据（不包含样式，体积很小）
 export const THEME_LIST: ThemeMeta[] = [
-  { name: 'github', label: 'GitHub' },
-  { name: 'newsprint', label: '报纸印刷' },
-  { name: 'night', label: '暗夜' },
-  { name: 'vercel', label: 'Vercel' },
+  { name: 'github', label: 'GitHub', isDark: false },
+  { name: 'newsprint', label: '报纸印刷', isDark: false },
+  { name: 'night', label: '暗夜', isDark: true },
+  { name: 'vercel', label: 'Vercel', isDark: false },
+  { name: 'jetbrains-dark', label: 'JetBrains Dark', isDark: true },
+  { name: 'konayuki', label: '小雪 Konayuki', isDark: false },
+  { name: 'notion-style', label: 'Notion Style', isDark: false },
+  { name: 'notion-style-dark', label: 'Notion Style Dark', isDark: true },
+  { name: 'scrolls', label: '羊皮卷 Scrolls', isDark: false },
+  { name: 'scrolls-dark', label: '羊皮卷 Scrolls Dark', isDark: true },
 ];
 
 // 主题加载器 - 按需动态导入
 const themeLoaders: Record<ThemeName, () => Promise<{ style: string }>> = {
-  github: () => import('./github'),
-  newsprint: () => import('./newsprint'),
-  night: () => import('./night'),
-  vercel: () => import('./vercel'),
+  'github': () => import('./github'),
+  'newsprint': () => import('./newsprint'),
+  'night': () => import('./night'),
+  'vercel': () => import('./vercel'),
+  'jetbrains-dark': () => import('./jetbrains-dark'),
+  'konayuki': () => import('./konayuki'),
+  'notion-style': () => import('./notion-style'),
+  'notion-style-dark': () => import('./notion-style-dark'),
+  'scrolls': () => import('./scrolls'),
+  'scrolls-dark': () => import('./scrolls-dark'),
 };
 
 // 主题缓存
