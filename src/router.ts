@@ -6,6 +6,7 @@ import {
   Circle,
   FileDiff,
   FileImage,
+  FileText,
   FileType2,
   Fingerprint,
   ImageIcon,
@@ -44,6 +45,7 @@ const SeoAnalyzerPage = lazy(() => import('@/pages/seo-analyzer'));
 const QRCodeToolPage = lazy(() => import('@/pages/qrcode-tool'));
 const JsonSchemaConverterPage = lazy(() => import('@/pages/json-schema-converter'));
 const RegexVisualizerPage = lazy(() => import('@/pages/regex-visualizer'));
+const MarkdownEditorPage = lazy(() => import('@/pages/markdown-editor'));
 
 export const toolRoutes: ToolRoute[] = [
   {
@@ -352,6 +354,20 @@ export const toolRoutes: ToolRoute[] = [
       description:
         '免费在线正则表达式可视化工具，将正则渲染为铁路图，支持实时匹配测试、捕获组展示、正则解释、替换预览，内置常用正则模板。',
       keywords: '正则可视化,正则表达式,regex,铁路图,正则测试,正则解释,正则匹配,正则替换',
+    },
+  },
+  {
+    key: ToolKey.MarkdownEditor,
+    path: '/markdown-editor',
+    title: 'Markdown 编辑器',
+    subtitle: '实时预览的 Markdown 编辑器，支持插入表格、代码块、链接等快捷操作',
+    icon: FileText,
+    component: MarkdownEditorPage,
+    category: 'text',
+    seo: {
+      description:
+        '免费在线 Markdown 编辑器，支持实时预览、表格生成、代码高亮、GFM 语法，提供丰富的工具栏快捷操作。',
+      keywords: 'Markdown编辑器,Markdown预览,Markdown表格,在线Markdown,MD编辑器,Markdown工具',
     },
   },
 ];
