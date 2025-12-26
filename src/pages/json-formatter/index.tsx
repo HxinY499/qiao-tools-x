@@ -5,11 +5,10 @@ import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
 import { CodeArea } from '@/components/code-area';
+import { ResizablePanels } from '@/components/resizable-panels';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { useThemeStore } from '@/store/theme';
-import { cn } from '@/utils';
 
 import { HistoryDialog } from './history-dialog';
 import { SaveJsonDialog } from './save-dialog';
@@ -114,174 +113,155 @@ export default function JsonFormatterPage() {
     }
   };
 
-  return (
-    <div className="container mx-auto p-2 lg:p-4 lg:h-[calc(100vh-4rem)] flex flex-col gap-2 lg:gap-4">
-      <div
-        className={cn(
-          'grid gap-2 lg:gap-4 lg:h-full transition-all duration-300',
-          isExpanded ? 'grid-cols-1' : 'grid-cols-1 lg:grid-cols-2',
+  const inputPanel = (
+    <>
+      <header className="flex items-center justify-between px-3 py-2 border-b border-border bg-muted/30 min-w-0 gap-2">
+        <div className="flex items-center gap-2 shrink-0">
+          <FileJson className="h-4 w-4 text-muted-foreground" />
+          <span className="font-medium text-xs text-muted-foreground uppercase tracking-wider hidden md:block">
+            输入 JSON
+          </span>
+        </div>
+        <div className="flex items-center gap-1 flex-wrap justify-end min-w-0">
+          <SaveJsonDialog content={input} disabled={!hasInput || !!error} />
+          <HistoryDialog onLoad={handleLoadHistory} />
+          <div className="w-px h-4 bg-border mx-1 hidden sm:block" />
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={removeEscapes}
+            disabled={!hasInput}
+            className="h-8 px-2"
+            title="去除转义符"
+          >
+            <Eraser className="h-3.5 w-3.5" />
+            <span className="hidden 2xl:inline ml-1">去除转义</span>
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => {
+              setInput('');
+              setJsonData(null);
+              setError(null);
+            }}
+            disabled={!hasInput}
+            className="h-8 px-2"
+            title="清空"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+            <span className="hidden 2xl:inline ml-1">清空</span>
+          </Button>
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={() => processJson(true)}
+            disabled={!hasInput}
+            className="h-8 px-2"
+            title="压缩"
+          >
+            <Minimize2 className="h-3.5 w-3.5" />
+            <span className="hidden 2xl:inline ml-1">压缩</span>
+          </Button>
+          <Button size="sm" onClick={() => processJson(false)} disabled={!hasInput} className="h-8 px-2" title="格式化">
+            <Braces className="h-3.5 w-3.5" />
+            <span className="hidden 2xl:inline ml-1">格式化</span>
+          </Button>
+        </div>
+      </header>
+      <div className="flex-1 relative min-h-0 min-w-0">
+        <Textarea
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="在此粘贴 JSON 代码..."
+          className="h-full w-full font-mono !text-xs resize-none p-4 leading-relaxed custom-scrollbar rounded-none border-0 focus-visible:ring-0"
+          spellCheck={false}
+        />
+        {error && (
+          <div className="absolute bottom-4 left-4 right-4 bg-destructive/80 border border-destructive text-white rounded-md p-3 flex items-start gap-2 text-xs animate-in slide-in-from-bottom-2 shadow-sm backdrop-blur-sm">
+            <XCircle className="h-4 w-4 mt-0.5 shrink-0" />
+            <div className="flex-1 overflow-hidden">
+              <p className="font-semibold mb-1">解析错误</p>
+              <p className="font-mono opacity-90 mb-2">{error.message}</p>
+              {error.errorLine !== null && error.column !== null && (
+                <p className="font-mono break-all opacity-90 overflow-x-auto custom-scrollbar">
+                  {error.errorLine.slice(0, Math.max(0, error.column - ERROR_HIGHLIGHT_RANGE))}
+                  <span className="bg-yellow-400 text-black px-0.5 rounded">
+                    {error.errorLine.slice(Math.max(0, error.column - ERROR_HIGHLIGHT_RANGE), error.column + 1)}
+                  </span>
+                  {error.errorLine.slice(error.column + 1)}
+                </p>
+              )}
+            </div>
+          </div>
         )}
-      >
-        {/* Input Section */}
-        <Card
-          className={cn(
-            'flex flex-col p-3 lg:p-4 gap-3 lg:gap-4 transition-all duration-300',
-            // 移动端给固定高度，方便输入；桌面端撑满
-            'h-[400px] lg:h-full',
-            isExpanded ? 'hidden' : 'flex',
-          )}
-        >
-          <header className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <FileJson className="h-5 w-5 text-muted-foreground" />
-              <h2 className="font-medium text-sm text-muted-foreground uppercase tracking-wider hidden md:block">
-                输入 JSON
-              </h2>
-            </div>
-            <div className="flex items-center gap-2">
-              <SaveJsonDialog content={input} disabled={!hasInput || !!error} />
-              <HistoryDialog onLoad={handleLoadHistory} />
-              <div className="w-px h-4 bg-border mx-1" />
-              <Button
-                size="sm"
-                variant="secondary"
-                onClick={removeEscapes}
-                disabled={!hasInput}
-                className="h-8 px-2 xl:px-3"
-                title="去除转义符"
-              >
-                <Eraser className="h-3.5 w-3.5 xl:hidden" />
-                <span className="hidden xl:inline">去除转义</span>
-              </Button>
-              <Button
-                size="sm"
-                variant="secondary"
-                onClick={() => {
-                  setInput('');
-                  setJsonData(null);
-                  setError(null);
-                }}
-                disabled={!hasInput}
-                className="h-8 px-2 xl:px-3"
-                title="清空"
-              >
-                <Trash2 className="h-3.5 w-3.5 xl:hidden" />
-                <span className="hidden xl:inline">清空</span>
-              </Button>
-              <Button
-                size="sm"
-                onClick={() => processJson(true)}
-                disabled={!hasInput}
-                className="h-8 gap-2 px-2 xl:px-3"
-                title="压缩"
-              >
-                <Minimize2 className="h-3.5 w-3.5 xl:hidden" />
-                <span className="hidden xl:inline">压缩</span>
-              </Button>
-              <Button
-                size="sm"
-                onClick={() => processJson(false)}
-                disabled={!hasInput}
-                className="h-8 gap-2 px-2 xl:px-3"
-                title="格式化"
-              >
-                <Braces className="h-3.5 w-3.5 xl:hidden" />
-                <span className="hidden xl:inline">格式化</span>
-              </Button>
-            </div>
-          </header>
+      </div>
+    </>
+  );
 
-          <div className="flex-1 relative min-h-0">
-            <Textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="在此粘贴 JSON 代码..."
-              className="h-full font-mono !text-xs resize-none p-3 lg:p-4 leading-relaxed custom-scrollbar"
-              spellCheck={false}
-            />
-            {error && (
-              <div className="absolute bottom-4 left-4 right-4 bg-destructive/80 border border-destructive text-white rounded-md p-3 flex items-start gap-2 text-xs animate-in slide-in-from-bottom-2 shadow-sm backdrop-blur-sm">
-                <XCircle className="h-4 w-4 mt-0.5 shrink-0" />
-                <div className="flex-1 overflow-hidden">
-                  <p className="font-semibold mb-1">解析错误</p>
-                  <p className="font-mono opacity-90 mb-2">{error.message}</p>
-                  {error.errorLine !== null && error.column !== null && (
-                    <p className="font-mono break-all opacity-90 overflow-x-auto custom-scrollbar">
-                      {error.errorLine.slice(0, Math.max(0, error.column - ERROR_HIGHLIGHT_RANGE))}
-                      <span className="bg-yellow-400 text-black px-0.5 rounded">
-                        {error.errorLine.slice(Math.max(0, error.column - ERROR_HIGHLIGHT_RANGE), error.column + 1)}
-                      </span>
-                      {error.errorLine.slice(error.column + 1)}
-                    </p>
-                  )}
-                </div>
-              </div>
-            )}
+  const outputPanel = (
+    <div className={`flex flex-col h-full ${isExpanded ? 'fixed inset-0 z-50 bg-background' : ''}`}>
+      <header className="flex items-center justify-between px-3 py-2 border-b border-border bg-muted/30">
+        <div className="flex items-center gap-2">
+          <Braces className="h-4 w-4 text-muted-foreground" />
+          <span className="font-medium text-xs text-muted-foreground uppercase tracking-wider hidden md:block">
+            格式化结果
+          </span>
+        </div>
+        <div className="flex items-center gap-1">
+          <JsonSettings />
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={() => setIsExpanded(!isExpanded)}
+            title={isExpanded ? '退出全屏' : '全屏查看'}
+          >
+            {isExpanded ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
+          </Button>
+        </div>
+      </header>
+      <div className="flex-1 relative min-h-0 min-w-0 overflow-auto custom-scrollbar">
+        {jsonData !== null ? (
+          settings.simpleMode ? (
+            <CodeArea code={getDisplayCode()} language="json" className="h-full border-none bg-transparent" />
+          ) : (
+            <div className="min-h-full w-full p-2">
+              <JsonEditor
+                data={jsonData}
+                setData={handleTreeUpdate}
+                theme={effectiveTheme === 'dark' ? githubDarkTheme : defaultTheme}
+                restrictEdit={settings.viewOnly}
+                viewOnly={settings.viewOnly}
+                rootName="root"
+                maxWidth="100%"
+                minWidth="100%"
+                rootFontSize={`${settings.rootFontSize}px`}
+                indent={settings.indent}
+                collapse={settings.collapse}
+                showArrayIndices={settings.showArrayIndices}
+                showStringQuotes={settings.showStringQuotes}
+                keySort={settings.sortKeys}
+                showCollectionCount={settings.showCollectionCount}
+                arrayIndexFromOne={settings.arrayIndexFromOne}
+                showIconTooltips={settings.showIconTooltips}
+                stringTruncate={settings.stringTruncate}
+                collapseAnimationTime={settings.collapseAnimationTime}
+                enableClipboard={settings.enableClipboard}
+              />
+            </div>
+          )
+        ) : (
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground/50 gap-2 pointer-events-none">
+            <Braces className="h-12 w-12 opacity-20" />
+            <p className="text-sm">等待输入...</p>
           </div>
-        </Card>
-
-        {/* Output Section */}
-        <Card className="flex flex-col p-3 lg:p-4 gap-3 lg:gap-4 h-[500px] lg:h-full min-h-[300px]">
-          <header className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Braces className="h-5 w-5 text-muted-foreground" />
-              <h2 className="font-medium text-sm text-muted-foreground uppercase tracking-wider hidden md:block">
-                格式化结果
-              </h2>
-            </div>
-            <div className="flex items-center gap-1">
-              <JsonSettings />
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 hover:bg-muted"
-                onClick={() => setIsExpanded(!isExpanded)}
-                title={isExpanded ? '退出全屏' : '全屏查看'}
-              >
-                {isExpanded ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
-              </Button>
-            </div>
-          </header>
-
-          <div className="flex-1 relative min-h-0 border rounded-md overflow-auto bg-background/50">
-            {jsonData !== null ? (
-              settings.simpleMode ? (
-                <CodeArea code={getDisplayCode()} language="json" className="h-full border-none bg-transparent" />
-              ) : (
-                <div className="min-h-full w-full">
-                  <JsonEditor
-                    data={jsonData}
-                    setData={handleTreeUpdate}
-                    theme={effectiveTheme === 'dark' ? githubDarkTheme : defaultTheme}
-                    restrictEdit={settings.viewOnly}
-                    viewOnly={settings.viewOnly}
-                    rootName="root"
-                    maxWidth="100%"
-                    minWidth="100%"
-                    rootFontSize={`${settings.rootFontSize}px`}
-                    indent={settings.indent}
-                    collapse={settings.collapse}
-                    showArrayIndices={settings.showArrayIndices}
-                    showStringQuotes={settings.showStringQuotes}
-                    keySort={settings.sortKeys}
-                    showCollectionCount={settings.showCollectionCount}
-                    arrayIndexFromOne={settings.arrayIndexFromOne}
-                    showIconTooltips={settings.showIconTooltips}
-                    stringTruncate={settings.stringTruncate}
-                    collapseAnimationTime={settings.collapseAnimationTime}
-                    enableClipboard={settings.enableClipboard}
-                  />
-                </div>
-              )
-            ) : (
-              <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground/50 gap-2 pointer-events-none">
-                <Braces className="h-12 w-12 opacity-20" />
-                <p className="text-sm">等待输入...</p>
-              </div>
-            )}
-          </div>
-        </Card>
+        )}
       </div>
     </div>
+  );
+
+  return (
+    <ResizablePanels left={inputPanel} right={outputPanel} hideLeft={isExpanded} className="h-[calc(100vh-4rem)]" />
   );
 }

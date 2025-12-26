@@ -58,7 +58,7 @@ export function ToolPage({ route }: { route: ToolRoute }) {
         />
       )}
 
-      <div className="flex flex-col min-h-screen">
+      <div className="flex flex-col min-h-screen overflow-hidden">
         {/* 页面 Header */}
         <header
           className={cn(
@@ -136,7 +136,7 @@ export function ToolPage({ route }: { route: ToolRoute }) {
         </header>
 
         {/* 页面内容 */}
-        <div className="flex-1">
+        <div className="flex-1 min-w-0 overflow-hidden">
           <Suspense fallback={<RouteLoadingFallback />}>
             <route.component />
           </Suspense>

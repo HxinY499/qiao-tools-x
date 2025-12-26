@@ -1,15 +1,16 @@
-import { Maximize2, Minimize2, Palette, Upload } from 'lucide-react';
+import { Download, FileText, Globe, Image, Import, Maximize2, Menu, Minimize2, Palette } from 'lucide-react';
 import { Marked } from 'marked';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { codeToHtml } from 'shiki';
 import { toast } from 'sonner';
 
+import { ResizablePanels } from '@/components/resizable-panels';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Textarea } from '@/components/ui/textarea';
@@ -18,6 +19,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { useMarkdownEditorStore } from './store';
 import { getThemeLabel, loadThemeStyle, THEME_LIST, ThemeName } from './themes';
 import { Toolbar } from './toolbar';
+import { exportToDocx, exportToHtml, exportToImage, exportToMarkdown, exportToPdf, htmlToMarkdown } from './utils';
 
 // 配置 marked（不带代码高亮，后续用 shiki 处理）
 const marked = new Marked();
@@ -178,141 +180,223 @@ export default function MarkdownEditorPage() {
     return () => clearTimeout(timer);
   }, [content, syncScrollToPreview]);
 
-  // 供 Toolbar 调用的内容更新函数，会保存焦点状态
-  const handleContentChange = useCallback(
-    (newContent: string, selectionStart?: number, selectionEnd?: number) => {
-      const textarea = textareaRef.current;
-      if (textarea && selectionStart !== undefined && selectionEnd !== undefined) {
-        // 保存需要恢复的焦点状态
-        pendingFocusRef.current = {
-          selectionStart,
-          selectionEnd,
-          scrollTop: textarea.scrollTop,
-        };
-      }
-      setContent(newContent);
-    },
-    [setContent],
-  );
+  // 供 Toolbar 调用，仅设置光标位置（内容更新由 execCommand 触发的 onChange 处理）
+  const handleSelectionChange = useCallback((selectionStart: number, selectionEnd: number) => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      pendingFocusRef.current = {
+        selectionStart,
+        selectionEnd,
+        scrollTop: textarea.scrollTop,
+      };
+    }
+  }, []);
 
-  const handleImportMd = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImportFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     const reader = new FileReader();
     reader.onload = (event) => {
       const text = event.target?.result as string;
-      if (text) {
+      if (!text) return;
+
+      const ext = file.name.split('.').pop()?.toLowerCase();
+      const isHtml = ext === 'html' || ext === 'htm';
+
+      if (isHtml) {
+        setContent(htmlToMarkdown(text));
+      } else {
         setContent(text);
-        toast.success(`已导入 ${file.name}`);
       }
+      toast.success(`已导入 ${file.name}`);
     };
     reader.onerror = () => {
       toast.error('读取文件失败');
     };
     reader.readAsText(file);
 
-    // 重置 input 以便可以再次选择同一文件
     e.target.value = '';
   };
 
-  return (
-    <div className="container mx-auto p-2 lg:p-4 h-[calc(100vh-4rem)] flex flex-col gap-2 lg:gap-4">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-4 flex-1 min-h-0">
-        {/* 编辑器 */}
-        <Card className="flex flex-col p-3 lg:p-4 gap-3 min-h-[400px] lg:min-h-0">
-          <header className="flex items-center justify-between gap-2">
-            <Toolbar textareaRef={textareaRef} content={content} onContentChange={handleContentChange} />
-            <div className="flex items-center gap-1">
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".md,.markdown,.txt"
-                onChange={handleImportMd}
-                className="hidden"
-              />
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="h-8 w-8"
-                    onClick={() => fileInputRef.current?.click()}
-                    tabIndex={-1}
-                  >
-                    <Upload className="h-3.5 w-3.5" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>导入 MD 文件</TooltipContent>
-              </Tooltip>
-            </div>
-          </header>
+  // 导出处理函数
+  const handleExportMd = () => {
+    if (!content) {
+      toast.error('没有内容可导出');
+      return;
+    }
+    exportToMarkdown(content);
+    toast.success('已导出 Markdown 文件');
+  };
 
-          {/* 编辑区 */}
-          <div className="flex-1 min-h-0">
-            <Textarea
-              ref={textareaRef}
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              placeholder="在此输入 Markdown..."
-              className="h-full font-mono !text-xs resize-none p-3 leading-relaxed custom-scrollbar"
-              spellCheck={false}
-            />
-          </div>
-        </Card>
+  const handleExportHtml = () => {
+    if (!content) {
+      toast.error('没有内容可导出');
+      return;
+    }
+    exportToHtml(htmlContent, themeStyle);
+    toast.success('已导出 HTML 文件');
+  };
 
-        {/* 预览 */}
-        <Card
-          className={`flex flex-col p-3 lg:p-4 min-h-[400px] lg:min-h-0 gap-3 ${
-            isFullscreen ? 'fixed inset-0 z-50 m-0 rounded-none min-h-0' : ''
-          }`}
-        >
-          <header className="flex items-center justify-end gap-1">
-            <DropdownMenu>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm" className="h-8 gap-1.5" tabIndex={-1}>
-                      <Palette className="h-3.5 w-3.5" />
-                      <span className="text-xs">{getThemeLabel(previewTheme)}</span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                </TooltipTrigger>
-                <TooltipContent>切换预览主题</TooltipContent>
-              </Tooltip>
-              <DropdownMenuContent align="end">
-                {THEME_LIST.map((theme) => (
-                  <DropdownMenuItem
-                    key={theme.name}
-                    onClick={() => setPreviewTheme(theme.name as ThemeName)}
-                    className={previewTheme === theme.name ? 'bg-accent' : ''}
-                  >
-                    {theme.label}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+  const handleExportPdf = async () => {
+    if (!previewRef.current || !content) {
+      toast.error('没有内容可导出');
+      return;
+    }
+    toast.info('正在生成 PDF...');
+    try {
+      await exportToPdf(previewRef.current);
+      toast.success('已导出 PDF 文件');
+    } catch {
+      toast.error('PDF 导出失败');
+    }
+  };
+
+  const handleExportDocx = async () => {
+    if (!content) {
+      toast.error('没有内容可导出');
+      return;
+    }
+    toast.info('正在生成 Word 文档...');
+    try {
+      await exportToDocx(content);
+      toast.success('已导出 Word 文件');
+    } catch {
+      toast.error('Word 导出失败');
+    }
+  };
+
+  const handleExportImage = async () => {
+    if (!previewRef.current || !content) {
+      toast.error('没有内容可导出');
+      return;
+    }
+    toast.info('正在生成图片...');
+    try {
+      await exportToImage(previewRef.current);
+      toast.success('已导出图片');
+    } catch {
+      toast.error('图片导出失败');
+    }
+  };
+
+  const editorPanel = (
+    <>
+      <header className="flex items-center justify-between gap-2 px-3 py-2 border-b border-border bg-muted/30 min-w-0">
+        <Toolbar textareaRef={textareaRef} content={content} onSelectionChange={handleSelectionChange} />
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".md,.markdown,.txt,.html,.htm"
+          onChange={handleImportFile}
+          className="hidden"
+        />
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="h-8 w-8" tabIndex={-1}>
+              <Menu className="h-3.5 w-3.5" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="h-8 w-8"
-                  onClick={() => setIsFullscreen(!isFullscreen)}
-                  tabIndex={-1}
-                >
-                  {isFullscreen ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
-                </Button>
+                <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
+                  <Import className="h-4 w-4 mr-2" />
+                  导入
+                </DropdownMenuItem>
               </TooltipTrigger>
-              <TooltipContent>{isFullscreen ? '退出全屏 (ESC)' : '全屏预览'}</TooltipContent>
+              <TooltipContent side="left">支持 .md .html .txt</TooltipContent>
             </Tooltip>
-          </header>
-          <div ref={previewRef} className="flex-1 min-h-0 overflow-auto custom-scrollbar border rounded-md p-4 bg-card">
-            <style>{themeStyle}</style>
-            <article className="markdown-body !bg-transparent" dangerouslySetInnerHTML={{ __html: htmlContent }} />
-          </div>
-        </Card>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleExportMd} disabled={!content}>
+              <Download className="h-4 w-4 mr-2" />
+              导出 Markdown
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleExportHtml} disabled={!content}>
+              <Globe className="h-4 w-4 mr-2" />
+              导出 HTML
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleExportPdf} disabled={!content}>
+              <FileText className="h-4 w-4 mr-2" />
+              导出 PDF
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleExportDocx} disabled={!content}>
+              <FileText className="h-4 w-4 mr-2" />
+              导出 Word
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleExportImage} disabled={!content}>
+              <Image className="h-4 w-4 mr-2" />
+              导出图片
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </header>
+      <div className="flex-1 min-h-0 min-w-0">
+        <Textarea
+          ref={textareaRef}
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          placeholder="在此输入 Markdown..."
+          className="h-full w-full font-mono !text-xs resize-none p-4 leading-relaxed custom-scrollbar rounded-none border-0 focus-visible:ring-0"
+          spellCheck={false}
+        />
+      </div>
+    </>
+  );
+
+  const previewPanel = (
+    <div className={`flex flex-col h-full ${isFullscreen ? 'fixed inset-0 z-50 bg-background' : ''}`}>
+      <header className="flex items-center justify-end gap-1 px-3 py-2 border-b border-border bg-muted/30">
+        <DropdownMenu>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-8 gap-1.5" tabIndex={-1}>
+                  <Palette className="h-3.5 w-3.5" />
+                  <span className="text-xs">{getThemeLabel(previewTheme)}</span>
+                </Button>
+              </DropdownMenuTrigger>
+            </TooltipTrigger>
+            <TooltipContent>切换预览主题</TooltipContent>
+          </Tooltip>
+          <DropdownMenuContent align="end">
+            {THEME_LIST.map((theme) => (
+              <DropdownMenuItem
+                key={theme.name}
+                onClick={() => setPreviewTheme(theme.name as ThemeName)}
+                className={previewTheme === theme.name ? 'bg-accent' : ''}
+              >
+                {theme.label}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => setIsFullscreen(!isFullscreen)}
+              tabIndex={-1}
+            >
+              {isFullscreen ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>{isFullscreen ? '退出全屏 (ESC)' : '全屏预览'}</TooltipContent>
+        </Tooltip>
+      </header>
+      <div ref={previewRef} className="flex-1 min-h-0 min-w-0 overflow-auto custom-scrollbar p-4">
+        <style>{themeStyle}</style>
+        <article
+          className="markdown-body !bg-transparent max-w-full overflow-x-auto"
+          dangerouslySetInnerHTML={{ __html: htmlContent }}
+        />
       </div>
     </div>
+  );
+
+  return (
+    <ResizablePanels left={editorPanel} right={previewPanel} hideLeft={isFullscreen} className="h-[calc(100vh-4rem)]" />
   );
 }

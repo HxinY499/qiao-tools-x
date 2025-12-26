@@ -365,8 +365,7 @@ export const toolRoutes: ToolRoute[] = [
     component: MarkdownEditorPage,
     category: 'text',
     seo: {
-      description:
-        '免费在线 Markdown 编辑器，支持实时预览、表格生成、代码高亮、GFM 语法，提供丰富的工具栏快捷操作。',
+      description: '免费在线 Markdown 编辑器，支持实时预览、表格生成、代码高亮、GFM 语法，提供丰富的工具栏快捷操作。',
       keywords: 'Markdown编辑器,Markdown预览,Markdown表格,在线Markdown,MD编辑器,Markdown工具',
     },
   },

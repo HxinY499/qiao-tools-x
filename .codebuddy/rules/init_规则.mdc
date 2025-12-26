@@ -68,6 +68,7 @@ pnpm lint         # 运行 ESLint 并自动修复问题
 - `color-picker`: 颜色选择器，用于选择颜色
 - `image`: 显示图片的组件，如果需要弹窗预览大图，就使用这个组件
 - `file-drag-uploader`: 上传文件的组件
+- `resizable-panels`: 可拖动分隔条的双栏布局组件，支持左右两栏宽度调整（桌面端拖动，移动端垂直堆叠）
 - 其他业务组件根据需要自行实现，放在此目录下
 
 ### UI 组件使用
@@ -91,6 +92,7 @@ pnpm lint         # 运行 ESLint 并自动修复问题
 - 组件使用 CVA (class-variance-authority) 管理变体样式
 
 #### 一些样式规则
+
 - 如果一个元素可以滚动（overflow-auto），请加上custom-scrollbar类名，这是一个全局类名，可以美化滚动条样式
 
 #### 暗色模式支持
