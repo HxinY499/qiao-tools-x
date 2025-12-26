@@ -15,12 +15,12 @@ import { HistoryDialog } from './history-dialog';
 import { SaveJsonDialog } from './save-dialog';
 import { JsonSettings } from './settings';
 import { useJsonFormatterStore } from './store';
-import { parseJsonWithBetterError } from './utils';
+import { JsonParseErrorInfo, parseJsonWithBetterError } from './utils';
 
 export default function JsonFormatterPage() {
   const [input, setInput] = useState('');
   const [jsonData, setJsonData] = useState<any>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<JsonParseErrorInfo | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const { effectiveTheme } = useThemeStore();
   const settings = useJsonFormatterStore();
@@ -44,9 +44,13 @@ export default function JsonFormatterPage() {
       setJsonData(parsed);
       setError(null);
       return parsed;
-    } catch (e) {
+    } catch (e: any) {
       setJsonData(null);
-      setError((e as Error).message);
+      if (e.errorInfo) {
+        setError(e.errorInfo as JsonParseErrorInfo);
+      } else {
+        setError({ message: e.message, position: null, errorLine: null, column: null });
+      }
       return null;
     }
   };
@@ -92,9 +96,9 @@ export default function JsonFormatterPage() {
       const parsed = JSON.parse(content);
       setJsonData(parsed);
       setError(null);
-    } catch (e) {
+    } catch (e: any) {
       setJsonData(null);
-      setError((e as Error).message);
+      setError({ message: e.message, position: null, errorLine: null, column: null });
     }
   };
 
@@ -205,9 +209,18 @@ export default function JsonFormatterPage() {
             {error && (
               <div className="absolute bottom-4 left-4 right-4 bg-destructive/80 border border-destructive text-white rounded-md p-3 flex items-start gap-2 text-xs animate-in slide-in-from-bottom-2 shadow-sm backdrop-blur-sm">
                 <XCircle className="h-4 w-4 mt-0.5 shrink-0" />
-                <div className="flex-1">
+                <div className="flex-1 overflow-hidden">
                   <p className="font-semibold mb-1">解析错误</p>
-                  <p className="font-mono break-all opacity-90 whitespace-pre-wrap">{error}</p>
+                  <p className="font-mono opacity-90 mb-2">{error.message}</p>
+                  {error.errorLine !== null && error.column !== null && (
+                    <p className="font-mono break-all opacity-90 overflow-x-auto custom-scrollbar">
+                      {error.errorLine.slice(0, Math.max(0, error.column - 5))}
+                      <span className="bg-yellow-400 text-black px-0.5 rounded">
+                        {error.errorLine.slice(Math.max(0, error.column - 5), error.column + 1)}
+                      </span>
+                      {error.errorLine.slice(error.column + 1)}
+                    </p>
+                  )}
                 </div>
               </div>
             )}
