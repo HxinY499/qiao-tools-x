@@ -15,7 +15,7 @@ import { HistoryDialog } from './history-dialog';
 import { SaveJsonDialog } from './save-dialog';
 import { JsonSettings } from './settings';
 import { useJsonFormatterStore } from './store';
-import { JsonParseErrorInfo, parseJsonWithBetterError } from './utils';
+import { ERROR_HIGHLIGHT_RANGE, JsonParseErrorInfo, parseJsonWithBetterError } from './utils';
 
 export default function JsonFormatterPage() {
   const [input, setInput] = useState('');
@@ -92,14 +92,7 @@ export default function JsonFormatterPage() {
   // 加载历史记录
   const handleLoadHistory = (content: string) => {
     setInput(content);
-    try {
-      const parsed = JSON.parse(content);
-      setJsonData(parsed);
-      setError(null);
-    } catch (e: any) {
-      setJsonData(null);
-      setError({ message: e.message, position: null, errorLine: null, column: null });
-    }
+    parseJson(content);
   };
 
   // 去除转义符
@@ -203,7 +196,7 @@ export default function JsonFormatterPage() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="在此粘贴 JSON 代码..."
-              className="h-full font-mono !text-xs resize-none p-3 lg:p-4 leading-relaxed"
+              className="h-full font-mono !text-xs resize-none p-3 lg:p-4 leading-relaxed custom-scrollbar"
               spellCheck={false}
             />
             {error && (
@@ -214,9 +207,9 @@ export default function JsonFormatterPage() {
                   <p className="font-mono opacity-90 mb-2">{error.message}</p>
                   {error.errorLine !== null && error.column !== null && (
                     <p className="font-mono break-all opacity-90 overflow-x-auto custom-scrollbar">
-                      {error.errorLine.slice(0, Math.max(0, error.column - 5))}
+                      {error.errorLine.slice(0, Math.max(0, error.column - ERROR_HIGHLIGHT_RANGE))}
                       <span className="bg-yellow-400 text-black px-0.5 rounded">
-                        {error.errorLine.slice(Math.max(0, error.column - 5), error.column + 1)}
+                        {error.errorLine.slice(Math.max(0, error.column - ERROR_HIGHLIGHT_RANGE), error.column + 1)}
                       </span>
                       {error.errorLine.slice(error.column + 1)}
                     </p>
@@ -253,12 +246,7 @@ export default function JsonFormatterPage() {
           <div className="flex-1 relative min-h-0 border rounded-md overflow-auto bg-background/50">
             {jsonData !== null ? (
               settings.simpleMode ? (
-                <CodeArea
-                  code={getDisplayCode()}
-                  language="json"
-                  className="h-full border-none bg-transparent"
-                  showCopyButton={false}
-                />
+                <CodeArea code={getDisplayCode()} language="json" className="h-full border-none bg-transparent" />
               ) : (
                 <div className="min-h-full w-full">
                   <JsonEditor

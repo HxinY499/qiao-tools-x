@@ -1,3 +1,6 @@
+/** 错误高亮向前扩展的字符数 */
+export const ERROR_HIGHLIGHT_RANGE = 5;
+
 export interface JsonParseErrorInfo {
   message: string;
   position: number | null;
