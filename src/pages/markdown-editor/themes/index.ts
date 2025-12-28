@@ -1,16 +1,6 @@
 // 主题配置 - 按需加载
 
-export type ThemeName =
-  | 'github'
-  | 'newsprint'
-  | 'night'
-  | 'vercel'
-  | 'jetbrains-dark'
-  | 'konayuki'
-  | 'notion-style'
-  | 'notion-style-dark'
-  | 'scrolls'
-  | 'scrolls-dark';
+export type ThemeName = 'github';
 
 export interface ThemeMeta {
   name: ThemeName;
@@ -20,31 +10,11 @@ export interface ThemeMeta {
 }
 
 // 主题元数据（不包含样式，体积很小）
-export const THEME_LIST: ThemeMeta[] = [
-  { name: 'notion-style', label: 'Notion Style', isDark: false },
-  { name: 'github', label: 'GitHub', isDark: false },
-  { name: 'newsprint', label: '报纸印刷', isDark: false },
-  { name: 'vercel', label: 'Vercel', isDark: false },
-  { name: 'konayuki', label: '小雪 Konayuki', isDark: false },
-  { name: 'scrolls', label: '羊皮卷 Scrolls', isDark: false },
-  { name: 'notion-style-dark', label: 'Notion Style Dark', isDark: true },
-  { name: 'night', label: '暗夜', isDark: true },
-  { name: 'jetbrains-dark', label: 'JetBrains Dark', isDark: true },
-  { name: 'scrolls-dark', label: '羊皮卷 Scrolls Dark', isDark: true },
-];
+export const THEME_LIST: ThemeMeta[] = [{ name: 'github', label: 'GitHub', isDark: false }];
 
 // 主题加载器 - 按需动态导入
 const themeLoaders: Record<ThemeName, () => Promise<{ style: string }>> = {
-  'github': () => import('./github'),
-  'newsprint': () => import('./newsprint'),
-  'night': () => import('./night'),
-  'vercel': () => import('./vercel'),
-  'jetbrains-dark': () => import('./jetbrains-dark'),
-  'konayuki': () => import('./konayuki'),
-  'notion-style': () => import('./notion-style'),
-  'notion-style-dark': () => import('./notion-style-dark'),
-  'scrolls': () => import('./scrolls'),
-  'scrolls-dark': () => import('./scrolls-dark'),
+  github: () => import('./github'),
 };
 
 // 主题缓存
