@@ -21,15 +21,15 @@ export interface ThemeMeta {
 
 // 主题元数据（不包含样式，体积很小）
 export const THEME_LIST: ThemeMeta[] = [
+  { name: 'notion-style', label: 'Notion Style', isDark: false },
   { name: 'github', label: 'GitHub', isDark: false },
   { name: 'newsprint', label: '报纸印刷', isDark: false },
-  { name: 'night', label: '暗夜', isDark: true },
   { name: 'vercel', label: 'Vercel', isDark: false },
-  { name: 'jetbrains-dark', label: 'JetBrains Dark', isDark: true },
   { name: 'konayuki', label: '小雪 Konayuki', isDark: false },
-  { name: 'notion-style', label: 'Notion Style', isDark: false },
-  { name: 'notion-style-dark', label: 'Notion Style Dark', isDark: true },
   { name: 'scrolls', label: '羊皮卷 Scrolls', isDark: false },
+  { name: 'notion-style-dark', label: 'Notion Style Dark', isDark: true },
+  { name: 'night', label: '暗夜', isDark: true },
+  { name: 'jetbrains-dark', label: 'JetBrains Dark', isDark: true },
   { name: 'scrolls-dark', label: '羊皮卷 Scrolls Dark', isDark: true },
 ];
 
@@ -76,4 +76,14 @@ export async function loadThemeStyle(name: ThemeName): Promise<string> {
  */
 export function getThemeLabel(name: ThemeName): string {
   return THEME_LIST.find((t) => t.name === name)?.label || name;
+}
+
+/**
+ * 按亮色/暗色分类主题
+ */
+export function getThemesByCategory() {
+  return {
+    light: THEME_LIST.filter((t) => !t.isDark),
+    dark: THEME_LIST.filter((t) => t.isDark),
+  };
 }

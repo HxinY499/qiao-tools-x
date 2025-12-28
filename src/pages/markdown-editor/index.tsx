@@ -1,8 +1,7 @@
-import { Download, FileText, Globe, Image, Import, Maximize2, Menu, Minimize2, Moon, Palette, Sun } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
+import { Download, FileText, Globe, Image, Import, Maximize2, Menu, Minimize2, Moon, Palette, Sun } from 'lucide-react';
 
-import { ResizablePanels } from '@/components/resizable-panels';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -12,12 +11,13 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Textarea } from '@/components/ui/textarea';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { ResizablePanels } from '@/components/resizable-panels';
 
+import { parseMarkdown } from './renderer';
 import { useMarkdownEditorStore } from './store';
-import { getThemeLabel, loadThemeStyle, THEME_LIST, ThemeName } from './themes';
+import { getThemeLabel, getThemesByCategory, loadThemeStyle, ThemeName } from './themes';
 import { Toolbar } from './toolbar';
 import { exportToDocx, exportToHtml, exportToImage, exportToMarkdown, exportToPdf, htmlToMarkdown } from './utils';
-import { parseMarkdown } from './renderer';
 
 export default function MarkdownEditorPage() {
   const { content, previewTheme, setContent, setPreviewTheme } = useMarkdownEditorStore();
@@ -264,20 +264,45 @@ export default function MarkdownEditorPage() {
             <TooltipContent>切换预览主题</TooltipContent>
           </Tooltip>
           <DropdownMenuContent align="end">
-            {THEME_LIST.map((theme) => (
-              <DropdownMenuItem
-                key={theme.name}
-                onClick={() => setPreviewTheme(theme.name as ThemeName)}
-                className={previewTheme === theme.name ? 'bg-accent' : ''}
-              >
-                {theme.isDark ? (
-                  <Moon className="h-3.5 w-3.5 mr-2 text-indigo-400" />
-                ) : (
-                  <Sun className="h-3.5 w-3.5 mr-2 text-amber-500" />
-                )}
-                {theme.label}
-              </DropdownMenuItem>
-            ))}
+            {(() => {
+              const { light, dark } = getThemesByCategory();
+              return (
+                <>
+                  {/* 亮色主题 */}
+                  {light.length > 0 && (
+                    <>
+                      <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">亮色主题</div>
+                      {light.map((theme) => (
+                        <DropdownMenuItem
+                          key={theme.name}
+                          onClick={() => setPreviewTheme(theme.name as ThemeName)}
+                          className={previewTheme === theme.name ? 'bg-accent' : ''}
+                        >
+                          <Sun className="h-3.5 w-3.5 mr-2 text-amber-500" />
+                          {theme.label}
+                        </DropdownMenuItem>
+                      ))}
+                    </>
+                  )}
+                  {/* 暗色主题 */}
+                  {dark.length > 0 && (
+                    <>
+                      <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground mt-1">暗色主题</div>
+                      {dark.map((theme) => (
+                        <DropdownMenuItem
+                          key={theme.name}
+                          onClick={() => setPreviewTheme(theme.name as ThemeName)}
+                          className={previewTheme === theme.name ? 'bg-accent' : ''}
+                        >
+                          <Moon className="h-3.5 w-3.5 mr-2 text-indigo-400" />
+                          {theme.label}
+                        </DropdownMenuItem>
+                      ))}
+                    </>
+                  )}
+                </>
+              );
+            })()}
           </DropdownMenuContent>
         </DropdownMenu>
         <DropdownMenu>
