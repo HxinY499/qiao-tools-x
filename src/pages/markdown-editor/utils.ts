@@ -378,12 +378,16 @@ export function exportToHtml(htmlContent: string, themeStyle: string, filename =
  */
 async function createScreenshotElement(
   previewElement: HTMLElement,
+  isDark = false,
 ): Promise<{ container: HTMLDivElement; cleanup: () => void }> {
   // 获取 markdown-body 内容
   const markdownBody = previewElement.querySelector('.markdown-body');
   if (!markdownBody) {
     throw new Error('未找到内容');
   }
+
+  // 根据主题明暗选择背景色
+  const backgroundColor = isDark ? '#0a0a0a' : '#ffffff';
 
   // 创建临时容器
   const container = document.createElement('div');
@@ -393,7 +397,7 @@ async function createScreenshotElement(
     top: 0;
     width: 800px;
     padding: 40px;
-    background: #ffffff;
+    background: ${backgroundColor};
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   `;
 
@@ -435,15 +439,16 @@ async function createScreenshotElement(
 /**
  * 导出为 PDF
  */
-export async function exportToPdf(previewElement: HTMLElement, filename = 'document.pdf') {
-  const { container, cleanup } = await createScreenshotElement(previewElement);
+export async function exportToPdf(previewElement: HTMLElement, isDark = false, filename = 'document.pdf') {
+  const { container, cleanup } = await createScreenshotElement(previewElement, isDark);
 
   try {
+    const backgroundColor = isDark ? '#0a0a0a' : '#ffffff';
     const canvas = await html2canvas(container, {
       scale: 2,
       useCORS: true,
       logging: false,
-      backgroundColor: '#ffffff',
+      backgroundColor,
       windowWidth: 800,
     });
 
@@ -609,15 +614,16 @@ function parseInlineMarkdown(text: string): TextRun[] {
 /**
  * 导出为图片 (JPG)
  */
-export async function exportToImage(previewElement: HTMLElement, filename = 'document.jpg') {
-  const { container, cleanup } = await createScreenshotElement(previewElement);
+export async function exportToImage(previewElement: HTMLElement, isDark = false, filename = 'document.jpg') {
+  const { container, cleanup } = await createScreenshotElement(previewElement, isDark);
 
   try {
+    const backgroundColor = isDark ? '#0a0a0a' : '#ffffff';
     const canvas = await html2canvas(container, {
       scale: 2,
       useCORS: true,
       logging: false,
-      backgroundColor: '#ffffff',
+      backgroundColor,
       windowWidth: 800,
     });
 

@@ -15,12 +15,15 @@ import { ResizablePanels } from '@/components/resizable-panels';
 
 import { parseMarkdown } from './renderer';
 import { useMarkdownEditorStore } from './store';
-import { getThemeLabel, getThemesByCategory, loadThemeStyle, ThemeName } from './themes';
+import { getThemeLabel, getThemesByCategory, loadThemeStyle, THEME_LIST, ThemeName } from './themes';
 import { Toolbar } from './toolbar';
 import { exportToDocx, exportToHtml, exportToImage, exportToMarkdown, exportToPdf, htmlToMarkdown } from './utils';
 
 export default function MarkdownEditorPage() {
   const { content, previewTheme, setContent, setPreviewTheme } = useMarkdownEditorStore();
+
+  // 获取当前主题是否为暗色主题
+  const isDarkTheme = THEME_LIST.find((t) => t.name === previewTheme)?.isDark || false;
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -170,7 +173,7 @@ export default function MarkdownEditorPage() {
     }
     toast.info('正在生成 PDF...');
     try {
-      await exportToPdf(previewRef.current);
+      await exportToPdf(previewRef.current, isDarkTheme);
       toast.success('已导出 PDF 文件');
     } catch {
       toast.error('PDF 导出失败');
@@ -198,7 +201,7 @@ export default function MarkdownEditorPage() {
     }
     toast.info('正在生成图片...');
     try {
-      await exportToImage(previewRef.current);
+      await exportToImage(previewRef.current, isDarkTheme);
       toast.success('已导出图片');
     } catch {
       toast.error('图片导出失败');
