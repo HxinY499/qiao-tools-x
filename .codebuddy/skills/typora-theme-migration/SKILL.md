@@ -34,7 +34,7 @@ description: "用于将 Typora 主题（CSS）迁移到本项目的 markdown 编
    - 保留/迁移变量：`--bg-color`, `--text-color`, `--border-color`, `--link-color`, `--code-bg-color`, `--code-block-bg-color`, `--code-color`, `--body-font`, `--monospace-font`, `--font-size`, `--h1/h2/h3`, `--line-height`, `--main-content-max-width`, `--document-padding-x`, `--code-border-radius`, `--monospace-font-size`，可选 `--mermaid-theme` 等。
    - 间距与排版：保持段落、标题、列表、引用、HR、图片、表格的间距和风格。
 
-5) **代码块映射（Shiki）**
+5) **代码块映射（Shiki，务必用 `!important` 防止被 Shiki 覆盖）**
    - 将 Typora CodeMirror 颜色映射到 Shiki token：
      - `.cm-keyword`→`.token.keyword`
      - `.cm-string/.cm-string-2`→`.token.string`
@@ -44,8 +44,9 @@ description: "用于将 Typora 主题（CSS）迁移到本项目的 markdown 编
      - `.cm-tag/.cm-attribute`→`.token.tag/.token.attr-name`
      - `.cm-def/.cm-variable-2`→`.token.function/.token.variable`
      - 其他按相近颜色映射。
-   - 容器样式：`.markdown-body pre`、`.markdown-body code`、`.markdown-body .shiki` 使用主题变量设置背景、圆角、内边距、等宽字体。
-   - 行内代码：`.markdown-body p code`（或排除 `.shiki .token`）避免覆盖语法 token。
+   - **代码相关样式一律加 `!important`**，包括 `.markdown-body .shiki .token.*` 颜色、`pre/code/.shiki` 的背景/圆角/内边距/字体，防止被 Shiki 默认样式覆盖。
+   - 容器样式：`.markdown-body pre`、`.markdown-body code`、`.markdown-body .shiki` 使用主题变量设置背景、圆角、内边距、等宽字体，并加 `!important`。
+   - 行内代码：`.markdown-body p code`（或排除 `.shiki .token`）避免覆盖语法 token，必要时为颜色/背景加 `!important`。
    - Typora 的行号/gutter/tooltip/自动完成，如无必要可删除。
 
 6) **列表 / 任务列表 / 表格 / 引用 / 链接**
@@ -84,6 +85,7 @@ description: "用于将 Typora 主题（CSS）迁移到本项目的 markdown 编
 
 ## 提示
 - 始终加 `.markdown-body` 前缀，防止全局污染。
+- 代码配色/容器相关规则务必加 `!important`，优先级压过 Shiki 默认样式。
 - 变量缺失（如 `--header-color`）可用 `--text-color` 替代或显式声明。
 - 删除无用的 Typora UI 样式以减小体积、避免冲突。
 - 保留源主题的许可证与版权声明。

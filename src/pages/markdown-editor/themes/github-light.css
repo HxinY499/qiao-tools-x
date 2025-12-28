@@ -1102,3 +1102,46 @@
 .markdown-body .highlight pre:has(+.zeroclipboard-container) {
   min-height: 52px;
 }
+
+/* 强制覆盖代码样式，避免被 shiki 默认样式覆盖 */
+.markdown-body pre,
+.markdown-body .shiki {
+  background: #f6f8fa !important;
+  color: #1f2328 !important;
+  padding: 1rem !important;
+  border-radius: 6px !important;
+  line-height: 1.45 !important;
+}
+
+.markdown-body .shiki code {
+  display: block !important;
+  line-height: 1.5 !important;
+}
+
+.markdown-body :not(pre) > code {
+  background: #818b981f !important;
+  color: #1f2328 !important;
+  border-radius: 6px !important;
+  font-weight: 600 !important;
+  padding: 0.2em 0.4em !important;
+}
+
+.markdown-body code[class*="language-"],
+.markdown-body pre[class*="language-"] {
+  background: #f6f8fa !important;
+  color: #1f2328 !important;
+}
+
+.markdown-body .token.comment { color: #59636e !important; }
+.markdown-body .token.string { color: #0a3069 !important; }
+.markdown-body .token.number,
+.markdown-body .token.constant { color: #0550ae !important; }
+.markdown-body .token.operator { color: #1f2328 !important; }
+.markdown-body .token.keyword { color: #cf222e !important; }
+.markdown-body .token.function,
+.markdown-body .token.variable,
+.markdown-body .token.symbol { color: #1f2328 !important; }
+.markdown-body .token.tag { color: #0550ae !important; }
+.markdown-body .token.attr-name { color: #6639ba !important; }
+.markdown-body .token.property { color: #0550ae !important; }
+.markdown-body .token.punctuation { color: #59636e !important; }

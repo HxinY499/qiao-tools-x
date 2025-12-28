@@ -285,3 +285,50 @@
   cursor: pointer;
   font-weight: 600;
 }
+
+/* 强制覆盖代码样式，避免被 shiki 默认样式覆盖 */
+.markdown-body pre,
+.markdown-body .shiki {
+  background: var(--code-block-bg-color) !important;
+  color: var(--text-color) !important;
+  padding: 1.1rem 1.25rem !important;
+  border-radius: var(--code-border-radius) !important;
+  line-height: var(--monospace-line-height) !important;
+}
+
+.markdown-body .shiki code {
+  font-family: var(--monospace-font) !important;
+  font-size: var(--monospace-font-size) !important;
+  line-height: var(--monospace-line-height) !important;
+  display: block !important;
+}
+
+.markdown-body :not(pre) > code {
+  background: var(--code-bg-color) !important;
+  color: var(--code-color) !important;
+  border-radius: 6px !important;
+  font-weight: 600 !important;
+  padding: 0.12em 0.35em !important;
+}
+
+.markdown-body code[class*="language-"],
+.markdown-body pre[class*="language-"] {
+  background: var(--code-block-bg-color) !important;
+  color: var(--text-color) !important;
+}
+
+.markdown-body .token.keyword,
+.markdown-body .token.builtin { color: #67a2cc !important; }
+.markdown-body .token.operator { color: #f5b73d !important; }
+.markdown-body .token.function,
+.markdown-body .token.variable { color: #ecec93 !important; }
+.markdown-body .token.number,
+.markdown-body .token.constant,
+.markdown-body .token.tag,
+.markdown-body .token.attr-name,
+.markdown-body .token.property { color: #e06c75 !important; }
+.markdown-body .token.string,
+.markdown-body .token.class-name,
+.markdown-body .token.attr-value { color: #bde051 !important; }
+.markdown-body .token.comment { color: #998066 !important; }
+.markdown-body .token.meta { color: #dcdcdc !important; }

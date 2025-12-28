@@ -1,6 +1,12 @@
 // 主题配置 - 按需加载
 
-export type ThemeName = 'github-light' | 'github-dark' | 'notion-style-light' | 'notion-style-dark';
+export type ThemeName =
+  | 'github-light'
+  | 'github-dark'
+  | 'notion-style-light'
+  | 'notion-style-dark'
+  | 'scrolls-light'
+  | 'scrolls-dark';
 
 export interface ThemeMeta {
   name: ThemeName;
@@ -15,6 +21,8 @@ export const THEME_LIST: ThemeMeta[] = [
   { name: 'notion-style-dark', label: 'Notion Style Dark', isDark: true },
   { name: 'github-light', label: 'GitHub Light', isDark: false },
   { name: 'github-dark', label: 'GitHub Dark', isDark: true },
+  { name: 'scrolls-light', label: 'Scrolls Light', isDark: false },
+  { name: 'scrolls-dark', label: 'Scrolls Dark', isDark: true },
 ];
 
 // 主题加载器 - 按需动态导入（使用 ?raw 获取 CSS 原始内容）
@@ -23,6 +31,8 @@ const themeLoaders: Record<ThemeName, () => Promise<{ default: string }>> = {
   'notion-style-dark': () => import('./notion-style-dark.css?raw'),
   'github-light': () => import('./github-light.css?raw'),
   'github-dark': () => import('./github-dark.css?raw'),
+  'scrolls-light': () => import('./scrolls-light.css?raw'),
+  'scrolls-dark': () => import('./scrolls-dark.css?raw'),
 };
 
 // 主题缓存
