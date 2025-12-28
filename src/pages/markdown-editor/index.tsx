@@ -358,10 +358,10 @@ export default function MarkdownEditorPage() {
           <TooltipContent>{isFullscreen ? '退出全屏 (ESC)' : '全屏预览'}</TooltipContent>
         </Tooltip>
       </header>
-      <div ref={previewRef} className="flex-1 min-h-0 min-w-0 overflow-auto custom-scrollbar p-4">
+      <div ref={previewRef} className="flex-1 min-h-0 min-w-0 overflow-auto custom-scrollbar">
         <style>{themeStyle}</style>
         <article
-          className="markdown-body max-w-full overflow-x-auto"
+          className="markdown-body max-w-full overflow-x-auto px-4"
           dangerouslySetInnerHTML={{ __html: htmlContent }}
         />
       </div>
