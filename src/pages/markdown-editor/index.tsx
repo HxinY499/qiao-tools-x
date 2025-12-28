@@ -1,7 +1,5 @@
 import { Download, FileText, Globe, Image, Import, Maximize2, Menu, Minimize2, Moon, Palette, Sun } from 'lucide-react';
-import { Marked } from 'marked';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { codeToHtml } from 'shiki';
 import { toast } from 'sonner';
 
 import { ResizablePanels } from '@/components/resizable-panels';
@@ -10,7 +8,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Textarea } from '@/components/ui/textarea';
@@ -20,76 +17,7 @@ import { useMarkdownEditorStore } from './store';
 import { getThemeLabel, loadThemeStyle, THEME_LIST, ThemeName } from './themes';
 import { Toolbar } from './toolbar';
 import { exportToDocx, exportToHtml, exportToImage, exportToMarkdown, exportToPdf, htmlToMarkdown } from './utils';
-
-// 配置 marked（不带代码高亮，后续用 shiki 处理）
-const marked = new Marked();
-
-marked.setOptions({
-  gfm: true,
-  breaks: true,
-});
-
-// 使用 shiki 高亮代码块
-async function highlightCodeBlocks(html: string): Promise<string> {
-  const codeBlockRegex = /<pre><code class="language-(\w+)">([\s\S]*?)<\/code><\/pre>/g;
-  const codeBlockNoLangRegex = /<pre><code>([\s\S]*?)<\/code><\/pre>/g;
-
-  const matches: { full: string; lang: string; code: string }[] = [];
-
-  // 收集带语言标记的代码块
-  let match;
-  while ((match = codeBlockRegex.exec(html)) !== null) {
-    matches.push({
-      full: match[0],
-      lang: match[1],
-      code: decodeHtmlEntities(match[2]),
-    });
-  }
-
-  // 收集不带语言标记的代码块
-  while ((match = codeBlockNoLangRegex.exec(html)) !== null) {
-    matches.push({
-      full: match[0],
-      lang: 'text',
-      code: decodeHtmlEntities(match[1]),
-    });
-  }
-
-  // 并行高亮所有代码块
-  const highlightedBlocks = await Promise.all(
-    matches.map(async ({ full, lang, code }) => {
-      try {
-        const html = await codeToHtml(code, {
-          lang: lang || 'text',
-          theme: 'github-dark',
-        });
-        return { full, html };
-      } catch {
-        // 如果语言不支持，使用 text
-        const html = await codeToHtml(code, {
-          lang: 'text',
-          theme: 'github-dark',
-        });
-        return { full, html };
-      }
-    }),
-  );
-
-  // 替换原始代码块
-  let result = html;
-  for (const { full, html: highlightedHtml } of highlightedBlocks) {
-    result = result.replace(full, highlightedHtml);
-  }
-
-  return result;
-}
-
-// 解码 HTML 实体
-function decodeHtmlEntities(text: string): string {
-  const textarea = document.createElement('textarea');
-  textarea.innerHTML = text;
-  return textarea.value;
-}
+import { parseMarkdown } from './renderer';
 
 export default function MarkdownEditorPage() {
   const { content, previewTheme, setContent, setPreviewTheme } = useMarkdownEditorStore();
@@ -111,15 +39,12 @@ export default function MarkdownEditorPage() {
 
   // 解析 Markdown 并高亮代码
   useEffect(() => {
-    if (!content) {
-      setHtmlContent('<p><em>开始输入以查看预览...</em></p>');
-      return;
-    }
+    const processMarkdown = async () => {
+      const html = await parseMarkdown(content);
+      setHtmlContent(html);
+    };
 
-    const rawHtml = marked.parse(content) as string;
-
-    // 异步高亮代码块
-    highlightCodeBlocks(rawHtml).then(setHtmlContent);
+    processMarkdown();
   }, [content]);
 
   // ESC 键退出全屏
@@ -307,27 +232,6 @@ export default function MarkdownEditorPage() {
               </TooltipTrigger>
               <TooltipContent side="left">支持 .md .html .txt</TooltipContent>
             </Tooltip>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleExportMd} disabled={!content}>
-              <Download className="h-4 w-4 mr-2" />
-              导出 Markdown
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleExportHtml} disabled={!content}>
-              <Globe className="h-4 w-4 mr-2" />
-              导出 HTML
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleExportPdf} disabled={!content}>
-              <FileText className="h-4 w-4 mr-2" />
-              导出 PDF
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleExportDocx} disabled={!content}>
-              <FileText className="h-4 w-4 mr-2" />
-              导出 Word
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleExportImage} disabled={!content}>
-              <Image className="h-4 w-4 mr-2" />
-              导出图片
-            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </header>
@@ -374,6 +278,41 @@ export default function MarkdownEditorPage() {
                 {theme.label}
               </DropdownMenuItem>
             ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <DropdownMenu>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-8 gap-1.5" tabIndex={-1}>
+                  <Download className="h-3.5 w-3.5" />
+                  <span className="text-xs">导出</span>
+                </Button>
+              </DropdownMenuTrigger>
+            </TooltipTrigger>
+            <TooltipContent>导出选项</TooltipContent>
+          </Tooltip>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={handleExportMd} disabled={!content}>
+              <Download className="h-4 w-4 mr-2" />
+              导出 Markdown
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleExportHtml} disabled={!content}>
+              <Globe className="h-4 w-4 mr-2" />
+              导出 HTML
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleExportPdf} disabled={!content}>
+              <FileText className="h-4 w-4 mr-2" />
+              导出 PDF
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleExportDocx} disabled={!content}>
+              <FileText className="h-4 w-4 mr-2" />
+              导出 Word
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleExportImage} disabled={!content}>
+              <Image className="h-4 w-4 mr-2" />
+              导出图片
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
         <Tooltip>
