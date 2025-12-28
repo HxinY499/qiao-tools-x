@@ -1,7 +1,8 @@
+import { Download, FileText, Globe, Image, Import, Maximize2, Menu, Minimize2, Moon, Palette, Sun } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import { Download, FileText, Globe, Image, Import, Maximize2, Menu, Minimize2, Moon, Palette, Sun } from 'lucide-react';
 
+import { ResizablePanels } from '@/components/resizable-panels';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -11,7 +12,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Textarea } from '@/components/ui/textarea';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { ResizablePanels } from '@/components/resizable-panels';
 
 import { parseMarkdown } from './renderer';
 import { useMarkdownEditorStore } from './store';
@@ -361,7 +361,7 @@ export default function MarkdownEditorPage() {
       <div ref={previewRef} className="flex-1 min-h-0 min-w-0 overflow-auto custom-scrollbar p-4">
         <style>{themeStyle}</style>
         <article
-          className="markdown-body !bg-transparent max-w-full overflow-x-auto"
+          className="markdown-body max-w-full overflow-x-auto"
           dangerouslySetInnerHTML={{ __html: htmlContent }}
         />
       </div>
