@@ -379,15 +379,48 @@ export function exportToHtml(htmlContent: string, themeStyle: string, filename =
 async function createScreenshotElement(
   previewElement: HTMLElement,
   isDark = false,
-): Promise<{ container: HTMLDivElement; cleanup: () => void }> {
+): Promise<{ container: HTMLDivElement; cleanup: () => void; background: string; backgroundColor: string }> {
   // 获取 markdown-body 内容
   const markdownBody = previewElement.querySelector('.markdown-body');
   if (!markdownBody) {
     throw new Error('未找到内容');
   }
 
-  // 根据主题明暗选择背景色
-  const backgroundColor = isDark ? '#0a0a0a' : '#ffffff';
+  const pickBackground = (style: CSSStyleDeclaration, dark: boolean) => {
+    const bgImage = style.backgroundImage;
+    const bgColor = style.backgroundColor;
+    const bgShorthand = style.background;
+
+    // 优先使用渐变/图片
+    if (bgImage && bgImage !== 'none') {
+      const colorPart = bgColor && bgColor !== 'rgba(0, 0, 0, 0)' ? ` ${bgColor}` : '';
+      return {
+        background: `${bgImage}${colorPart}`,
+        backgroundColor: colorPart.trim() || (dark ? '#0a0a0a' : '#ffffff'),
+      };
+    }
+
+    // 其次使用非透明的 background 简写
+    if (bgShorthand && bgShorthand !== 'none' && !bgShorthand.includes('rgba(0, 0, 0, 0)')) {
+      return {
+        background: bgShorthand,
+        backgroundColor: bgColor && bgColor !== 'rgba(0, 0, 0, 0)' ? bgColor : dark ? '#0a0a0a' : '#ffffff',
+      };
+    }
+
+    // 再次使用非透明背景色
+    if (bgColor && bgColor !== 'rgba(0, 0, 0, 0)') {
+      return { background: bgColor, backgroundColor: bgColor };
+    }
+
+    return { background: dark ? '#0a0a0a' : '#ffffff', backgroundColor: dark ? '#0a0a0a' : '#ffffff' };
+  };
+
+  // 先取 markdown-body 的背景，再兜底取预览容器背景
+  const bodyStyle = getComputedStyle(markdownBody);
+  const previewStyle = getComputedStyle(previewElement);
+  const picked = pickBackground(bodyStyle, isDark) || pickBackground(previewStyle, isDark);
+  const { background, backgroundColor } = picked;
 
   // 创建临时容器
   const container = document.createElement('div');
@@ -397,7 +430,7 @@ async function createScreenshotElement(
     top: 0;
     width: 800px;
     padding: 40px;
-    background: ${backgroundColor};
+    background: ${background};
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   `;
 
@@ -433,6 +466,8 @@ async function createScreenshotElement(
   return {
     container,
     cleanup: () => document.body.removeChild(container),
+    background,
+    backgroundColor,
   };
 }
 
@@ -440,10 +475,9 @@ async function createScreenshotElement(
  * 导出为 PDF
  */
 export async function exportToPdf(previewElement: HTMLElement, isDark = false, filename = 'document.pdf') {
-  const { container, cleanup } = await createScreenshotElement(previewElement, isDark);
+  const { container, cleanup, backgroundColor } = await createScreenshotElement(previewElement, isDark);
 
   try {
-    const backgroundColor = isDark ? '#0a0a0a' : '#ffffff';
     const canvas = await html2canvas(container, {
       scale: 2,
       useCORS: true,
@@ -615,10 +649,9 @@ function parseInlineMarkdown(text: string): TextRun[] {
  * 导出为图片 (JPG)
  */
 export async function exportToImage(previewElement: HTMLElement, isDark = false, filename = 'document.jpg') {
-  const { container, cleanup } = await createScreenshotElement(previewElement, isDark);
+  const { container, cleanup, backgroundColor } = await createScreenshotElement(previewElement, isDark);
 
   try {
-    const backgroundColor = isDark ? '#0a0a0a' : '#ffffff';
     const canvas = await html2canvas(container, {
       scale: 2,
       useCORS: true,

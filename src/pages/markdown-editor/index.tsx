@@ -175,7 +175,8 @@ export default function MarkdownEditorPage() {
     try {
       await exportToPdf(previewRef.current, isDarkTheme);
       toast.success('已导出 PDF 文件');
-    } catch {
+    } catch (err) {
+      console.error(err);
       toast.error('PDF 导出失败');
     }
   };
@@ -189,7 +190,8 @@ export default function MarkdownEditorPage() {
     try {
       await exportToDocx(content);
       toast.success('已导出 Word 文件');
-    } catch {
+    } catch (err) {
+      console.error(err);
       toast.error('Word 导出失败');
     }
   };
@@ -203,7 +205,8 @@ export default function MarkdownEditorPage() {
     try {
       await exportToImage(previewRef.current, isDarkTheme);
       toast.success('已导出图片');
-    } catch {
+    } catch (err) {
+      console.error(err);
       toast.error('图片导出失败');
     }
   };
