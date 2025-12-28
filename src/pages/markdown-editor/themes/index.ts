@@ -1,6 +1,6 @@
 // 主题配置 - 按需加载
 
-export type ThemeName = 'github';
+export type ThemeName = 'github-light' | 'github-dark' | 'notion-style-light' | 'notion-style-dark';
 
 export interface ThemeMeta {
   name: ThemeName;
@@ -10,11 +10,19 @@ export interface ThemeMeta {
 }
 
 // 主题元数据（不包含样式，体积很小）
-export const THEME_LIST: ThemeMeta[] = [{ name: 'github', label: 'GitHub', isDark: false }];
+export const THEME_LIST: ThemeMeta[] = [
+  { name: 'notion-style-light', label: 'Notion Style Light', isDark: false },
+  { name: 'notion-style-dark', label: 'Notion Style Dark', isDark: true },
+  { name: 'github-light', label: 'GitHub Light', isDark: false },
+  { name: 'github-dark', label: 'GitHub Dark', isDark: true },
+];
 
-// 主题加载器 - 按需动态导入
-const themeLoaders: Record<ThemeName, () => Promise<{ style: string }>> = {
-  github: () => import('./github'),
+// 主题加载器 - 按需动态导入（使用 ?raw 获取 CSS 原始内容）
+const themeLoaders: Record<ThemeName, () => Promise<{ default: string }>> = {
+  'notion-style-light': () => import('./notion-style-light.css?raw'),
+  'notion-style-dark': () => import('./notion-style-dark.css?raw'),
+  'github-light': () => import('./github-light.css?raw'),
+  'github-dark': () => import('./github-dark.css?raw'),
 };
 
 // 主题缓存
@@ -33,7 +41,7 @@ export async function loadThemeStyle(name: ThemeName): Promise<string> {
   if (!loader) return '';
 
   const module = await loader();
-  const style = module.style;
+  const style = module.default;
 
   // 缓存结果
   themeCache.set(name, style);

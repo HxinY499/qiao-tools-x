@@ -361,7 +361,7 @@ export default function MarkdownEditorPage() {
       <div ref={previewRef} className="flex-1 min-h-0 min-w-0 overflow-auto custom-scrollbar">
         <style>{themeStyle}</style>
         <article
-          className="markdown-body max-w-full overflow-x-auto px-4"
+          className="markdown-body max-w-full overflow-x-auto px-4 py-2"
           dangerouslySetInnerHTML={{ __html: htmlContent }}
         />
       </div>

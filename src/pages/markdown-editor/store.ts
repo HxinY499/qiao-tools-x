@@ -67,7 +67,7 @@ export const useMarkdownEditorStore = create<MarkdownEditorState>()(
   persist(
     (set) => ({
       content: DEFAULT_CONTENT,
-      previewTheme: 'github',
+      previewTheme: 'notion-style-light',
       setContent: (content) => set({ content }),
       setPreviewTheme: (previewTheme) => set({ previewTheme }),
       clear: () => set({ content: '' }),
