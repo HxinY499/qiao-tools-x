@@ -210,7 +210,7 @@ export default function MarkdownEditorPage() {
 
   const editorPanel = (
     <>
-      <header className="flex items-center justify-between gap-2 px-3 py-2 border-b border-border bg-muted/30 min-w-0">
+      <header className="flex items-center justify-between gap-2 px-3 py-1 border-b border-border bg-muted/30 min-w-0">
         <Toolbar textareaRef={textareaRef} content={content} onSelectionChange={handleSelectionChange} />
         <input
           ref={fileInputRef}
@@ -221,7 +221,7 @@ export default function MarkdownEditorPage() {
         />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8" tabIndex={-1}>
+            <Button variant="ghost" size="icon" className="h-7 w-7" tabIndex={-1}>
               <Menu className="h-3.5 w-3.5" />
             </Button>
           </DropdownMenuTrigger>
@@ -253,12 +253,12 @@ export default function MarkdownEditorPage() {
 
   const previewPanel = (
     <div className={`flex flex-col h-full ${isFullscreen ? 'fixed inset-0 z-50 bg-background' : ''}`}>
-      <header className="flex items-center justify-end gap-1 px-3 py-2 border-b border-border bg-muted/30">
+      <header className="flex items-center justify-end gap-1 px-3 py-1 border-b border-border bg-muted/30">
         <DropdownMenu>
           <Tooltip>
             <TooltipTrigger asChild>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-8 gap-1.5" tabIndex={-1}>
+                <Button variant="ghost" size="sm" className="h-7 gap-1.5" tabIndex={-1}>
                   <Palette className="h-3.5 w-3.5" />
                   <span className="text-xs">{getThemeLabel(previewTheme)}</span>
                 </Button>
@@ -312,7 +312,7 @@ export default function MarkdownEditorPage() {
           <Tooltip>
             <TooltipTrigger asChild>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-8 gap-1.5" tabIndex={-1}>
+                <Button variant="ghost" size="sm" className="h-7 gap-1.5" tabIndex={-1}>
                   <Download className="h-3.5 w-3.5" />
                   <span className="text-xs">导出</span>
                 </Button>
@@ -348,7 +348,7 @@ export default function MarkdownEditorPage() {
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8"
+              className="h-7 w-7"
               onClick={() => setIsFullscreen(!isFullscreen)}
               tabIndex={-1}
             >

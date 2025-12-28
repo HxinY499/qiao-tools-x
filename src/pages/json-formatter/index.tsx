@@ -115,7 +115,7 @@ export default function JsonFormatterPage() {
 
   const inputPanel = (
     <>
-      <header className="flex items-center justify-between px-3 py-2 border-b border-border bg-muted/30 min-w-0 gap-2">
+      <header className="flex items-center justify-between px-3 py-1 border-b border-border bg-muted/30 min-w-0 gap-2">
         <div className="flex items-center gap-2 shrink-0">
           <FileJson className="h-4 w-4 text-muted-foreground" />
           <span className="font-medium text-xs text-muted-foreground uppercase tracking-wider hidden md:block">
@@ -125,13 +125,13 @@ export default function JsonFormatterPage() {
         <div className="flex items-center gap-1 flex-wrap justify-end min-w-0">
           <SaveJsonDialog content={input} disabled={!hasInput || !!error} />
           <HistoryDialog onLoad={handleLoadHistory} />
-          <div className="w-px h-4 bg-border mx-1 hidden sm:block" />
+          <div className="w-px h-4 bg-border mx-0.5 hidden sm:block" />
           <Button
             size="sm"
             variant="ghost"
             onClick={removeEscapes}
             disabled={!hasInput}
-            className="h-8 px-2"
+            className="h-7 px-1.5"
             title="去除转义符"
           >
             <Eraser className="h-3.5 w-3.5" />
@@ -146,7 +146,7 @@ export default function JsonFormatterPage() {
               setError(null);
             }}
             disabled={!hasInput}
-            className="h-8 px-2"
+            className="h-7 px-1.5"
             title="清空"
           >
             <Trash2 className="h-3.5 w-3.5" />
@@ -157,13 +157,13 @@ export default function JsonFormatterPage() {
             variant="secondary"
             onClick={() => processJson(true)}
             disabled={!hasInput}
-            className="h-8 px-2"
+            className="h-7 px-1.5"
             title="压缩"
           >
             <Minimize2 className="h-3.5 w-3.5" />
             <span className="hidden 2xl:inline ml-1">压缩</span>
           </Button>
-          <Button size="sm" onClick={() => processJson(false)} disabled={!hasInput} className="h-8 px-2" title="格式化">
+          <Button size="sm" onClick={() => processJson(false)} disabled={!hasInput} className="h-7 px-1.5" title="格式化">
             <Braces className="h-3.5 w-3.5" />
             <span className="hidden 2xl:inline ml-1">格式化</span>
           </Button>
@@ -201,7 +201,7 @@ export default function JsonFormatterPage() {
 
   const outputPanel = (
     <div className={`flex flex-col h-full ${isExpanded ? 'fixed inset-0 z-50 bg-background' : ''}`}>
-      <header className="flex items-center justify-between px-3 py-2 border-b border-border bg-muted/30">
+      <header className="flex items-center justify-between px-3 py-1 border-b border-border bg-muted/30">
         <div className="flex items-center gap-2">
           <Braces className="h-4 w-4 text-muted-foreground" />
           <span className="font-medium text-xs text-muted-foreground uppercase tracking-wider hidden md:block">
@@ -213,7 +213,7 @@ export default function JsonFormatterPage() {
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8"
+            className="h-7 w-7"
             onClick={() => setIsExpanded(!isExpanded)}
             title={isExpanded ? '退出全屏' : '全屏查看'}
           >

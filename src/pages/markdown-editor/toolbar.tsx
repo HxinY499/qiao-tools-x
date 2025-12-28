@@ -273,7 +273,7 @@ export function Toolbar({ textareaRef, content, onSelectionChange }: ToolbarProp
           <TableDialog
             trigger={
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8" tabIndex={-1}>
+                <Button variant="ghost" size="icon" className="h-7 w-7" tabIndex={-1}>
                   <item.icon className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
@@ -298,7 +298,7 @@ export function Toolbar({ textareaRef, content, onSelectionChange }: ToolbarProp
       return (
         <Tooltip key={item.id}>
           <TooltipTrigger asChild>
-            <Button variant="ghost" size="sm" className="h-8 px-2 text-xs" tabIndex={-1} onClick={item.action}>
+            <Button variant="ghost" size="sm" className="h-7 px-2 text-xs" tabIndex={-1} onClick={item.action}>
               {item.text}
             </Button>
           </TooltipTrigger>
@@ -310,7 +310,7 @@ export function Toolbar({ textareaRef, content, onSelectionChange }: ToolbarProp
     return (
       <Tooltip key={item.id}>
         <TooltipTrigger asChild>
-          <Button variant="ghost" size="icon" className="h-8 w-8" tabIndex={-1} onClick={item.action}>
+          <Button variant="ghost" size="icon" className="h-7 w-7" tabIndex={-1} onClick={item.action}>
             <item.icon className="h-4 w-4" />
           </Button>
         </TooltipTrigger>
@@ -330,15 +330,15 @@ export function Toolbar({ textareaRef, content, onSelectionChange }: ToolbarProp
         >
           {allItems.map((item, index) =>
             item === 'separator' ? (
-              <Separator key={`sep-${index}`} orientation="vertical" className="h-6 mx-1" />
+              <Separator key={`sep-${index}`} orientation="vertical" className="h-5 mx-1" />
             ) : (
               <div key={item.id} className="inline-flex">
                 {item.isText ? (
-                  <Button variant="ghost" size="sm" className="h-8 px-2 text-xs" tabIndex={-1}>
+                  <Button variant="ghost" size="sm" className="h-7 px-2 text-xs" tabIndex={-1}>
                     {item.text}
                   </Button>
                 ) : (
-                  <Button variant="ghost" size="icon" className="h-8 w-8" tabIndex={-1}>
+                  <Button variant="ghost" size="icon" className="h-7 w-7" tabIndex={-1}>
                     <item.icon className="h-4 w-4" />
                   </Button>
                 )}
@@ -349,7 +349,7 @@ export function Toolbar({ textareaRef, content, onSelectionChange }: ToolbarProp
 
         {/* 隐藏的展开按钮测量 */}
         <div ref={moreButtonRef} className="absolute left-0 top-0 invisible pointer-events-none" aria-hidden="true">
-          <Button variant="ghost" size="icon" className="h-8 w-8 ml-0.5" tabIndex={-1}>
+          <Button variant="ghost" size="icon" className="h-7 w-7 ml-0.5" tabIndex={-1}>
             <ChevronDown className="h-4 w-4" />
           </Button>
         </div>
@@ -358,7 +358,7 @@ export function Toolbar({ textareaRef, content, onSelectionChange }: ToolbarProp
         <div className="flex items-center gap-0.5">
           {visibleItems.map((item, index) =>
             item === 'separator' ? (
-              <Separator key={`sep-${index}`} orientation="vertical" className="h-6 mx-1" />
+              <Separator key={`sep-${index}`} orientation="vertical" className="h-5 mx-1" />
             ) : (
               renderButton(item)
             ),
@@ -368,7 +368,7 @@ export function Toolbar({ textareaRef, content, onSelectionChange }: ToolbarProp
           {overflowItems.length > 0 && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8 ml-0.5" tabIndex={-1}>
+                <Button variant="ghost" size="icon" className="h-7 w-7 ml-0.5" tabIndex={-1}>
                   <ChevronDown className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>

@@ -48,7 +48,7 @@ export function JsonSettings() {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-muted" title="编辑器设置">
+        <Button variant="ghost" size="icon" className="h-7 w-7 hover:bg-muted" title="编辑器设置">
           <Settings2 className="h-4 w-4" />
         </Button>
       </PopoverTrigger>
