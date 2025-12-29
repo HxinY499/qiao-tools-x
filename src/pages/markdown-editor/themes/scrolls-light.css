@@ -33,6 +33,14 @@
   --shiki-token-string-expression: #e6db74;
   --shiki-token-punctuation: #f8f8f2;
   --shiki-token-link: #66d9ef;
+
+  /* Mermaid Theme Variables */
+  --mermaid-background: #f7e7c3;
+  --mermaid-primaryColor: #fdf1d5;
+  --mermaid-primaryTextColor: #333333;
+  --mermaid-primaryBorderColor: #7397ca;
+  --mermaid-lineColor: #7a766a;
+  --mermaid-textColor: #333333;
   background: var(--bg-color);
   color: var(--text-color);
   font-family: 'Mono', 'Clear Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;

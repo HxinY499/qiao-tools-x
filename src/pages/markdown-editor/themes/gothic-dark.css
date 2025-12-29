@@ -67,6 +67,14 @@
   --shiki-token-punctuation: #d4d4d4;
   --shiki-token-link: #a5d6ff;
 
+  /* Mermaid Theme Variables */
+  --mermaid-background: #1a1a1a;
+  --mermaid-primaryColor: #3d2828;
+  --mermaid-primaryTextColor: #e8e8e8;
+  --mermaid-primaryBorderColor: #ff6666;
+  --mermaid-lineColor: #a0a0a0;
+  --mermaid-textColor: #e8e8e8;
+
   background: var(--bg-color);
   color: var(--text-color);
   font-family: 'TeXGyreAdventor', 'Century Gothic', 'Didact Gothic', 'Yu Gothic', 'Segoe UI Emoji', sans-serif;

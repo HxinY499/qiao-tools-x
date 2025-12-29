@@ -144,6 +144,33 @@ export async function highlightCodeBlocks(html: string): Promise<string> {
   return result;
 }
 
+// 从 DOM 中读取 Mermaid CSS 变量
+function getMermaidThemeVariables(): Record<string, string | boolean> {
+  const markdownBody = document.querySelector('.markdown-body');
+  if (!markdownBody) {
+    return {};
+  }
+
+  const styles = getComputedStyle(markdownBody);
+  const getVar = (name: string) => styles.getPropertyValue(name).trim();
+
+  // 检测是否为暗色模式
+  const colorScheme = styles.getPropertyValue('color-scheme').trim();
+  const isDarkMode = colorScheme === 'dark';
+
+  // 只设置核心变量，让 mermaid 自动派生其他颜色
+  // 参考: https://mermaid.js.org/config/theming.html#theme-variables
+  return {
+    darkMode: isDarkMode,
+    background: getVar('--mermaid-background') || (isDarkMode ? '#1a1a1a' : '#ffffff'),
+    primaryColor: getVar('--mermaid-primaryColor') || (isDarkMode ? '#1f3a5f' : '#dce8f5'),
+    primaryTextColor: getVar('--mermaid-primaryTextColor') || (isDarkMode ? '#f0f6fc' : '#1f2328'),
+    primaryBorderColor: getVar('--mermaid-primaryBorderColor') || (isDarkMode ? '#4493f8' : '#0969da'),
+    lineColor: getVar('--mermaid-lineColor') || (isDarkMode ? '#8b949e' : '#57606a'),
+    textColor: getVar('--mermaid-textColor') || (isDarkMode ? '#f0f6fc' : '#1f2328'),
+  };
+}
+
 // 渲染 mermaid 图表
 export async function renderMermaidBlocks(html: string): Promise<string> {
   const mermaidRegex = /<pre><code class="language-mermaid">([\s\S]*?)<\/code><\/pre>/g;
@@ -163,9 +190,14 @@ export async function renderMermaidBlocks(html: string): Promise<string> {
 
   // 动态导入 mermaid
   const mermaid = (await import('mermaid')).default;
+
+  // 获取当前主题的 CSS 变量
+  const themeVariables = getMermaidThemeVariables();
+
   mermaid.initialize({
     startOnLoad: false,
-    theme: 'default',
+    theme: 'base',
+    themeVariables,
     securityLevel: 'loose',
   });
 

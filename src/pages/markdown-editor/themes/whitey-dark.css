@@ -12,6 +12,9 @@
   --whitey-link: #4fb3ff;
   --whitey-border: #444;
   --whitey-code-bg: #011f4b;
+  --content-max-width: 960px;
+  --content-padding-x: 24px;
+  --content-padding-y: 40px;
 
   /* Shiki Code Highlight Variables - Deep Blue Dark */
   --shiki-foreground: #d4d4d4;
@@ -25,6 +28,14 @@
   --shiki-token-string-expression: #7ee787;
   --shiki-token-punctuation: #d4d4d4;
   --shiki-token-link: #4fb3ff;
+
+  /* Mermaid Theme Variables */
+  --mermaid-background: #1E222A;
+  --mermaid-primaryColor: #2a3040;
+  --mermaid-primaryTextColor: #CECFCF;
+  --mermaid-primaryBorderColor: #4fb3ff;
+  --mermaid-lineColor: #888888;
+  --mermaid-textColor: #CECFCF;
   
   background-color: var(--whitey-bg);
   color: var(--whitey-text);
@@ -34,9 +45,8 @@
   text-align: justify;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 40px 24px 2em;
+  min-height: 100%;
+  padding: var(--content-padding-y) max(var(--content-padding-x), calc((100% - var(--content-max-width)) / 2 + var(--content-padding-x))) 2em;
   hyphens: auto;
   -webkit-hyphens: auto;
   -moz-hyphens: auto;
@@ -44,7 +54,7 @@
 
 @media only screen and (min-width: 1400px) {
   .markdown-body {
-    max-width: 1100px;
+    --content-max-width: 1100px;
   }
 }
 

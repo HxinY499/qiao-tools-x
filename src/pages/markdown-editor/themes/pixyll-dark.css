@@ -128,6 +128,14 @@
   --shiki-token-punctuation: #9399b2;
   --shiki-token-link: #89dceb;
 
+  /* Mermaid Theme Variables */
+  --mermaid-background: #1a1a2e;
+  --mermaid-primaryColor: #2a2a4e;
+  --mermaid-primaryTextColor: #e0e0e0;
+  --mermaid-primaryBorderColor: #a89cc8;
+  --mermaid-lineColor: #9a9a9a;
+  --mermaid-textColor: #e0e0e0;
+
   background: var(--bg-color);
   color: var(--text-color);
   font-family: 'Merriweather', 'PT Serif', Georgia, 'Times New Roman', 'STSong', serif;

@@ -36,7 +36,7 @@ description: "用于将 Typora 主题（CSS）迁移到本项目的 markdown 编
    - 所有标签与组件选择器（`img/table/code/blockquote/hr/ul/ol/li/a/p/h1~h6`、任务列表等）全部加 `.markdown-body` 前缀。
 
 4) **变量与基础排版**
-   - 保留/迁移变量：`--bg-color`, `--text-color`, `--border-color`, `--link-color`, `--code-bg-color`, `--code-block-bg-color`, `--code-color`, `--body-font`, `--monospace-font`, `--font-size`, `--h1/h2/h3`, `--line-height`, `--content-max-width`, `--content-padding-x`, `--code-border-radius`, `--monospace-font-size`，可选 `--mermaid-theme` 等。
+   - 保留/迁移变量：`--bg-color`, `--text-color`, `--border-color`, `--link-color`, `--code-bg-color`, `--code-block-bg-color`, `--code-color`, `--body-font`, `--monospace-font`, `--font-size`, `--h1/h2/h3`, `--line-height`, `--content-max-width`, `--content-padding-x`, `--code-border-radius`, `--monospace-font-size` 等。
    - 间距与排版：保持段落、标题、列表、引用、HR、图片、表格的间距和风格。
    - **背景铺满**：不要使用 `max-width` + `margin: 0 auto`，这会导致预览区域拉宽时左右留白。应使用动态 padding 实现内容居中且背景铺满：
      ```css
@@ -66,6 +66,43 @@ description: "用于将 Typora 主题（CSS）迁移到本项目的 markdown 编
        --shiki-token-link: #4183c4;        /* 链接 */
      }
      ```
+
+6) **Mermaid 图表主题（CSS 变量方案）**
+   - 本项目使用 Mermaid 的 `base` 主题 + `themeVariables` 实现动态主题跟随。
+   - **必须在每个主题的 `.markdown-body` 中定义以下 6 个核心 Mermaid 变量**：
+     ```css
+     .markdown-body {
+       /* Mermaid Theme Variables */
+       --mermaid-background: #ffffff;       /* 图表背景色 */
+       --mermaid-primaryColor: #dce8f5;     /* 主要节点填充色 */
+       --mermaid-primaryTextColor: #1f2328; /* 主要节点文字色 */
+       --mermaid-primaryBorderColor: #0969da; /* 主要节点边框色 */
+       --mermaid-lineColor: #57606a;        /* 连接线颜色 */
+       --mermaid-textColor: #1f2328;        /* 通用文字颜色 */
+     }
+     ```
+   - **只需定义这 6 个核心变量**，Mermaid 会自动派生 `secondaryColor`、`tertiaryColor` 等其他颜色。
+   - **亮色主题**：使用浅色背景 + 深色文字，`primaryColor` 用浅色填充。
+   - **暗色主题**：使用深色背景 + 浅色文字，颜色适当调整以保证对比度。
+   - **renderer.ts 会自动读取这些变量**并传递给 Mermaid，同时根据 `color-scheme` 自动设置 `darkMode`。
+
+7) **color-scheme 声明**
+   - **必须在每个主题的 `.markdown-body` 中声明 `color-scheme`**，用于告知浏览器当前主题的配色模式：
+     ```css
+     .markdown-body {
+       color-scheme: light; /* 亮色主题 */
+     }
+     /* 或 */
+     .markdown-body {
+       color-scheme: dark;  /* 暗色主题 */
+     }
+     ```
+   - **作用**：
+     - 浏览器会根据此值自动调整滚动条、表单控件等原生 UI 的配色。
+     - **Mermaid 的 `darkMode` 会根据此值自动判断**，无需手动配置。
+   - 亮色主题文件使用 `color-scheme: light`，暗色主题文件使用 `color-scheme: dark`。
+
+8) **Shiki 代码块配色映射**
    - **Typora CodeMirror 颜色映射到 Shiki 变量**：
      | Typora (CodeMirror) | Shiki 变量 |
      |---------------------|-----------|
@@ -89,14 +126,14 @@ description: "用于将 Typora 主题（CSS）迁移到本项目的 markdown 编
      ```
    - 行内代码样式单独处理，避免与 Shiki 语法高亮冲突。
 
-6) **列表 / 任务列表 / 表格 / 引用 / 链接**
+9) **列表 / 任务列表 / 表格 / 引用 / 链接**
    - 列表缩进/间距：加前缀。
    - 任务列表 checkbox：加前缀，修正 `vat(--link-color)` 为 `var(--link-color)`（若出现）。
    - 表格：边框/内边距/宽度限制加前缀。
    - 引用、HR、段落间距：加前缀。
    - 链接：使用 `--link-color`，加前缀。
 
-7) **字体（如有）**
+10) **字体（如有）**
    - 字体放置：`public/themes/fonts/<主题名>/*.woff2`（用户自行下载/放入）。
    - CSS 使用绝对路径按需加载，例如：
      ```css
@@ -111,16 +148,17 @@ description: "用于将 Typora 主题（CSS）迁移到本项目的 markdown 编
    - 使用时带兜底：`font-family: 'Scrolls', var(--body-font), system-ui, sans-serif;`。
    - 仅当主题 CSS 注入时浏览器才会请求字体。
 
-8) **注册主题（`themes/index.ts`）**
+11) **注册主题（`themes/index.ts`）**
    - 扩展 `ThemeName`，在 `THEME_LIST` 写入 `label`、`isDark`。
    - 添加 loader：`'<name>': () => import('./<file>.css?raw')`。
    - 使用现有 `loadThemeStyle` 完成缓存与按需加载。
 
-9) **验证**
+12) **验证**
    - 亮/暗切换是否正常；
    - 表格/列表/引用/行内与块级代码/图片的间距与风格是否还原；
    - 背景、字体是否只作用于预览区域；
    - Shiki 语法色是否接近原主题；
+   - **Mermaid 图表配色是否跟随主题变化**；
    - 是否移除多余 UI 块、文件体积是否合理。
 
 ## 提示

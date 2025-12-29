@@ -41,14 +41,21 @@ export default function MarkdownEditorPage() {
   }, [previewTheme]);
 
   // 解析 Markdown 并高亮代码
+  // 依赖 themeStyle 而非 previewTheme，确保 CSS 已应用到 DOM 后再渲染 mermaid
   useEffect(() => {
+    // 等待 themeStyle 加载完成
+    if (!themeStyle) return;
+
     const processMarkdown = async () => {
-      const html = await parseMarkdown(content);
-      setHtmlContent(html);
+      // 使用 requestAnimationFrame 确保 CSS 已渲染到 DOM
+      requestAnimationFrame(async () => {
+        const html = await parseMarkdown(content);
+        setHtmlContent(html);
+      });
     };
 
     processMarkdown();
-  }, [content]);
+  }, [content, themeStyle]);
 
   // ESC 键退出全屏
   useEffect(() => {

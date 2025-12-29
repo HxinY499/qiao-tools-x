@@ -72,6 +72,14 @@
   --shiki-token-punctuation: #57534e;
   --shiki-token-link: #0369a1;
 
+  /* Mermaid Theme Variables */
+  --mermaid-background: #fffdf8;
+  --mermaid-primaryColor: #e8f4fd;
+  --mermaid-primaryTextColor: #2c3e50;
+  --mermaid-primaryBorderColor: #4a90e2;
+  --mermaid-lineColor: #7f8c8d;
+  --mermaid-textColor: #2c3e50;
+
   /* Content Layout */
   --content-max-width: 90ch;
   --content-padding-x: 20px;

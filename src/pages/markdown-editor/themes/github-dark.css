@@ -19,6 +19,14 @@
   --shiki-token-string-expression: #85e89d;
   --shiki-token-punctuation: #e1e4e8;
   --shiki-token-link: #9ecbff;
+
+  /* Mermaid Theme Variables */
+  --mermaid-background: #0d1117;
+  --mermaid-primaryColor: #1f3a5f;
+  --mermaid-primaryTextColor: #f0f6fc;
+  --mermaid-primaryBorderColor: #4493f8;
+  --mermaid-lineColor: #8b949e;
+  --mermaid-textColor: #f0f6fc;
   font-family: -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji";
   font-size: 16px;
   line-height: 1.5;
