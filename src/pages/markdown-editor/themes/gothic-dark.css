@@ -1,0 +1,339 @@
+/**
+ * Gothic Dark Theme
+ * A clean, elegant theme with TeXGyreAdventor font
+ * Dark mode adaptation
+ */
+
+/* 字体定义 - TeXGyreAdventor */
+@font-face {
+  font-family: 'TeXGyreAdventor';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/themes/fonts/gothic/texgyreadventor-regular.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'TeXGyreAdventor';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/themes/fonts/gothic/texgyreadventor-italic.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'TeXGyreAdventor';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/themes/fonts/gothic/texgyreadventor-bold.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'TeXGyreAdventor';
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/themes/fonts/gothic/texgyreadventor-bolditalic.otf') format('opentype');
+}
+
+.markdown-body {
+  color-scheme: dark;
+  --bg-color: #1a1a1a;
+  --text-color: #e8e8e8;
+  --muted-color: #a0a0a0;
+  --link-color: #ff6666;
+  --heading-color: #f0f0f0;
+  --border-color: #444;
+  --blockquote-border: #666;
+  --blockquote-text: #a0a0a0;
+  --code-border: #444;
+  --code-bg: #2a2a2a;
+  --code-text: #d4d4d4;
+  --content-max-width: 914px;
+  --content-padding-x: 30px;
+  --content-padding-y: 2rem;
+
+  background: var(--bg-color);
+  color: var(--text-color);
+  font-family: 'TeXGyreAdventor', 'Century Gothic', 'Didact Gothic', 'Yu Gothic', 'Segoe UI Emoji', sans-serif;
+  font-size: 16px;
+  font-weight: 300;
+  line-height: 1.75rem;
+  min-height: 100%;
+  padding: var(--content-padding-y) max(var(--content-padding-x), calc((100% - var(--content-max-width)) / 2 + var(--content-padding-x)));
+  text-align: justify;
+  -webkit-font-smoothing: antialiased;
+}
+
+@media only screen and (min-width: 1400px) {
+  .markdown-body {
+    --content-max-width: 1024px;
+  }
+}
+
+/* 链接 */
+.markdown-body a {
+  color: var(--link-color);
+  text-decoration: none;
+}
+
+.markdown-body a:hover {
+  text-decoration: underline;
+}
+
+/* 段落 */
+.markdown-body p {
+  color: var(--text-color);
+  font-size: 1rem;
+  line-height: 1.75rem;
+  margin: 0 0 1.25rem;
+  word-wrap: break-word;
+}
+
+/* 标题 */
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+  font-family: 'TeXGyreAdventor', 'Century Gothic', 'Didact Gothic', 'Yu Gothic', sans-serif;
+  color: var(--heading-color);
+}
+
+.markdown-body h1 {
+  font-weight: normal;
+  font-size: 2.5rem;
+  line-height: 4rem;
+  margin: 4rem 0 1.75rem;
+  padding: 20px 30px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.markdown-body h2 {
+  font-weight: normal;
+  font-size: 1.75rem;
+  line-height: 3rem;
+  margin: 3rem 0 1.9375rem;
+  padding: 0 30px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.markdown-body h3 {
+  font-weight: normal;
+  font-size: 1.413rem;
+  margin: 1.5rem 0 1rem;
+}
+
+.markdown-body h4 {
+  font-weight: normal;
+  font-size: 1.25rem;
+  margin: 1.25rem 0 0.75rem;
+}
+
+.markdown-body h5 {
+  font-size: 1.125rem;
+  font-weight: normal;
+  margin: 1rem 0 0.5rem;
+}
+
+.markdown-body h6 {
+  font-size: 1rem;
+  font-weight: bold;
+  margin: 1rem 0 0.5rem;
+}
+
+/* 响应式标题 */
+@media screen and (max-width: 48em) {
+  .markdown-body h1 { font-size: 2.827rem; }
+  .markdown-body h2 { font-size: 1.999rem; }
+  .markdown-body h3 { font-size: 1.413rem; }
+  .markdown-body h4 { font-size: 1.25rem; }
+  .markdown-body h5 { font-size: 1.15rem; }
+  .markdown-body h6 { font-size: 1rem; }
+  .markdown-body blockquote {
+    margin-left: 1rem;
+    margin-right: 0;
+    padding: 0.5em;
+  }
+}
+
+/* 水平线 */
+.markdown-body hr {
+  height: 1px;
+  border: none;
+  background-color: var(--border-color);
+  margin: 1.5rem 0;
+}
+
+/* 列表 */
+.markdown-body ul,
+.markdown-body ol {
+  margin: 0 0 1.25rem 1.5rem;
+  padding: 0;
+}
+
+.markdown-body li {
+  line-height: 1.75rem;
+}
+
+/* 引用块 */
+.markdown-body blockquote {
+  margin: 0 0 1.11111rem;
+  padding: 0.5rem 1.11111rem 0 1.05556rem;
+  border-left: 1px solid var(--blockquote-border);
+  color: var(--blockquote-text);
+  line-height: 1.6;
+}
+
+.markdown-body blockquote p {
+  color: var(--blockquote-text);
+  line-height: 1.6;
+}
+
+/* 表格 */
+.markdown-body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.markdown-body th,
+.markdown-body td {
+  padding: 8px;
+  line-height: 1.25rem;
+  vertical-align: top;
+  border-top: 1px solid var(--border-color);
+}
+
+.markdown-body th {
+  font-weight: bold;
+  vertical-align: bottom;
+}
+
+.markdown-body thead:first-child tr:first-child th,
+.markdown-body thead:first-child tr:first-child td {
+  border-top: 0;
+}
+
+.markdown-body tbody + tbody {
+  border-top: 2px solid var(--border-color);
+}
+
+/* 代码 - 行内 */
+.markdown-body :not(pre) > code {
+  font-family: Menlo, Monaco, 'Courier New', monospace !important;
+  border: 1px solid var(--code-border) !important;
+  background: var(--code-bg) !important;
+  color: var(--code-text) !important;
+  padding: 0.1em 0.3em !important;
+  font-size: 0.9em !important;
+  margin: 0 0.2em !important;
+  border-radius: 0 !important;
+}
+
+/* 代码块 */
+.markdown-body pre,
+.markdown-body code {
+  font-family: Menlo, Monaco, 'Courier New', monospace;
+}
+
+.markdown-body pre {
+  border: 1px solid var(--code-border) !important;
+  background: var(--code-bg) !important;
+  color: var(--code-text) !important;
+  margin: 0 0 20px !important;
+  padding: 0.4em 1em !important;
+  font-size: 1em !important;
+  overflow: auto !important;
+  border-radius: 0 !important;
+}
+
+.markdown-body .shiki {
+  border: 1px solid var(--code-border) !important;
+  background: var(--code-bg) !important;
+  margin: 0 0 20px !important;
+  padding: 0.4em 1em !important;
+  overflow: auto !important;
+  border-radius: 0 !important;
+}
+
+.markdown-body .shiki code {
+  display: block !important;
+  line-height: 1.6 !important;
+  background: transparent !important;
+  padding: 0 !important;
+  border: none !important;
+  margin: 0 !important;
+}
+
+/* Shiki 语法高亮 token - 暗色模式 */
+.markdown-body .token.comment { color: #6a9955 !important; }
+.markdown-body .token.prolog,
+.markdown-body .token.doctype,
+.markdown-body .token.cdata { color: #6a9955 !important; }
+.markdown-body .token.string { color: #ce9178 !important; }
+.markdown-body .token.number,
+.markdown-body .token.constant { color: #b5cea8 !important; }
+.markdown-body .token.operator { color: #d4d4d4 !important; }
+.markdown-body .token.keyword { color: #569cd6 !important; }
+.markdown-body .token.function { color: #dcdcaa !important; }
+.markdown-body .token.variable { color: #9cdcfe !important; }
+.markdown-body .token.symbol { color: #b5cea8 !important; }
+.markdown-body .token.tag { color: #569cd6 !important; }
+.markdown-body .token.attr-name { color: #9cdcfe !important; }
+.markdown-body .token.attr-value { color: #ce9178 !important; }
+.markdown-body .token.property { color: #9cdcfe !important; }
+.markdown-body .token.punctuation { color: #d4d4d4 !important; }
+.markdown-body .token.boolean { color: #569cd6 !important; }
+.markdown-body .token.class-name { color: #4ec9b0 !important; }
+
+.markdown-body code[class*="language-"],
+.markdown-body pre[class*="language-"] {
+  background: var(--code-bg) !important;
+  color: var(--code-text) !important;
+}
+
+/* 任务列表 */
+.markdown-body .task-list-item {
+  list-style: none;
+  position: relative;
+  padding-left: 2.125rem;
+}
+
+.markdown-body .task-list-item input[type='checkbox'] {
+  position: absolute;
+  left: 0;
+  top: 0.25em;
+  width: 1rem;
+  height: 1rem;
+  appearance: none;
+  border: 1px solid #666;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+.markdown-body .task-list-item input[type='checkbox']:checked::before {
+  content: '◼';
+  display: block;
+  font-size: 0.8125rem;
+  line-height: 0.9375rem;
+  text-align: center;
+  color: var(--text-color);
+}
+
+/* 图片 */
+.markdown-body img {
+  max-width: 100%;
+  margin-top: 2px;
+}
+
+/* 高亮 */
+.markdown-body mark {
+  background: #4a4a00;
+  color: #f0f0f0;
+  padding: 0 4px;
+}

@@ -10,7 +10,13 @@ export type ThemeName =
   | 'konayuki-light'
   | 'konayuki-dark'
   | 'whitey-light'
-  | 'whitey-dark';
+  | 'whitey-dark'
+  | 'pixyll-light'
+  | 'pixyll-dark'
+  | 'newsprint-light'
+  | 'newsprint-dark'
+  | 'gothic-light'
+  | 'gothic-dark';
 
 export interface ThemeMeta {
   name: ThemeName;
@@ -31,6 +37,12 @@ export const THEME_LIST: ThemeMeta[] = [
   { name: 'konayuki-dark', label: 'Konayuki Dark', isDark: true },
   { name: 'whitey-light', label: 'Whitey Light', isDark: false },
   { name: 'whitey-dark', label: 'Whitey Dark', isDark: true },
+  { name: 'pixyll-light', label: 'Pixyll Light', isDark: false },
+  { name: 'pixyll-dark', label: 'Pixyll Dark', isDark: true },
+  { name: 'newsprint-light', label: 'Newsprint Light', isDark: false },
+  { name: 'newsprint-dark', label: 'Newsprint Dark', isDark: true },
+  { name: 'gothic-light', label: 'Gothic Light', isDark: false },
+  { name: 'gothic-dark', label: 'Gothic Dark', isDark: true },
 ];
 
 // 主题加载器 - 按需动态导入（使用 ?raw 获取 CSS 原始内容）
@@ -45,6 +57,12 @@ const themeLoaders: Record<ThemeName, () => Promise<{ default: string }>> = {
   'konayuki-dark': () => import('./konayuki-dark.css?raw'),
   'whitey-light': () => import('./whitey-light.css?raw'),
   'whitey-dark': () => import('./whitey-dark.css?raw'),
+  'pixyll-light': () => import('./pixyll-light.css?raw'),
+  'pixyll-dark': () => import('./pixyll-dark.css?raw'),
+  'newsprint-light': () => import('./newsprint-light.css?raw'),
+  'newsprint-dark': () => import('./newsprint-dark.css?raw'),
+  'gothic-light': () => import('./gothic-light.css?raw'),
+  'gothic-dark': () => import('./gothic-dark.css?raw'),
 };
 
 // 主题缓存

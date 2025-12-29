@@ -1,0 +1,438 @@
+/**
+ * Pixyll Dark Theme
+ * Forked from pixyll.com
+ * MIT License - John Otander (@4lpine)
+ * A simple, beautiful theme that emphasizes content rather than aesthetic fluff.
+ * Dark mode adaptation.
+ */
+
+/* 字体定义 - Merriweather (正文) */
+@font-face {
+  font-family: 'Merriweather';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('/themes/fonts/pixyll/Merriweather-Light.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Merriweather';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/themes/fonts/pixyll/Merriweather-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Merriweather';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/themes/fonts/pixyll/Merriweather-Bold.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Merriweather';
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url('/themes/fonts/pixyll/Merriweather-Black.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Merriweather';
+  font-style: italic;
+  font-weight: 300;
+  font-display: swap;
+  src: url('/themes/fonts/pixyll/Merriweather-LightItalic.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Merriweather';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/themes/fonts/pixyll/Merriweather-Italic.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Merriweather';
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/themes/fonts/pixyll/Merriweather-BoldItalic.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Merriweather';
+  font-style: italic;
+  font-weight: 900;
+  font-display: swap;
+  src: url('/themes/fonts/pixyll/Merriweather-BlackItalic.ttf') format('truetype');
+}
+
+/* 字体定义 - Lato (标题) */
+@font-face {
+  font-family: 'Lato';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('/themes/fonts/pixyll/Lato-Light.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Lato';
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url('/themes/fonts/pixyll/Lato-Black.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Lato';
+  font-style: italic;
+  font-weight: 900;
+  font-display: swap;
+  src: url('/themes/fonts/pixyll/Lato-BlackItalic.ttf') format('truetype');
+}
+
+.markdown-body {
+  color-scheme: dark;
+  --bg-color: #1a1a2e;
+  --text-color: #e0e0e0;
+  --muted-color: #9a9a9a;
+  --link-color: #a89cc8;
+  --heading-color: #f0f0f0;
+  --blockquote-border: #9a9a9a;
+  --blockquote-text: #b0b0b0;
+  --table-border: #555555;
+  --code-border: #555555;
+  --code-text: #d4d4d4;
+  --code-block-bg: #0d0d1a;
+  --inline-code-bg: #2a2a3e;
+  --inline-code-text: #c0c0c0;
+  --content-max-width: 914px;
+  --content-padding-x: 30px;
+  --content-padding-y: 2rem;
+
+  background: var(--bg-color);
+  color: var(--text-color);
+  font-family: 'Merriweather', 'PT Serif', Georgia, 'Times New Roman', 'STSong', serif;
+  font-size: 1.25rem;
+  font-weight: 300;
+  line-height: 1.8;
+  min-height: 100%;
+  padding: var(--content-padding-y) max(var(--content-padding-x), calc((100% - var(--content-max-width)) / 2 + var(--content-padding-x)));
+}
+
+/* 链接 */
+.markdown-body a {
+  color: var(--link-color);
+  text-decoration: underline;
+}
+
+.markdown-body a:hover {
+  text-decoration: none;
+}
+
+/* 段落 */
+.markdown-body p {
+  margin: 0.8em 0;
+  font-weight: 300;
+  line-height: 1.5;
+  word-wrap: break-word;
+}
+
+/* 标题 */
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+  font-family: 'Lato', 'Helvetica Neue', Helvetica, sans-serif;
+  font-weight: bold;
+  line-height: 1.2;
+  margin: 1em 0 0.5em;
+  color: var(--heading-color);
+}
+
+.markdown-body h1 {
+  font-size: 3.25rem;
+  line-height: 2.5rem;
+}
+
+.markdown-body h2 {
+  font-size: 2.298rem;
+  line-height: 2rem;
+}
+
+.markdown-body h3 {
+  font-size: 1.625rem;
+  line-height: 1.5rem;
+}
+
+.markdown-body h4 {
+  font-size: 1.3rem;
+}
+
+.markdown-body h5,
+.markdown-body h6 {
+  font-size: 1.125rem;
+  line-height: 1.5rem;
+}
+
+/* 响应式标题 */
+@media screen and (min-width: 64em) {
+  .markdown-body h1 { font-size: 4.498rem; }
+  .markdown-body h2 { font-size: 2.29rem; }
+  .markdown-body h3 { font-size: 1.9rem; }
+  .markdown-body h4 { font-size: 1.591rem; }
+}
+
+@media (max-width: 48em) {
+  .markdown-body h1 { font-size: 2.827rem; }
+  .markdown-body h2 { font-size: 1.999rem; }
+  .markdown-body h3 { font-size: 1.413rem; }
+  .markdown-body h4 { font-size: 1.3rem; }
+  .markdown-body {
+    font-size: 1.125rem;
+    line-height: 1.5;
+  }
+  .markdown-body blockquote {
+    margin-left: 1rem;
+    margin-right: 0;
+    padding: 0.5em;
+  }
+}
+
+/* 水平线 */
+.markdown-body hr {
+  height: 1px;
+  border: 0;
+  margin: 1.5em 0;
+  background-color: var(--muted-color);
+}
+
+/* 列表 */
+.markdown-body ul,
+.markdown-body ol {
+  margin: 0.8em 0;
+  padding-left: 2em;
+  font-size: 1.125rem;
+  line-height: 1.5rem;
+}
+
+.markdown-body ul ul,
+.markdown-body ol ul,
+.markdown-body ul ol,
+.markdown-body ol ol {
+  margin: 0;
+}
+
+.markdown-body li {
+  font-size: 1.25rem;
+  line-height: 1.8;
+}
+
+@media (max-width: 48em) {
+  .markdown-body li {
+    font-size: 1.125rem;
+    line-height: 1.5;
+  }
+}
+
+/* 引用块 */
+.markdown-body blockquote {
+  margin: 1rem 0;
+  padding: 1.33em;
+  border-left: 5px solid var(--blockquote-border);
+  font-style: italic;
+  color: var(--blockquote-text);
+  background: transparent;
+}
+
+.markdown-body blockquote em {
+  color: #ffffff;
+}
+
+.markdown-body blockquote footer {
+  font-size: 0.85rem;
+  font-style: normal;
+  background-color: transparent;
+  color: var(--muted-color);
+  border-color: transparent;
+}
+
+/* 表格 */
+.markdown-body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.8em 0;
+  font-size: 1.125rem;
+}
+
+@media screen and (min-width: 48em) {
+  .markdown-body table {
+    font-size: 1.25rem;
+  }
+}
+
+.markdown-body thead th {
+  vertical-align: bottom;
+  border-bottom: 2px solid var(--table-border);
+}
+
+.markdown-body th,
+.markdown-body td {
+  padding: 12px;
+  line-height: 1.2;
+  vertical-align: top;
+  border-top: 1px solid var(--table-border);
+}
+
+.markdown-body thead:first-child tr:first-child th,
+.markdown-body thead:first-child tr:first-child td {
+  border-top: 0;
+}
+
+.markdown-body tbody + tbody {
+  border-top: 2px solid var(--table-border);
+}
+
+/* 代码 - 行内 */
+.markdown-body :not(pre) > code {
+  font-family: Menlo, Monaco, 'Courier New', monospace !important;
+  color: var(--inline-code-text) !important;
+  background: var(--inline-code-bg) !important;
+  padding: 2px 6px !important;
+  border-radius: 3px !important;
+  font-size: 0.9em !important;
+}
+
+/* 代码块 */
+.markdown-body pre,
+.markdown-body code {
+  font-family: Menlo, Monaco, 'Courier New', monospace;
+}
+
+.markdown-body pre {
+  background: var(--code-block-bg) !important;
+  color: var(--code-text) !important;
+  padding: 1.125em !important;
+  margin: 0.88em 0 !important;
+  font-size: 1rem !important;
+  border: 1px solid var(--code-border) !important;
+  border-radius: 0 !important;
+  overflow: auto !important;
+  line-height: 1.45 !important;
+}
+
+.markdown-body .shiki {
+  background: var(--code-block-bg) !important;
+  padding: 1.125em !important;
+  margin: 0.88em 0 !important;
+  font-size: 1rem !important;
+  border: 1px solid var(--code-border) !important;
+  border-radius: 0 !important;
+  overflow: auto !important;
+}
+
+.markdown-body .shiki code {
+  display: block !important;
+  line-height: 1.5 !important;
+  background: transparent !important;
+  padding: 0 !important;
+  border: none !important;
+}
+
+/* Shiki 语法高亮 token 映射 - 暗色模式配色 */
+.markdown-body .token.comment { color: #6a9955 !important; }
+.markdown-body .token.prolog,
+.markdown-body .token.doctype,
+.markdown-body .token.cdata { color: #6a9955 !important; }
+.markdown-body .token.string { color: #ce9178 !important; }
+.markdown-body .token.number,
+.markdown-body .token.constant { color: #b5cea8 !important; }
+.markdown-body .token.operator { color: #d4d4d4 !important; }
+.markdown-body .token.keyword { color: #569cd6 !important; }
+.markdown-body .token.function { color: #dcdcaa !important; }
+.markdown-body .token.variable { color: #9cdcfe !important; }
+.markdown-body .token.symbol { color: #b5cea8 !important; }
+.markdown-body .token.tag { color: #569cd6 !important; }
+.markdown-body .token.attr-name { color: #9cdcfe !important; }
+.markdown-body .token.attr-value { color: #ce9178 !important; }
+.markdown-body .token.property { color: #9cdcfe !important; }
+.markdown-body .token.punctuation { color: #d4d4d4 !important; }
+.markdown-body .token.boolean { color: #569cd6 !important; }
+.markdown-body .token.class-name { color: #4ec9b0 !important; }
+
+.markdown-body code[class*="language-"],
+.markdown-body pre[class*="language-"] {
+  background: var(--code-block-bg) !important;
+  color: var(--code-text) !important;
+}
+
+/* 任务列表 */
+.markdown-body .task-list-item {
+  list-style: none;
+  position: relative;
+  padding-left: 2.2em;
+}
+
+.markdown-body .task-list-item input[type='checkbox'] {
+  position: absolute;
+  left: 0;
+  top: 0.15em;
+  width: 1.5rem;
+  height: 1.5rem;
+  appearance: none;
+  border: 1px solid #888888;
+  border-radius: 1.5rem;
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 200ms ease-in-out;
+}
+
+.markdown-body .task-list-item input[type='checkbox']:checked {
+  background: #e0e0e0;
+  border-width: 2px;
+}
+
+.markdown-body .task-list-item input[type='checkbox']:checked::after {
+  content: '';
+  position: absolute;
+  top: 0.35rem;
+  left: 0.28rem;
+  width: 0.9rem;
+  height: 0.5rem;
+  border: 3px solid #1a1a2e;
+  border-top: 0;
+  border-right: 0;
+  transform: rotate(-45deg);
+}
+
+/* 图片 */
+.markdown-body img {
+  width: auto;
+  max-width: 100%;
+  border: none;
+}
+
+/* 缩写 */
+.markdown-body abbr {
+  border-bottom: 1px #e0e0e0 dotted;
+  cursor: help;
+}
+
+/* 高亮 */
+.markdown-body mark {
+  background: #4a4a00;
+  color: #f0f0f0;
+  padding: 0 4px;
+}
+
+/* 脚注 */
+.markdown-body .footnotes {
+  font-size: 1.1rem;
+}
