@@ -54,6 +54,19 @@
   --content-padding-x: 30px;
   --content-padding-y: 2rem;
 
+  /* Shiki Code Highlight Variables */
+  --shiki-foreground: #333333;
+  --shiki-background: #f8f8f8;
+  --shiki-token-constant: #0086b3;
+  --shiki-token-string: #183691;
+  --shiki-token-comment: #969896;
+  --shiki-token-keyword: #a71d5d;
+  --shiki-token-parameter: #333333;
+  --shiki-token-function: #795da3;
+  --shiki-token-string-expression: #183691;
+  --shiki-token-punctuation: #333333;
+  --shiki-token-link: #183691;
+
   background: var(--bg-color);
   color: var(--text-color);
   font-family: 'TeXGyreAdventor', 'Century Gothic', 'Didact Gothic', 'Yu Gothic', 'Segoe UI Emoji', sans-serif;

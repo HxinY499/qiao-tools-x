@@ -55,6 +55,19 @@
   --content-padding-x: 30px;
   --content-padding-y: 2rem;
 
+  /* Shiki Code Highlight Variables - Classic Newspaper */
+  --shiki-foreground: #1f0909;
+  --shiki-background: #e8e7e3;
+  --shiki-token-constant: #0550ae;
+  --shiki-token-string: #0a3069;
+  --shiki-token-comment: #6e7781;
+  --shiki-token-keyword: #cf222e;
+  --shiki-token-parameter: #1f0909;
+  --shiki-token-function: #8250df;
+  --shiki-token-string-expression: #116329;
+  --shiki-token-punctuation: #1f0909;
+  --shiki-token-link: #0a3069;
+
   background: var(--bg-color);
   color: var(--text-color);
   font-family: 'PT Serif', 'Times New Roman', Times, serif;

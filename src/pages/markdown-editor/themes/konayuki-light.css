@@ -59,6 +59,19 @@
   --syntax-string: #4d7c0f;
   --syntax-tag: #a11b1b;
 
+  /* Shiki Code Highlight Variables - Warm Light */
+  --shiki-foreground: #3b2f2a;
+  --shiki-background: #f7f4ef;
+  --shiki-token-constant: #b45309;
+  --shiki-token-string: #4d7c0f;
+  --shiki-token-comment: #9a7b66;
+  --shiki-token-keyword: #8f3f2a;
+  --shiki-token-parameter: #3b2f2a;
+  --shiki-token-function: #9a3412;
+  --shiki-token-string-expression: #4d7c0f;
+  --shiki-token-punctuation: #57534e;
+  --shiki-token-link: #0369a1;
+
   /* Content Layout */
   --content-max-width: 90ch;
   --content-padding-x: 20px;

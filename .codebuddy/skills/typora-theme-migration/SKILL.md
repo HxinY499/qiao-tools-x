@@ -47,20 +47,47 @@ description: "用于将 Typora 主题（CSS）迁移到本项目的 markdown 编
      }
      ```
 
-5) **代码块映射（Shiki，务必用 `!important` 防止被 Shiki 覆盖）**
-   - 将 Typora CodeMirror 颜色映射到 Shiki token：
-     - `.cm-keyword`→`.token.keyword`
-     - `.cm-string/.cm-string-2`→`.token.string`
-     - `.cm-number/.cm-atom`→`.token.number` 或 `.token.constant`
-     - `.cm-comment`→`.token.comment`
-     - `.cm-operator`→`.token.operator`
-     - `.cm-tag/.cm-attribute`→`.token.tag/.token.attr-name`
-     - `.cm-def/.cm-variable-2`→`.token.function/.token.variable`
-     - 其他按相近颜色映射。
-   - **代码相关样式一律加 `!important`**，包括 `.markdown-body .shiki .token.*` 颜色、`pre/code/.shiki` 的背景/圆角/内边距/字体，防止被 Shiki 默认样式覆盖。
-   - 容器样式：`.markdown-body pre`、`.markdown-body code`、`.markdown-body .shiki` 使用主题变量设置背景、圆角、内边距、等宽字体，并加 `!important`。
-   - 行内代码：`.markdown-body p code`（或排除 `.shiki .token`）避免覆盖语法 token，必要时为颜色/背景加 `!important`。
-   - Typora 的行号/gutter/tooltip/自动完成，如无必要可删除。
+5) **代码块配色（Shiki CSS 变量方案）**
+   - 本项目使用 Shiki 的 `css-variables` 主题，通过 CSS 变量控制语法高亮颜色。
+   - **必须在每个主题的 `.markdown-body` 中定义以下 Shiki 变量**：
+     ```css
+     .markdown-body {
+       /* Shiki Code Highlight Variables */
+       --shiki-foreground: #333333;        /* 默认代码文字颜色 */
+       --shiki-background: #f8f8f8;        /* 代码块背景色 */
+       --shiki-token-constant: #0086b3;    /* 常量（数字、布尔值等） */
+       --shiki-token-string: #183691;      /* 字符串 */
+       --shiki-token-comment: #969896;     /* 注释 */
+       --shiki-token-keyword: #a71d5d;     /* 关键字（if、const、function 等） */
+       --shiki-token-parameter: #333333;   /* 函数参数 */
+       --shiki-token-function: #795da3;    /* 函数名 */
+       --shiki-token-string-expression: #183691; /* 模板字符串 */
+       --shiki-token-punctuation: #333333; /* 标点符号 */
+       --shiki-token-link: #4183c4;        /* 链接 */
+     }
+     ```
+   - **Typora CodeMirror 颜色映射到 Shiki 变量**：
+     | Typora (CodeMirror) | Shiki 变量 |
+     |---------------------|-----------|
+     | `.cm-keyword` | `--shiki-token-keyword` |
+     | `.cm-string`, `.cm-string-2` | `--shiki-token-string` |
+     | `.cm-number`, `.cm-atom` | `--shiki-token-constant` |
+     | `.cm-comment` | `--shiki-token-comment` |
+     | `.cm-def`, `.cm-variable-2` | `--shiki-token-function` |
+     | `.cm-tag`, `.cm-attribute` | `--shiki-token-keyword` / `--shiki-token-parameter` |
+     | `.cm-operator` | `--shiki-token-punctuation` |
+   - **亮色主题**：使用深色文字 + 浅色背景，关键字/函数名用饱和色。
+   - **暗色主题**：使用浅色文字 + 深色背景，颜色适当提亮以保证对比度。
+   - 代码块容器样式（`pre`, `code`, `.shiki`）仍需设置背景、圆角、内边距等，可引用 `--shiki-background`：
+     ```css
+     .markdown-body pre,
+     .markdown-body .shiki {
+       background: var(--shiki-background) !important;
+       border-radius: 6px;
+       padding: 1em;
+     }
+     ```
+   - 行内代码样式单独处理，避免与 Shiki 语法高亮冲突。
 
 6) **列表 / 任务列表 / 表格 / 引用 / 链接**
    - 列表缩进/间距：加前缀。

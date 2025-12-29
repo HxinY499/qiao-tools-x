@@ -59,6 +59,19 @@
   --syntax-string: #9ece6a;
   --syntax-tag: #f7768e;
 
+  /* Shiki Code Highlight Variables - Tokyo Night */
+  --shiki-foreground: #e5e9f0;
+  --shiki-background: #24283b;
+  --shiki-token-constant: #ff9e64;
+  --shiki-token-string: #9ece6a;
+  --shiki-token-comment: #565f89;
+  --shiki-token-keyword: #bb9af7;
+  --shiki-token-parameter: #c0caf5;
+  --shiki-token-function: #7dcfff;
+  --shiki-token-string-expression: #9ece6a;
+  --shiki-token-punctuation: #9aa5ce;
+  --shiki-token-link: #7aa2f7;
+
   /* Content Layout */
   --content-max-width: 90ch;
   --content-padding-x: 20px;

@@ -115,6 +115,19 @@
   --content-padding-x: 30px;
   --content-padding-y: 2rem;
 
+  /* Shiki Code Highlight Variables - Soft Purple Dark Theme */
+  --shiki-foreground: #d4d4d4;
+  --shiki-background: #0d0d1a;
+  --shiki-token-constant: #b4befe;
+  --shiki-token-string: #a6e3a1;
+  --shiki-token-comment: #6c7086;
+  --shiki-token-keyword: #cba6f7;
+  --shiki-token-parameter: #cdd6f4;
+  --shiki-token-function: #89b4fa;
+  --shiki-token-string-expression: #a6e3a1;
+  --shiki-token-punctuation: #9399b2;
+  --shiki-token-link: #89dceb;
+
   background: var(--bg-color);
   color: var(--text-color);
   font-family: 'Merriweather', 'PT Serif', Georgia, 'Times New Roman', 'STSong', serif;

@@ -1,5 +1,6 @@
 import { Marked } from 'marked';
-import { codeToHtml } from 'shiki';
+import { createHighlighter, type Highlighter } from 'shiki';
+import { createCssVariablesTheme } from 'shiki/core';
 
 // 配置 marked（不带代码高亮，后续用 shiki 处理）
 const marked = new Marked();
@@ -8,6 +9,59 @@ marked.setOptions({
   gfm: true,
   breaks: true,
 });
+
+// 创建 CSS 变量主题
+const cssVarsTheme = createCssVariablesTheme({
+  name: 'css-variables',
+  variablePrefix: '--shiki-',
+  variableDefaults: {},
+  fontStyle: true,
+});
+
+// Shiki highlighter 单例
+let highlighter: Highlighter | null = null;
+
+// 常用语言列表
+const COMMON_LANGS = [
+  'javascript',
+  'typescript',
+  'jsx',
+  'tsx',
+  'json',
+  'html',
+  'css',
+  'scss',
+  'markdown',
+  'python',
+  'java',
+  'c',
+  'cpp',
+  'csharp',
+  'go',
+  'rust',
+  'ruby',
+  'php',
+  'swift',
+  'kotlin',
+  'sql',
+  'bash',
+  'shell',
+  'yaml',
+  'xml',
+  'diff',
+  'text',
+];
+
+// 初始化 highlighter
+async function getHighlighter(): Promise<Highlighter> {
+  if (!highlighter) {
+    highlighter = await createHighlighter({
+      themes: [cssVarsTheme],
+      langs: COMMON_LANGS,
+    });
+  }
+  return highlighter;
+}
 
 // 解码 HTML 实体
 export function decodeHtmlEntities(text: string): string {
@@ -51,19 +105,30 @@ export async function highlightCodeBlocks(html: string): Promise<string> {
   }
 
   // 并行高亮所有代码块
+  const shiki = await getHighlighter();
   const highlightedBlocks = await Promise.all(
     matches.map(async ({ full, lang, code }) => {
       try {
-        const html = await codeToHtml(code, {
+        // 检查语言是否已加载，如果没有则动态加载
+        const loadedLangs = shiki.getLoadedLanguages();
+        if (!loadedLangs.includes(lang as never) && lang !== 'text') {
+          try {
+            await shiki.loadLanguage(lang as never);
+          } catch {
+            // 语言不支持，使用 text
+            lang = 'text';
+          }
+        }
+        const html = shiki.codeToHtml(code, {
           lang: lang || 'text',
-          theme: 'github-dark',
+          theme: 'css-variables',
         });
         return { full, html };
       } catch {
         // 如果语言不支持，使用 text
-        const html = await codeToHtml(code, {
+        const html = shiki.codeToHtml(code, {
           lang: 'text',
-          theme: 'github-dark',
+          theme: 'css-variables',
         });
         return { full, html };
       }

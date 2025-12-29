@@ -20,6 +20,19 @@
   --shadow-soft: 0 6px 15px #00000055;
   --content-max-width: 800px;
   --content-padding-x: 30px;
+
+  /* Shiki Code Highlight Variables - Ocean Dark */
+  --shiki-foreground: #fef7f0;
+  --shiki-background: #2b3640;
+  --shiki-token-constant: #fca369;
+  --shiki-token-string: #99c794;
+  --shiki-token-comment: #65737e;
+  --shiki-token-keyword: #c594c5;
+  --shiki-token-parameter: #f99157;
+  --shiki-token-function: #6699cc;
+  --shiki-token-string-expression: #99c794;
+  --shiki-token-punctuation: #c0c5ce;
+  --shiki-token-link: #62c5f4;
   background: linear-gradient(to bottom, #1d242c, #29333e 80%, #1d242c);
   color: var(--text-color);
   font-family: 'Mono', 'Clear Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;

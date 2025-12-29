@@ -20,6 +20,19 @@
   --shadow-soft: 0 6px 15px #8e8e8e44;
   --content-max-width: 800px;
   --content-padding-x: 30px;
+
+  /* Shiki Code Highlight Variables - Monokai (for dark code block) */
+  --shiki-foreground: #f8f8f2;
+  --shiki-background: #323527;
+  --shiki-token-constant: #ae81ff;
+  --shiki-token-string: #e6db74;
+  --shiki-token-comment: #75715e;
+  --shiki-token-keyword: #f92672;
+  --shiki-token-parameter: #fd971f;
+  --shiki-token-function: #a6e22e;
+  --shiki-token-string-expression: #e6db74;
+  --shiki-token-punctuation: #f8f8f2;
+  --shiki-token-link: #66d9ef;
   background: var(--bg-color);
   color: var(--text-color);
   font-family: 'Mono', 'Clear Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;

@@ -12,6 +12,19 @@
   --whitey-link: #4fb3ff;
   --whitey-border: #444;
   --whitey-code-bg: #011f4b;
+
+  /* Shiki Code Highlight Variables - Deep Blue Dark */
+  --shiki-foreground: #d4d4d4;
+  --shiki-background: #011f4b;
+  --shiki-token-constant: #79c0ff;
+  --shiki-token-string: #a5d6ff;
+  --shiki-token-comment: #6e7681;
+  --shiki-token-keyword: #ff7b72;
+  --shiki-token-parameter: #d4d4d4;
+  --shiki-token-function: #d2a8ff;
+  --shiki-token-string-expression: #7ee787;
+  --shiki-token-punctuation: #d4d4d4;
+  --shiki-token-link: #4fb3ff;
   
   background-color: var(--whitey-bg);
   color: var(--whitey-text);

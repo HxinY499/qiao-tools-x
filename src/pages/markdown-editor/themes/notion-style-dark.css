@@ -28,6 +28,19 @@
   --content-max-width: 105ch;
   --content-padding-x: 10ch;
   --content-padding-y: 32px;
+
+  /* Shiki Code Highlight Variables - Notion Dark */
+  --shiki-foreground: #d4d4d4;
+  --shiki-background: #202020;
+  --shiki-token-constant: #6ab0f3;
+  --shiki-token-string: #92d192;
+  --shiki-token-comment: #6d6d6d;
+  --shiki-token-keyword: #fca369;
+  --shiki-token-parameter: #d4d4d4;
+  --shiki-token-function: #c397d8;
+  --shiki-token-string-expression: #92d192;
+  --shiki-token-punctuation: #d4d4d4;
+  --shiki-token-link: #6ab0f3;
   background: var(--bg-color);
   color: var(--text-color);
   font-family: var(--body-font);
