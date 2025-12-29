@@ -1,4 +1,4 @@
-import { Download, FileText, Globe, Image, Import, Maximize2, Menu, Minimize2, Moon, Palette, Sun } from 'lucide-react';
+import { Download, FileText, Globe, Image, Import, List, Maximize2, Menu, Minimize2, Moon, Palette, Sun } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -10,12 +10,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Textarea } from '@/components/ui/textarea';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 import { parseMarkdown } from './renderer';
 import { useMarkdownEditorStore } from './store';
 import { getThemeLabel, getThemesByCategory, loadThemeStyle, THEME_LIST, ThemeName } from './themes';
+import { Toc } from './toc';
 import { Toolbar } from './toolbar';
 import { exportToDocx, exportToHtml, exportToImage, exportToMarkdown, exportToPdf, htmlToMarkdown } from './utils';
 
@@ -34,6 +36,8 @@ export default function MarkdownEditorPage() {
   // 按需加载主题样式
   const [themeStyle, setThemeStyle] = useState('');
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [tocOpen, setTocOpen] = useState(false);
+  const [tocPinned, setTocPinned] = useState(false);
   const [htmlContent, setHtmlContent] = useState('<p><em>开始输入以查看预览...</em></p>');
 
   useEffect(() => {
@@ -353,6 +357,39 @@ export default function MarkdownEditorPage() {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+        <Popover open={tocOpen} onOpenChange={(open) => !tocPinned && setTocOpen(open)}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7"
+                  tabIndex={-1}
+                  onClick={() => {
+                    if (tocPinned) {
+                      setTocPinned(false);
+                      setTocOpen(false);
+                    } else {
+                      setTocOpen(!tocOpen);
+                    }
+                  }}
+                >
+                  <List className="h-3.5 w-3.5" />
+                </Button>
+              </PopoverTrigger>
+            </TooltipTrigger>
+            <TooltipContent>目录大纲</TooltipContent>
+          </Tooltip>
+          <PopoverContent align="end" className="w-64 p-0 max-h-[calc(100vh-8rem)] overflow-hidden flex flex-col">
+            <Toc
+              htmlContent={htmlContent}
+              previewRef={previewRef}
+              pinned={tocPinned}
+              onPinChange={setTocPinned}
+            />
+          </PopoverContent>
+        </Popover>
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
