@@ -33,9 +33,8 @@
   font-family: var(--body-font);
   font-size: var(--font-size);
   line-height: var(--line-height);
-  margin: 0 auto;
-  max-width: var(--content-max-width);
-  padding: var(--content-padding-y) var(--content-padding-x);
+  min-height: 100%;
+  padding: var(--content-padding-y) max(var(--content-padding-x), calc((100% - var(--content-max-width)) / 2 + var(--content-padding-x)));
   word-break: break-word;
 }
 

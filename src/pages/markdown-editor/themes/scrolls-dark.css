@@ -18,14 +18,15 @@
   --mark-bg: #73b8e8;
   --mark-text: #ffffff;
   --shadow-soft: 0 6px 15px #00000055;
+  --content-max-width: 800px;
+  --content-padding-x: 30px;
   background: linear-gradient(to bottom, #1d242c, #29333e 80%, #1d242c);
   color: var(--text-color);
   font-family: 'Mono', 'Clear Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-size: 15px;
   line-height: 1.6;
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 30px 30px 80px;
+  min-height: 100%;
+  padding: 30px max(var(--content-padding-x), calc((100% - var(--content-max-width)) / 2 + var(--content-padding-x))) 80px;
 }
 
 @font-face {

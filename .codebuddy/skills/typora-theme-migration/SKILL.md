@@ -31,8 +31,16 @@ description: "用于将 Typora 主题（CSS）迁移到本项目的 markdown 编
    - 所有标签与组件选择器（`img/table/code/blockquote/hr/ul/ol/li/a/p/h1~h6`、任务列表等）全部加 `.markdown-body` 前缀。
 
 4) **变量与基础排版**
-   - 保留/迁移变量：`--bg-color`, `--text-color`, `--border-color`, `--link-color`, `--code-bg-color`, `--code-block-bg-color`, `--code-color`, `--body-font`, `--monospace-font`, `--font-size`, `--h1/h2/h3`, `--line-height`, `--main-content-max-width`, `--document-padding-x`, `--code-border-radius`, `--monospace-font-size`，可选 `--mermaid-theme` 等。
+   - 保留/迁移变量：`--bg-color`, `--text-color`, `--border-color`, `--link-color`, `--code-bg-color`, `--code-block-bg-color`, `--code-color`, `--body-font`, `--monospace-font`, `--font-size`, `--h1/h2/h3`, `--line-height`, `--content-max-width`, `--content-padding-x`, `--code-border-radius`, `--monospace-font-size`，可选 `--mermaid-theme` 等。
    - 间距与排版：保持段落、标题、列表、引用、HR、图片、表格的间距和风格。
+   - **背景铺满**：不要使用 `max-width` + `margin: 0 auto`，这会导致预览区域拉宽时左右留白。应使用动态 padding 实现内容居中且背景铺满：
+     ```css
+     .markdown-body {
+       min-height: 100%;
+       /* 使用 max() 函数：窄屏时用基础 padding，宽屏时自动增大 padding 使内容居中 */
+       padding: var(--content-padding-y) max(var(--content-padding-x), calc((100% - var(--content-max-width)) / 2 + var(--content-padding-x)));
+     }
+     ```
 
 5) **代码块映射（Shiki，务必用 `!important` 防止被 Shiki 覆盖）**
    - 将 Typora CodeMirror 颜色映射到 Shiki token：
