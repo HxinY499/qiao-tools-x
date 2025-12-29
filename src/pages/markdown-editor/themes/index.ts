@@ -8,7 +8,9 @@ export type ThemeName =
   | 'scrolls-light'
   | 'scrolls-dark'
   | 'konayuki-light'
-  | 'konayuki-dark';
+  | 'konayuki-dark'
+  | 'whitey-light'
+  | 'whitey-dark';
 
 export interface ThemeMeta {
   name: ThemeName;
@@ -27,6 +29,8 @@ export const THEME_LIST: ThemeMeta[] = [
   { name: 'scrolls-dark', label: 'Scrolls Dark', isDark: true },
   { name: 'konayuki-light', label: 'Konayuki Light', isDark: false },
   { name: 'konayuki-dark', label: 'Konayuki Dark', isDark: true },
+  { name: 'whitey-light', label: 'Whitey Light', isDark: false },
+  { name: 'whitey-dark', label: 'Whitey Dark', isDark: true },
 ];
 
 // 主题加载器 - 按需动态导入（使用 ?raw 获取 CSS 原始内容）
@@ -39,6 +43,8 @@ const themeLoaders: Record<ThemeName, () => Promise<{ default: string }>> = {
   'scrolls-dark': () => import('./scrolls-dark.css?raw'),
   'konayuki-light': () => import('./konayuki-light.css?raw'),
   'konayuki-dark': () => import('./konayuki-dark.css?raw'),
+  'whitey-light': () => import('./whitey-light.css?raw'),
+  'whitey-dark': () => import('./whitey-dark.css?raw'),
 };
 
 // 主题缓存
