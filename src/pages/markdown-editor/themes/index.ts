@@ -6,7 +6,9 @@ export type ThemeName =
   | 'notion-style-light'
   | 'notion-style-dark'
   | 'scrolls-light'
-  | 'scrolls-dark';
+  | 'scrolls-dark'
+  | 'konayuki-light'
+  | 'konayuki-dark';
 
 export interface ThemeMeta {
   name: ThemeName;
@@ -23,6 +25,8 @@ export const THEME_LIST: ThemeMeta[] = [
   { name: 'github-dark', label: 'GitHub Dark', isDark: true },
   { name: 'scrolls-light', label: 'Scrolls Light', isDark: false },
   { name: 'scrolls-dark', label: 'Scrolls Dark', isDark: true },
+  { name: 'konayuki-light', label: 'Konayuki Light', isDark: false },
+  { name: 'konayuki-dark', label: 'Konayuki Dark', isDark: true },
 ];
 
 // 主题加载器 - 按需动态导入（使用 ?raw 获取 CSS 原始内容）
@@ -33,6 +37,8 @@ const themeLoaders: Record<ThemeName, () => Promise<{ default: string }>> = {
   'github-dark': () => import('./github-dark.css?raw'),
   'scrolls-light': () => import('./scrolls-light.css?raw'),
   'scrolls-dark': () => import('./scrolls-dark.css?raw'),
+  'konayuki-light': () => import('./konayuki-light.css?raw'),
+  'konayuki-dark': () => import('./konayuki-dark.css?raw'),
 };
 
 // 主题缓存

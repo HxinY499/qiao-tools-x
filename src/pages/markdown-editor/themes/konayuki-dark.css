@@ -1,0 +1,507 @@
+/**
+ * Konayuki Dark Theme for Markdown Editor
+ * Migrated from Typora theme by aerandirsf
+ * https://github.com/aerandirsf/Konayuki
+ */
+
+/* ========================================
+   Variables & Base
+   ======================================== */
+
+.markdown-body {
+  /* Core Colors (Konayuki Dark / Tokyo Night-ish) */
+  --bg-color: #1a1b26;
+  --text-color: #e5e9f0;
+  --text-muted: #9aa5ce;
+  --text-faint: #565f89;
+  --text-subtle: #a9b1d6;
+
+  --primary-color: #7aa2f7;
+  --primary-color-hover: #93b4ff;
+
+  --border-color: #2a2f45;
+  --table-border-color: #3b4261;
+
+  /* Code blocks */
+  --code-bg-color: #24283b;
+  --code-text-color: #e5e9f0;
+
+  /* Inline Emphasis */
+  --mark-bg-color: #fbbf24;
+  --mark-text-color: #1a1b26;
+
+  /* Radii / Shadows */
+  --radius-small: 6px;
+  --radius-medium: 8px;
+
+  /* Callouts / Alerts */
+  --callout-note: #60a5fa;
+  --callout-note-bg: #60a5fa24;
+  --callout-caution: #fb7185;
+  --callout-caution-bg: #fb718524;
+  --callout-tip: #34d399;
+  --callout-tip-bg: #34d39924;
+  --callout-important: #a78bfa;
+  --callout-important-bg: #a78bfa24;
+  --callout-warning: #fbbf24;
+  --callout-warning-bg: #fbbf2424;
+
+  /* Tables */
+  --table-row-hover-bg: #7aa2f70a;
+
+  /* Syntax Highlight */
+  --syntax-comment: #526270;
+  --syntax-keyword: #bb9af7;
+  --syntax-number: #ff9e64;
+  --syntax-identifier: #c0f0f5;
+  --syntax-variable-2: #7dcfff;
+  --syntax-variable-3: #0db9d7;
+  --syntax-string: #9ece6a;
+  --syntax-tag: #f7768e;
+
+  /* Content Layout */
+  --content-max-width: 90ch;
+  --content-padding-x: 20px;
+  --content-padding-y: 32px;
+
+  /* Fonts */
+  --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB",
+      "Microsoft YaHei", "Noto Sans CJK SC", "Source Han Sans SC", sans-serif;
+  --font-mono: 'Maple Mono NF CN', 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
+
+  /* Base Styles */
+  color-scheme: dark;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.8;
+  color: var(--text-color);
+  background-color: var(--bg-color);
+  min-height: 100%;
+  padding: var(--content-padding-y) max(var(--content-padding-x), calc((100% - var(--content-max-width)) / 2 + var(--content-padding-x)));
+}
+
+/* ========================================
+   Typography (Headings / Paragraphs / HR)
+   ======================================== */
+
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+  font-family: var(--font-body);
+  font-weight: 700;
+  color: var(--text-color);
+  line-height: 1.25;
+  margin: 2.2rem 0 1rem;
+}
+
+.markdown-body h1 {
+  font-size: 2.1rem;
+  padding-bottom: 0.5em;
+  border-bottom: 2px solid var(--primary-color);
+  margin-top: 0;
+}
+
+.markdown-body h2 {
+  font-size: 1.8rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.markdown-body h3 {
+  font-size: 1.5rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.markdown-body h4 {
+  font-size: 1.25rem;
+}
+
+.markdown-body h5 {
+  font-size: 1.1rem;
+}
+
+.markdown-body h6 {
+  font-size: 1rem;
+  color: var(--text-subtle);
+}
+
+.markdown-body p {
+  margin: 1em 0;
+}
+
+.markdown-body hr {
+  border: none;
+  border-top: 1px solid var(--border-color);
+  margin: 2.5em 0;
+  position: relative;
+}
+
+.markdown-body hr:after {
+  content: '✦';
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--bg-color);
+  color: var(--primary-color);
+  padding: 0 1em;
+}
+
+/* ========================================
+   Links & Inline Emphasis
+   ======================================== */
+
+.markdown-body a {
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: 0.2s ease;
+  border-bottom: 1px solid transparent;
+}
+
+.markdown-body a:hover {
+  color: var(--primary-color-hover);
+  border-bottom-color: var(--primary-color-hover);
+}
+
+.markdown-body strong {
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.markdown-body em {
+  font-style: italic;
+  color: var(--text-color);
+}
+
+.markdown-body del {
+  color: var(--text-faint);
+  text-decoration: line-through;
+}
+
+.markdown-body mark {
+  background-color: var(--mark-bg-color);
+  color: var(--mark-text-color);
+  padding: 0.2em 0.4em;
+  border-radius: var(--radius-small);
+}
+
+.markdown-body sup,
+.markdown-body sub {
+  font-size: 0.75em;
+  line-height: 0;
+}
+
+.markdown-body sup {
+  vertical-align: super;
+}
+
+.markdown-body sub {
+  vertical-align: sub;
+}
+
+/* ========================================
+   Lists (Ordered / Unordered / Task List)
+   ======================================== */
+
+.markdown-body ul,
+.markdown-body ol {
+  padding-left: 2em;
+  margin: 1em 0;
+}
+
+.markdown-body ul {
+  list-style-type: disc;
+}
+
+.markdown-body ul ul {
+  list-style-type: circle;
+  margin: 0.5em 0;
+}
+
+.markdown-body ol {
+  list-style-type: decimal;
+}
+
+.markdown-body ol ol {
+  list-style-type: lower-alpha;
+  margin: 0.5em 0;
+}
+
+.markdown-body li {
+  margin: 0.5em 0;
+  line-height: 1.6;
+}
+
+.markdown-body .task-list-item {
+  list-style-type: none;
+  position: relative;
+  padding-left: 0.3rem;
+  margin: 0.45rem 0;
+}
+
+.markdown-body .task-list-item input[type="checkbox"] {
+  width: 1.3em;
+  height: 1.3em;
+  margin-right: 0.5em;
+  appearance: none;
+  -webkit-appearance: none;
+  border-radius: 6px;
+  border: 2px solid var(--primary-color);
+  background: transparent;
+  display: inline-block;
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+.markdown-body .task-list-item input[type="checkbox"]:checked {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M3.5 8.5l3 3 6-6' stroke='%231a1b26' stroke-width='2'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* ========================================
+   Blockquotes & Callouts (Alerts)
+   ======================================== */
+
+.markdown-body blockquote {
+  margin: 1.25rem 0;
+  padding: 0.9rem 1rem;
+  border-left: 4px solid var(--callout-note);
+  background: var(--callout-note-bg);
+  border-radius: var(--radius-small);
+  color: var(--text-color);
+  box-sizing: border-box;
+}
+
+.markdown-body blockquote p {
+  margin: 0.5em 0;
+  color: inherit;
+}
+
+.markdown-body blockquote cite {
+  color: var(--text-subtle);
+  font-style: italic;
+}
+
+/* GitHub-style Alerts */
+.markdown-body .markdown-alert {
+  padding: 0.9rem 1rem;
+  margin: 1.25rem 0;
+  border-left: 4px solid var(--callout-note);
+  background: var(--callout-note-bg);
+  border-radius: var(--radius-small);
+}
+
+.markdown-body .markdown-alert.markdown-alert-note {
+  border-left-color: var(--callout-note);
+  background: var(--callout-note-bg);
+}
+
+.markdown-body .markdown-alert.markdown-alert-tip {
+  border-left-color: var(--callout-tip);
+  background: var(--callout-tip-bg);
+}
+
+.markdown-body .markdown-alert.markdown-alert-important {
+  border-left-color: var(--callout-important);
+  background: var(--callout-important-bg);
+}
+
+.markdown-body .markdown-alert.markdown-alert-warning {
+  border-left-color: var(--callout-warning);
+  background: var(--callout-warning-bg);
+}
+
+.markdown-body .markdown-alert.markdown-alert-caution {
+  border-left-color: var(--callout-caution);
+  background: var(--callout-caution-bg);
+}
+
+.markdown-body .markdown-alert .markdown-alert-title {
+  font-weight: 700;
+  margin-bottom: 0.5em;
+}
+
+.markdown-body .markdown-alert.markdown-alert-note .markdown-alert-title { color: var(--callout-note); }
+.markdown-body .markdown-alert.markdown-alert-tip .markdown-alert-title { color: var(--callout-tip); }
+.markdown-body .markdown-alert.markdown-alert-important .markdown-alert-title { color: var(--callout-important); }
+.markdown-body .markdown-alert.markdown-alert-warning .markdown-alert-title { color: var(--callout-warning); }
+.markdown-body .markdown-alert.markdown-alert-caution .markdown-alert-title { color: var(--callout-caution); }
+
+/* ========================================
+   Tables
+   ======================================== */
+
+.markdown-body table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  margin: 1.5em 0;
+  background-color: var(--bg-color);
+  border-radius: var(--radius-medium);
+  overflow: hidden;
+  border: 1px solid var(--table-border-color);
+}
+
+.markdown-body thead {
+  background-color: var(--code-bg-color);
+}
+
+.markdown-body th {
+  padding: 0.8em 1em;
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-color);
+  border-bottom: 2px solid var(--table-border-color);
+  border-right: 1px solid var(--table-border-color);
+}
+
+.markdown-body td {
+  padding: 0.8em 1em;
+  border-bottom: 1px solid var(--table-border-color);
+  border-right: 1px solid var(--table-border-color);
+}
+
+.markdown-body tr > :last-child {
+  border-right: none;
+}
+
+.markdown-body tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.markdown-body tbody tr:hover {
+  background-color: var(--table-row-hover-bg);
+}
+
+/* ========================================
+   Images
+   ======================================== */
+
+.markdown-body img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1.5em auto;
+  border-radius: var(--radius-medium);
+}
+
+/* ========================================
+   Code Blocks (Shiki Integration)
+   ======================================== */
+
+/* Inline code */
+.markdown-body :not(pre) > code {
+  font-family: var(--font-mono) !important;
+  font-size: 0.9em !important;
+  background-color: var(--code-bg-color) !important;
+  padding: 0.2em 0.4em !important;
+  border-radius: var(--radius-small) !important;
+  color: var(--code-text-color) !important;
+}
+
+/* Code blocks */
+.markdown-body pre,
+.markdown-body .shiki {
+  background-color: var(--code-bg-color) !important;
+  border-radius: var(--radius-medium) !important;
+  padding: 1.2em !important;
+  margin: 1.5em 0 !important;
+  overflow-x: auto !important;
+  font-family: var(--font-mono) !important;
+  font-size: 0.9em !important;
+  line-height: 1.6 !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--code-text-color) !important;
+}
+
+.markdown-body pre code,
+.markdown-body .shiki code {
+  background-color: transparent !important;
+  padding: 0 !important;
+  font-size: 1em !important;
+  font-family: var(--font-mono) !important;
+}
+
+/* Shiki Token Colors (mapped from CodeMirror) */
+.markdown-body .shiki .token.comment,
+.markdown-body .shiki .token.prolog,
+.markdown-body .shiki .token.doctype,
+.markdown-body .shiki .token.cdata {
+  color: var(--syntax-comment) !important;
+  font-style: italic !important;
+}
+
+.markdown-body .shiki .token.keyword,
+.markdown-body .shiki .token.control,
+.markdown-body .shiki .token.directive {
+  color: var(--syntax-keyword) !important;
+  font-weight: 600 !important;
+}
+
+.markdown-body .shiki .token.number,
+.markdown-body .shiki .token.boolean,
+.markdown-body .shiki .token.constant {
+  color: var(--syntax-number) !important;
+}
+
+.markdown-body .shiki .token.string,
+.markdown-body .shiki .token.char,
+.markdown-body .shiki .token.regex {
+  color: var(--syntax-string) !important;
+}
+
+.markdown-body .shiki .token.variable {
+  color: var(--syntax-variable-2) !important;
+}
+
+.markdown-body .shiki .token.function,
+.markdown-body .shiki .token.method {
+  color: var(--syntax-variable-3) !important;
+}
+
+.markdown-body .shiki .token.tag {
+  color: var(--syntax-tag) !important;
+}
+
+.markdown-body .shiki .token.attr-name {
+  color: var(--syntax-number) !important;
+}
+
+.markdown-body .shiki .token.attr-value {
+  color: var(--syntax-string) !important;
+}
+
+.markdown-body .shiki .token.property {
+  color: var(--syntax-variable-2) !important;
+}
+
+.markdown-body .shiki .token.operator,
+.markdown-body .shiki .token.punctuation {
+  color: var(--syntax-identifier) !important;
+}
+
+.markdown-body .shiki .token.builtin,
+.markdown-body .shiki .token.class-name {
+  color: var(--syntax-variable-3) !important;
+}
+
+/* ========================================
+   First/Last Child Margins
+   ======================================== */
+
+.markdown-body > *:first-child {
+  margin-top: 0 !important;
+}
+
+.markdown-body > *:last-child {
+  margin-bottom: 0 !important;
+}
