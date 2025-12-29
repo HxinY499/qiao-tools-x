@@ -1,4 +1,17 @@
-import { Download, FileText, Globe, Image, Import, List, Maximize2, Menu, Minimize2, Moon, Palette, Sun } from 'lucide-react';
+import {
+  Download,
+  FileText,
+  Globe,
+  Image,
+  Import,
+  List,
+  Maximize2,
+  Menu,
+  Minimize2,
+  Moon,
+  Palette,
+  Sun,
+} from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -382,12 +395,7 @@ export default function MarkdownEditorPage() {
             <TooltipContent>目录大纲</TooltipContent>
           </Tooltip>
           <PopoverContent align="end" className="w-64 p-0 max-h-[calc(100vh-8rem)] overflow-hidden flex flex-col">
-            <Toc
-              htmlContent={htmlContent}
-              previewRef={previewRef}
-              pinned={tocPinned}
-              onPinChange={setTocPinned}
-            />
+            <Toc htmlContent={htmlContent} previewRef={previewRef} pinned={tocPinned} onPinChange={setTocPinned} />
           </PopoverContent>
         </Popover>
         <Tooltip>

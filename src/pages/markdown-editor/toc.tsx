@@ -150,12 +150,7 @@ export function Toc({ htmlContent, previewRef, className, pinned, onPinChange }:
         <span className="text-[10px] opacity-60">{tocItems.length}</span>
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-6 w-6 ml-auto"
-              onClick={() => onPinChange?.(!pinned)}
-            >
+            <Button variant="ghost" size="icon" className="h-6 w-6 ml-auto" onClick={() => onPinChange?.(!pinned)}>
               {pinned ? <PinOff className="h-3 w-3" /> : <Pin className="h-3 w-3" />}
             </Button>
           </TooltipTrigger>

@@ -163,7 +163,13 @@ export default function JsonFormatterPage() {
             <Minimize2 className="h-3.5 w-3.5" />
             <span className="hidden 2xl:inline ml-1">压缩</span>
           </Button>
-          <Button size="sm" onClick={() => processJson(false)} disabled={!hasInput} className="h-7 px-1.5" title="格式化">
+          <Button
+            size="sm"
+            onClick={() => processJson(false)}
+            disabled={!hasInput}
+            className="h-7 px-1.5"
+            title="格式化"
+          >
             <Braces className="h-3.5 w-3.5" />
             <span className="hidden 2xl:inline ml-1">格式化</span>
           </Button>
