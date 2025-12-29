@@ -17,8 +17,13 @@ description: "用于将 Typora 主题（CSS）迁移到本项目的 markdown 编
 - 示例：`src/pages/markdown-editor/themes/github-light.css` / `github-dark.css` 是作用域化后的参考实现。
 
 ## 工作流
-1) **收集输入（必要时用 fetcher 工具读取用户提供的链接）**
-   - 使用 fetcher 获取用户给出的 CSS / README / 文档链接内容。
+1) **收集输入（必要时用 fetcher 工具或 curl 读取用户提供的链接）**
+   - 优先使用 fetcher 获取用户给出的 CSS / README / 文档链接内容。
+   - **备选方案**：当 fetcher 无法使用或无法获取网页完整内容时，使用 curl 下载后查看：
+     ```bash
+     curl -sL "https://example.com/theme.css" -o /tmp/theme.css && echo "Downloaded successfully"
+     ```
+     然后使用 `read_file` 读取 `/tmp/theme.css` 查看内容。
    - Typora 源 CSS（亮/暗）。
    - 如果有字体，用户将字体放到 `public/themes/fonts/<主题名>/`，格式优先 `.woff2`。
 
