@@ -247,15 +247,8 @@ export const DEFAULT_TABLE = `| 标题 1 | 标题 2 | 标题 3 |
 |  |  |  |
 |  |  |  |`;
 
-// 标题级别模板
-export interface HeadingItem {
-  id: string;
-  icon: LucideIcon;
-  label: string;
-  shortcut?: CommandShortcut;
-}
-
-export const HEADING_ITEMS: HeadingItem[] = [
+// 标题级别命令
+export const HEADING_ITEMS: CommandItem[] = [
   { id: 'h1', icon: Heading1, label: '一级标题', shortcut: { key: '1', ctrl: true } },
   { id: 'h2', icon: Heading2, label: '二级标题', shortcut: { key: '2', ctrl: true } },
   { id: 'h3', icon: Heading3, label: '三级标题', shortcut: { key: '3', ctrl: true } },
@@ -513,7 +506,7 @@ export function matchShortcut(e: KeyboardEvent, shortcut: CommandShortcut): bool
 }
 
 // 根据快捷键查找命令
-export function findCommandByShortcut(e: KeyboardEvent): CommandItem | HeadingItem | undefined {
+export function findCommandByShortcut(e: KeyboardEvent): CommandItem | undefined {
   // 先检查标题快捷键
   const headingMatch = HEADING_ITEMS.find((h) => h.shortcut && matchShortcut(e, h.shortcut));
   if (headingMatch) return headingMatch;
