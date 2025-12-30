@@ -466,6 +466,10 @@ export default function MarkdownEditorPage() {
         </Tooltip>
       </header>
       <div ref={previewRef} className="flex-1 min-h-0 min-w-0 overflow-auto custom-scrollbar">
+        <style>{`
+          .markdown-body ul { list-style-type: disc; }
+          .markdown-body ol { list-style-type: decimal; }
+        `}</style>
         <style>{themeStyle}</style>
         <article
           className="markdown-body max-w-full overflow-x-auto"
