@@ -1,5 +1,6 @@
 import {
   Bold,
+  CheckSquare,
   Code,
   Heading1,
   Heading2,
@@ -11,7 +12,9 @@ import {
   ListOrdered,
   ListTree,
   LucideIcon,
+  Minus,
   Quote,
+  Square,
   Strikethrough,
   Table,
 } from 'lucide-react';
@@ -167,11 +170,34 @@ export const COMMAND_GROUPS: CommandGroup[] = [
         keywords: ['quote', 'blockquote', '引用'],
         shortcut: { key: 'q', ctrl: true, shift: true },
       },
+      {
+        id: 'taskUnchecked',
+        icon: Square,
+        label: '任务列表',
+        description: '未完成任务',
+        keywords: ['task', 'todo', 'checkbox', '任务', '待办'],
+        shortcut: { key: 'x', ctrl: true, shift: true },
+      },
+      {
+        id: 'taskChecked',
+        icon: CheckSquare,
+        label: '已完成任务',
+        description: '已完成任务',
+        keywords: ['task', 'done', 'checked', '任务', '完成'],
+      },
     ],
   },
   {
     items: [
       { id: 'table', icon: Table, label: '表格', description: '插入表格', keywords: ['table', '表格'], isTable: true },
+      {
+        id: 'hr',
+        icon: Minus,
+        label: '分隔线',
+        description: '水平分隔线',
+        keywords: ['hr', 'horizontal', 'divider', '分隔', '横线'],
+        shortcut: { key: '-', ctrl: true, shift: true },
+      },
       {
         id: 'toc',
         icon: ListTree,
@@ -252,6 +278,12 @@ export function getCommandExecutor(
       return (ta) => insertAtLineStart(ta, '1. ');
     case 'quote':
       return (ta) => insertAtLineStart(ta, '> ');
+    case 'taskUnchecked':
+      return (ta) => insertAtLineStart(ta, '- [ ] 待办');
+    case 'taskChecked':
+      return (ta) => insertAtLineStart(ta, '- [x] 已完成');
+    case 'hr':
+      return (ta) => insertTextAtCursor(ta, '\n---\n');
     case 'table':
       return () => {
         onTableInsert?.('\n' + DEFAULT_TABLE + '\n');

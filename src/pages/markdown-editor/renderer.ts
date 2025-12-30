@@ -1,9 +1,24 @@
-import { Marked } from 'marked';
+import { Marked, type Tokens } from 'marked';
 import { createHighlighter, type Highlighter } from 'shiki';
 import { createCssVariablesTheme } from 'shiki/core';
 
 // 配置 marked（不带代码高亮，后续用 shiki 处理）
 const marked = new Marked();
+
+marked.use({
+  renderer: {
+    listitem(item: Tokens.ListItem): string {
+      const content = this.parser.parse(item.tokens);
+      if (item.task) {
+        return `<li class="task-list-item">${content}</li>\n`;
+      }
+      return `<li>${content}</li>\n`;
+    },
+    checkbox({ checked }: Tokens.Checkbox): string {
+      return `<input type="checkbox" class="task-list-item-checkbox" ${checked ? 'checked=""' : ''} disabled="" /> `;
+    },
+  },
+});
 
 marked.setOptions({
   gfm: true,
