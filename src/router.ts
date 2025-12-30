@@ -359,8 +359,7 @@ export const toolRoutes: ToolRoute[] = [
   {
     key: ToolKey.MarkdownEditor,
     path: '/markdown-editor',
-    title: 'Markdown 编辑器',
-    subtitle: '实时预览的 Markdown 编辑器，支持插入表格、代码块、链接等快捷操作',
+    title: 'Markdown',
     icon: FileText,
     component: MarkdownEditorPage,
     category: 'text',

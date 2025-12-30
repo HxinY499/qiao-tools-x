@@ -195,7 +195,7 @@
 /* ========== 代码 ========== */
 .markdown-body code {
   font-family: "Consolas", "Menlo", "Monaco", monospace, serif;
-  font-size: 0.9em;
+  font-size: 0.85em;
   background: var(--whitey-code-bg);
   color: var(--whitey-text);
   padding: 0.2em 0.4em;
@@ -204,14 +204,14 @@
 
 .markdown-body pre {
   font-family: "Consolas", "Menlo", "Monaco", monospace, serif;
-  font-size: 0.9em;
+  font-size: 0.85em;
   background: var(--whitey-code-bg);
   color: var(--whitey-text);
   margin: 0 0 1.5em 1em;
   padding: 6px 1em 8px;
   border: 1px solid var(--whitey-border);
   overflow-x: auto;
-  line-height: 1.5;
+  line-height: 1;
 }
 
 .markdown-body pre code {
@@ -219,6 +219,7 @@
   background: transparent;
   border-radius: 0;
   font-size: inherit;
+  line-height: inherit;
 }
 
 /* Shiki 语法高亮 */
@@ -230,6 +231,7 @@
 
 .markdown-body .shiki .line {
   display: block;
+  line-height: 1;
 }
 
 /* ========== 分隔线 ========== */

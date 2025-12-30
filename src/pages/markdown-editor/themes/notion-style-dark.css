@@ -23,8 +23,8 @@
   --h2-fontsize: 1.5rem;
   --h3-fontsize: 1.25rem;
   --line-height: 1.6;
-  --monospace-font-size: 0.94rem;
-  --monospace-line-height: 1.55;
+  --monospace-font-size: 0.875rem;
+  --monospace-line-height: 0.8;
   --content-max-width: 105ch;
   --content-padding-x: 10ch;
   --content-padding-y: 32px;
@@ -255,7 +255,6 @@
 
 .markdown-body .shiki .line {
   display: block;
-  min-height: 1.4em;
 }
 
 /* Shiki token colors mapped from Typora CodeMirror palette */
