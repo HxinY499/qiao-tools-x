@@ -2,6 +2,7 @@ import {
   Bold,
   CheckSquare,
   Code,
+  GitBranch,
   Heading1,
   Heading2,
   Heading3,
@@ -17,6 +18,7 @@ import {
   Square,
   Strikethrough,
   Table,
+  Workflow,
 } from 'lucide-react';
 
 import { generateToc, insertAtLineStart, insertTextAtCursor, wrapSelection } from './utils';
@@ -35,6 +37,7 @@ export interface CommandItem {
   description?: string;
   keywords?: string[];
   isTable?: boolean;
+  isChart?: boolean; // 图表下拉菜单
   isText?: boolean;
   text?: string;
   shortcut?: CommandShortcut;
@@ -205,6 +208,14 @@ export const COMMAND_GROUPS: CommandGroup[] = [
         description: '生成文档目录',
         keywords: ['toc', 'table of contents', '目录'],
       },
+      {
+        id: 'chart',
+        icon: Workflow,
+        label: '图表',
+        description: '插入 Mermaid 图表',
+        keywords: ['chart', 'mermaid', 'diagram', '图表', '流程图'],
+        isChart: true,
+      },
     ],
   },
 ];
@@ -223,6 +234,133 @@ export const DEFAULT_TABLE = `| 标题 1 | 标题 2 | 标题 3 |
 | :--- | :---: | ---: |
 |  |  |  |
 |  |  |  |`;
+
+// Mermaid 图表模板
+export interface ChartTemplate {
+  id: string;
+  icon: LucideIcon;
+  label: string;
+  template: string;
+}
+
+export const CHART_TEMPLATES: ChartTemplate[] = [
+  {
+    id: 'flowchart',
+    icon: Workflow,
+    label: '流程图',
+    template: `\`\`\`mermaid
+flowchart TD
+    A[开始] --> B{判断条件}
+    B -->|是| C[执行操作]
+    B -->|否| D[其他操作]
+    C --> E[结束]
+    D --> E
+\`\`\``,
+  },
+  {
+    id: 'sequence',
+    icon: GitBranch,
+    label: '时序图',
+    template: `\`\`\`mermaid
+sequenceDiagram
+    participant A as 用户
+    participant B as 系统
+    A->>B: 发送请求
+    B-->>A: 返回响应
+\`\`\``,
+  },
+  {
+    id: 'state',
+    icon: GitBranch,
+    label: '状态图',
+    template: `\`\`\`mermaid
+stateDiagram-v2
+    [*] --> 待处理
+    待处理 --> 处理中: 开始处理
+    处理中 --> 已完成: 处理完成
+    处理中 --> 失败: 处理失败
+    失败 --> 待处理: 重试
+    已完成 --> [*]
+\`\`\``,
+  },
+  {
+    id: 'gantt',
+    icon: GitBranch,
+    label: '甘特图',
+    template: `\`\`\`mermaid
+gantt
+    title 项目计划
+    dateFormat YYYY-MM-DD
+    section 阶段一
+        任务1: a1, 2024-01-01, 7d
+        任务2: a2, after a1, 5d
+    section 阶段二
+        任务3: b1, after a2, 6d
+        任务4: b2, after b1, 4d
+\`\`\``,
+  },
+  {
+    id: 'class',
+    icon: GitBranch,
+    label: '类图',
+    template: `\`\`\`mermaid
+classDiagram
+    class Animal {
+        +String name
+        +int age
+        +makeSound()
+    }
+    class Dog {
+        +bark()
+    }
+    class Cat {
+        +meow()
+    }
+    Animal <|-- Dog
+    Animal <|-- Cat
+\`\`\``,
+  },
+  {
+    id: 'pie',
+    icon: GitBranch,
+    label: '饼图',
+    template: `\`\`\`mermaid
+pie title 数据分布
+    "类别A": 40
+    "类别B": 30
+    "类别C": 20
+    "类别D": 10
+\`\`\``,
+  },
+  {
+    id: 'mindmap',
+    icon: GitBranch,
+    label: '脑图',
+    template: `\`\`\`mermaid
+mindmap
+  root((项目规划))
+    需求分析
+      用户调研
+      竞品分析
+      需求文档
+    设计阶段
+      原型设计
+      UI设计
+      技术方案
+    开发实现
+      前端开发
+        页面开发
+        组件封装
+      后端开发
+        接口开发
+        数据库设计
+    测试上线
+      单元测试
+      集成测试
+      部署发布
+\`\`\``,
+  },
+];
 
 // 命令执行器类型
 export type CommandExecutor = (

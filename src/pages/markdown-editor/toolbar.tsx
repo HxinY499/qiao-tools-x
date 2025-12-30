@@ -11,7 +11,14 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
-import { CommandItem, FLAT_ITEMS_WITH_SEPARATOR, FlatItem, formatShortcut, getCommandExecutor } from './commands';
+import {
+  CHART_TEMPLATES,
+  CommandItem,
+  FLAT_ITEMS_WITH_SEPARATOR,
+  FlatItem,
+  formatShortcut,
+  getCommandExecutor,
+} from './commands';
 import { TableDialog } from './table-dialog';
 import { insertTextAtCursor } from './utils';
 
@@ -32,6 +39,16 @@ export function Toolbar({ textareaRef, content, onSelectionChange }: ToolbarProp
       const textarea = textareaRef.current;
       if (!textarea) return;
       const result = insertTextAtCursor(textarea, '\n' + markdown + '\n');
+      onSelectionChange(result.selectionStart, result.selectionEnd);
+    },
+    [textareaRef, onSelectionChange],
+  );
+
+  const handleInsertChart = useCallback(
+    (template: string) => {
+      const textarea = textareaRef.current;
+      if (!textarea) return;
+      const result = insertTextAtCursor(textarea, '\n' + template + '\n');
       onSelectionChange(result.selectionStart, result.selectionEnd);
     },
     [textareaRef, onSelectionChange],
@@ -134,6 +151,39 @@ export function Toolbar({ textareaRef, content, onSelectionChange }: ToolbarProp
           />
           <TooltipContent>{item.label}</TooltipContent>
         </Tooltip>
+      );
+    }
+
+    if (item.isChart) {
+      if (inDropdown) {
+        return CHART_TEMPLATES.map((chart) => (
+          <DropdownMenuItem key={chart.id} onClick={() => handleInsertChart(chart.template)}>
+            <chart.icon className="h-4 w-4 mr-2" />
+            {chart.label}
+          </DropdownMenuItem>
+        ));
+      }
+      return (
+        <DropdownMenu key={item.id}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-7 w-7" tabIndex={-1}>
+                  <item.icon className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+            </TooltipTrigger>
+            <TooltipContent>{item.label}</TooltipContent>
+          </Tooltip>
+          <DropdownMenuContent align="start">
+            {CHART_TEMPLATES.map((chart) => (
+              <DropdownMenuItem key={chart.id} onClick={() => handleInsertChart(chart.template)}>
+                <chart.icon className="h-4 w-4 mr-2" />
+                {chart.label}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
       );
     }
 
