@@ -15,6 +15,7 @@ import {
   LucideIcon,
   Minus,
   Quote,
+  Sigma,
   Square,
   Strikethrough,
   Table,
@@ -187,6 +188,28 @@ export const COMMAND_GROUPS: CommandGroup[] = [
         label: '已完成任务',
         description: '已完成任务',
         keywords: ['task', 'done', 'checked', '任务', '完成'],
+      },
+    ],
+  },
+  {
+    items: [
+      {
+        id: 'inlineMath',
+        icon: Sigma,
+        label: '行内公式',
+        description: '行内数学公式',
+        keywords: ['math', 'latex', 'katex', '公式', '数学'],
+        shortcut: { key: 'm', ctrl: true },
+      },
+      {
+        id: 'blockMath',
+        icon: Sigma,
+        label: '公式块',
+        description: '块级数学公式',
+        keywords: ['math', 'latex', 'katex', '公式', '数学'],
+        isText: true,
+        text: '∑',
+        shortcut: { key: 'm', ctrl: true, shift: true },
       },
     ],
   },
@@ -422,6 +445,10 @@ export function getCommandExecutor(
       return (ta) => insertAtLineStart(ta, '- [x] 已完成');
     case 'hr':
       return (ta) => insertTextAtCursor(ta, '\n---\n');
+    case 'inlineMath':
+      return (ta) => wrapSelection(ta, '$');
+    case 'blockMath':
+      return (ta) => insertTextAtCursor(ta, '$$\n\n$$', 3, 3);
     case 'table':
       return () => {
         onTableInsert?.('\n' + DEFAULT_TABLE + '\n');

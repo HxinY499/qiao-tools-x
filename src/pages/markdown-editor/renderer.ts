@@ -1,9 +1,18 @@
 import { Marked, type Tokens } from 'marked';
+import markedKatex from 'marked-katex-extension';
 import { createHighlighter, type Highlighter } from 'shiki';
 import { createCssVariablesTheme } from 'shiki/core';
 
 // 配置 marked（不带代码高亮，后续用 shiki 处理）
 const marked = new Marked();
+
+// 添加 KaTeX 数学公式支持
+marked.use(
+  markedKatex({
+    throwOnError: false, // 公式错误时不抛异常
+    output: 'htmlAndMathml', // 同时输出 HTML 和 MathML（提高可访问性）
+  }),
+);
 
 marked.use({
   renderer: {
