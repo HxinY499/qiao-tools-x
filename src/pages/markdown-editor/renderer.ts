@@ -199,9 +199,14 @@ export async function renderMermaidBlocks(html: string): Promise<string> {
     theme: 'base',
     themeVariables,
     securityLevel: 'loose',
+    suppressErrorRendering: true, // 禁止渲染错误 SVG 到 DOM
   });
 
   // 渲染所有 mermaid 代码块（使用顺序执行确保 ID 唯一）
+  // 渲染期间锁定 body 滚动，防止临时元素导致滚动条闪烁
+  const originalOverflow = document.body.style.overflow;
+  document.body.style.overflow = 'hidden';
+
   const renderedBlocks = [];
   for (const { full, code } of mermaidBlocks) {
     try {
@@ -213,6 +218,12 @@ export async function renderMermaidBlocks(html: string): Promise<string> {
       renderedBlocks.push({ full, html: `<pre><code>${decodeHtmlEntities(code)}</code></pre>` });
     }
   }
+
+  // 清理 mermaid 在 body 下创建的临时/错误元素
+  document.querySelectorAll('body > svg[id^="mermaid"], body > #d, body > .mermaid-error').forEach((el) => el.remove());
+
+  // 恢复 body 滚动
+  document.body.style.overflow = originalOverflow;
 
   // 替换原始 mermaid 代码块
   let result = html;

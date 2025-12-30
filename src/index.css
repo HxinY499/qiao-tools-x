@@ -117,3 +117,9 @@
 .custom-scrollbar::-webkit-scrollbar-corner {
   background: transparent;
 }
+
+/* 隐藏 mermaid 在 body 下创建的临时渲染容器 - 只隐藏错误元素，不影响正常渲染 */
+body > #d,
+body > .mermaid-error {
+  display: none !important;
+}

@@ -28,11 +28,20 @@ import { Textarea } from '@/components/ui/textarea';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 import { parseMarkdown } from './renderer';
+import { useSlashCommand } from './slash-command';
 import { useMarkdownEditorStore } from './store';
 import { getThemeLabel, getThemesByCategory, loadThemeStyle, THEME_LIST, ThemeName } from './themes';
 import { Toc } from './toc';
 import { Toolbar } from './toolbar';
-import { exportToDocx, exportToHtml, exportToImage, exportToMarkdown, exportToPdf, htmlToMarkdown } from './utils';
+import {
+  exportToDocx,
+  exportToHtml,
+  exportToImage,
+  exportToMarkdown,
+  exportToPdf,
+  htmlToMarkdown,
+  insertTextAtCursor,
+} from './utils';
 
 export default function MarkdownEditorPage() {
   const { content, previewTheme, setContent, setPreviewTheme } = useMarkdownEditorStore();
@@ -143,6 +152,26 @@ export default function MarkdownEditorPage() {
       };
     }
   }, []);
+
+  // 处理表格插入（供斜杠命令使用）
+  const handleTableInsert = useCallback(
+    (markdown: string) => {
+      const textarea = textareaRef.current;
+      if (!textarea) return;
+
+      const result = insertTextAtCursor(textarea, markdown);
+      handleSelectionChange(result.selectionStart, result.selectionEnd);
+    },
+    [handleSelectionChange],
+  );
+
+  // 斜杠命令
+  const { SlashCommandMenu } = useSlashCommand({
+    textareaRef,
+    content,
+    onSelectionChange: handleSelectionChange,
+    onTableInsert: handleTableInsert,
+  });
 
   const handleImportFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -270,11 +299,12 @@ export default function MarkdownEditorPage() {
           ref={textareaRef}
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          placeholder="在此输入 Markdown..."
+          placeholder="在此输入 Markdown... (输入 / 可快速插入)"
           className="h-full w-full font-mono !text-xs resize-none p-4 leading-relaxed custom-scrollbar rounded-none border-0 focus-visible:ring-0"
           spellCheck={false}
         />
       </div>
+      {SlashCommandMenu}
     </>
   );
 
