@@ -3,9 +3,13 @@ import {
   CheckSquare,
   Code,
   GitBranch,
+  Heading,
   Heading1,
   Heading2,
   Heading3,
+  Heading4,
+  Heading5,
+  Heading6,
   Image,
   Italic,
   Link,
@@ -39,6 +43,7 @@ export interface CommandItem {
   keywords?: string[];
   isTable?: boolean;
   isChart?: boolean; // 图表下拉菜单
+  isHeading?: boolean; // 标题下拉菜单
   isText?: boolean;
   text?: string;
   shortcut?: CommandShortcut;
@@ -53,28 +58,12 @@ export const COMMAND_GROUPS: CommandGroup[] = [
   {
     items: [
       {
-        id: 'h1',
-        icon: Heading1,
-        label: '一级标题',
-        description: '大标题',
-        keywords: ['heading', 'title', 'h1', '标题'],
-        shortcut: { key: '1', ctrl: true },
-      },
-      {
-        id: 'h2',
-        icon: Heading2,
-        label: '二级标题',
-        description: '中标题',
-        keywords: ['heading', 'title', 'h2', '标题'],
-        shortcut: { key: '2', ctrl: true },
-      },
-      {
-        id: 'h3',
-        icon: Heading3,
-        label: '三级标题',
-        description: '小标题',
-        keywords: ['heading', 'title', 'h3', '标题'],
-        shortcut: { key: '3', ctrl: true },
+        id: 'heading',
+        icon: Heading,
+        label: '标题',
+        description: '插入标题',
+        keywords: ['heading', 'title', '标题', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+        isHeading: true,
       },
     ],
   },
@@ -258,6 +247,23 @@ export const DEFAULT_TABLE = `| 标题 1 | 标题 2 | 标题 3 |
 |  |  |  |
 |  |  |  |`;
 
+// 标题级别模板
+export interface HeadingItem {
+  id: string;
+  icon: LucideIcon;
+  label: string;
+  shortcut?: CommandShortcut;
+}
+
+export const HEADING_ITEMS: HeadingItem[] = [
+  { id: 'h1', icon: Heading1, label: '一级标题', shortcut: { key: '1', ctrl: true } },
+  { id: 'h2', icon: Heading2, label: '二级标题', shortcut: { key: '2', ctrl: true } },
+  { id: 'h3', icon: Heading3, label: '三级标题', shortcut: { key: '3', ctrl: true } },
+  { id: 'h4', icon: Heading4, label: '四级标题', shortcut: { key: '4', ctrl: true } },
+  { id: 'h5', icon: Heading5, label: '五级标题', shortcut: { key: '5', ctrl: true } },
+  { id: 'h6', icon: Heading6, label: '六级标题', shortcut: { key: '6', ctrl: true } },
+];
+
 // Mermaid 图表模板
 export interface ChartTemplate {
   id: string;
@@ -407,6 +413,12 @@ export function getCommandExecutor(
       return (ta) => insertAtLineStart(ta, '## ');
     case 'h3':
       return (ta) => insertAtLineStart(ta, '### ');
+    case 'h4':
+      return (ta) => insertAtLineStart(ta, '#### ');
+    case 'h5':
+      return (ta) => insertAtLineStart(ta, '##### ');
+    case 'h6':
+      return (ta) => insertAtLineStart(ta, '###### ');
     case 'bold':
       return (ta) => wrapSelection(ta, '**');
     case 'italic':
@@ -501,6 +513,10 @@ export function matchShortcut(e: KeyboardEvent, shortcut: CommandShortcut): bool
 }
 
 // 根据快捷键查找命令
-export function findCommandByShortcut(e: KeyboardEvent): CommandItem | undefined {
+export function findCommandByShortcut(e: KeyboardEvent): CommandItem | HeadingItem | undefined {
+  // 先检查标题快捷键
+  const headingMatch = HEADING_ITEMS.find((h) => h.shortcut && matchShortcut(e, h.shortcut));
+  if (headingMatch) return headingMatch;
+
   return ALL_COMMANDS.find((cmd) => cmd.shortcut && matchShortcut(e, cmd.shortcut));
 }

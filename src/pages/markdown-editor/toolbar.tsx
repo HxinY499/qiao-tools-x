@@ -18,6 +18,7 @@ import {
   FlatItem,
   formatShortcut,
   getCommandExecutor,
+  HEADING_ITEMS,
 } from './commands';
 import { TableDialog } from './table-dialog';
 import { insertTextAtCursor } from './utils';
@@ -157,9 +158,68 @@ export function Toolbar({ textareaRef, content, onSelectionChange }: ToolbarProp
     if (item.isChart) {
       if (inDropdown) {
         return CHART_TEMPLATES.map((chart) => (
-          <DropdownMenuItem key={chart.id} onClick={() => handleInsertChart(chart.template)}>
+          <DropdownMenuItem
+            key={chart.id}
+            onSelect={() => {
+              handleInsertChart(chart.template);
+              // 在 inDropdown 模式下（折叠菜单中），由父级 Dropdown 处理焦点
+            }}
+          >
             <chart.icon className="h-4 w-4 mr-2" />
             {chart.label}
+          </DropdownMenuItem>
+        ));
+      }
+      return (
+        <DropdownMenu key={item.id}>
+          <Tooltip>
+            {/* 当下拉菜单打开时，阻止 Tooltip 显示 */}
+            <TooltipTrigger asChild>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-7 w-7" tabIndex={-1}>
+                  <item.icon className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+            </TooltipTrigger>
+            <TooltipContent>{item.label}</TooltipContent>
+          </Tooltip>
+          <DropdownMenuContent
+            align="start"
+            onCloseAutoFocus={(e) => {
+              e.preventDefault();
+              textareaRef.current?.focus();
+            }}
+          >
+            {CHART_TEMPLATES.map((chart) => (
+              <DropdownMenuItem
+                key={chart.id}
+                onSelect={() => {
+                  handleInsertChart(chart.template);
+                }}
+              >
+                <chart.icon className="h-4 w-4 mr-2" />
+                {chart.label}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
+    }
+
+    if (item.isHeading) {
+      if (inDropdown) {
+        return HEADING_ITEMS.map((heading) => (
+          <DropdownMenuItem
+            key={heading.id}
+            onSelect={() => {
+              executeCommand(heading.id);
+            }}
+          >
+            <heading.icon className="h-4 w-4 mr-2" />
+            <span className="flex-1">{heading.label}</span>
+            {heading.shortcut && (
+              <span className="ml-auto text-xs text-muted-foreground">{formatShortcut(heading.shortcut)}</span>
+            )}
           </DropdownMenuItem>
         ));
       }
@@ -175,11 +235,25 @@ export function Toolbar({ textareaRef, content, onSelectionChange }: ToolbarProp
             </TooltipTrigger>
             <TooltipContent>{item.label}</TooltipContent>
           </Tooltip>
-          <DropdownMenuContent align="start">
-            {CHART_TEMPLATES.map((chart) => (
-              <DropdownMenuItem key={chart.id} onClick={() => handleInsertChart(chart.template)}>
-                <chart.icon className="h-4 w-4 mr-2" />
-                {chart.label}
+          <DropdownMenuContent
+            align="start"
+            onCloseAutoFocus={(e) => {
+              e.preventDefault();
+              textareaRef.current?.focus();
+            }}
+          >
+            {HEADING_ITEMS.map((heading) => (
+              <DropdownMenuItem
+                key={heading.id}
+                onSelect={() => {
+                  executeCommand(heading.id);
+                }}
+              >
+                <heading.icon className="h-4 w-4 mr-2" />
+                <span className="flex-1">{heading.label}</span>
+                {heading.shortcut && (
+                  <span className="ml-auto text-xs text-muted-foreground">{formatShortcut(heading.shortcut)}</span>
+                )}
               </DropdownMenuItem>
             ))}
           </DropdownMenuContent>
