@@ -11,7 +11,7 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
-import { CommandItem, FLAT_ITEMS_WITH_SEPARATOR, FlatItem, getCommandExecutor } from './commands';
+import { CommandItem, FLAT_ITEMS_WITH_SEPARATOR, FlatItem, formatShortcut, getCommandExecutor } from './commands';
 import { TableDialog } from './table-dialog';
 import { insertTextAtCursor } from './utils';
 
@@ -102,6 +102,8 @@ export function Toolbar({ textareaRef, content, onSelectionChange }: ToolbarProp
       : (FLAT_ITEMS_WITH_SEPARATOR.slice(visibleCount).filter((item) => item !== 'separator') as CommandItem[]);
 
   const renderButton = (item: CommandItem, inDropdown = false) => {
+    const shortcutText = item.shortcut ? formatShortcut(item.shortcut) : undefined;
+
     if (item.isTable) {
       if (inDropdown) {
         return (
@@ -139,7 +141,8 @@ export function Toolbar({ textareaRef, content, onSelectionChange }: ToolbarProp
       return (
         <DropdownMenuItem key={item.id} onClick={() => executeCommand(item.id)}>
           <item.icon className="h-4 w-4 mr-2" />
-          {item.label}
+          <span className="flex-1">{item.label}</span>
+          {shortcutText && <span className="ml-auto text-xs text-muted-foreground">{shortcutText}</span>}
         </DropdownMenuItem>
       );
     }
@@ -158,7 +161,10 @@ export function Toolbar({ textareaRef, content, onSelectionChange }: ToolbarProp
               {item.text}
             </Button>
           </TooltipTrigger>
-          <TooltipContent>{item.label}</TooltipContent>
+          <TooltipContent>
+            {item.label}
+            {shortcutText && <span className="ml-2 text-muted-foreground">{shortcutText}</span>}
+          </TooltipContent>
         </Tooltip>
       );
     }
@@ -170,7 +176,10 @@ export function Toolbar({ textareaRef, content, onSelectionChange }: ToolbarProp
             <item.icon className="h-4 w-4" />
           </Button>
         </TooltipTrigger>
-        <TooltipContent>{item.label}</TooltipContent>
+        <TooltipContent>
+          {item.label}
+          {shortcutText && <span className="ml-2 text-muted-foreground">{shortcutText}</span>}
+        </TooltipContent>
       </Tooltip>
     );
   };

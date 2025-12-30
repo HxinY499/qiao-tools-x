@@ -27,8 +27,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Textarea } from '@/components/ui/textarea';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
+import { findCommandByShortcut, getCommandExecutor } from './commands';
 import { parseMarkdown } from './renderer';
-import { useSlashCommand } from './slash-command';
 import { useMarkdownEditorStore } from './store';
 import { getThemeLabel, getThemesByCategory, loadThemeStyle, THEME_LIST, ThemeName } from './themes';
 import { Toc } from './toc';
@@ -153,7 +153,7 @@ export default function MarkdownEditorPage() {
     }
   }, []);
 
-  // 处理表格插入（供斜杠命令使用）
+  // 处理表格插入
   const handleTableInsert = useCallback(
     (markdown: string) => {
       const textarea = textareaRef.current;
@@ -165,13 +165,34 @@ export default function MarkdownEditorPage() {
     [handleSelectionChange],
   );
 
-  // 斜杠命令
-  const { SlashCommandMenu } = useSlashCommand({
-    textareaRef,
-    content,
-    onSelectionChange: handleSelectionChange,
-    onTableInsert: handleTableInsert,
-  });
+  // 快捷键处理（使用 capture 阶段拦截，防止其他组件响应）
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const textarea = textareaRef.current;
+      if (!textarea || document.activeElement !== textarea) return;
+
+      const command = findCommandByShortcut(e);
+      if (!command) return;
+
+      // 表格命令不支持快捷键（需要弹窗选择行列）
+      if (command.isTable) return;
+
+      e.preventDefault();
+      e.stopImmediatePropagation(); // 阻止所有后续监听器
+
+      const executor = getCommandExecutor(command.id, { content, onTableInsert: handleTableInsert });
+      if (!executor) return;
+
+      const result = executor(textarea);
+      if (result) {
+        handleSelectionChange(result.selectionStart, result.selectionEnd);
+      }
+    };
+
+    // 使用 capture: true 在捕获阶段拦截事件
+    window.addEventListener('keydown', handleKeyDown, true);
+    return () => window.removeEventListener('keydown', handleKeyDown, true);
+  }, [content, handleSelectionChange, handleTableInsert]);
 
   const handleImportFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -299,12 +320,11 @@ export default function MarkdownEditorPage() {
           ref={textareaRef}
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          placeholder="在此输入 Markdown... (输入 / 可快速插入)"
+          placeholder="在此输入 Markdown..."
           className="h-full w-full font-mono !text-xs resize-none p-4 leading-relaxed custom-scrollbar rounded-none border-0 focus-visible:ring-0"
           spellCheck={false}
         />
       </div>
-      {SlashCommandMenu}
     </>
   );
 

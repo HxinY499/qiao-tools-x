@@ -18,6 +18,13 @@ import {
 
 import { generateToc, insertAtLineStart, insertTextAtCursor, wrapSelection } from './utils';
 
+export interface CommandShortcut {
+  key: string; // 主键（如 'b', '1', 'k'）
+  ctrl?: boolean; // Ctrl (Windows/Linux) 或 ⌘ (Mac)
+  shift?: boolean;
+  alt?: boolean;
+}
+
 export interface CommandItem {
   id: string;
   icon: LucideIcon;
@@ -27,6 +34,7 @@ export interface CommandItem {
   isTable?: boolean;
   isText?: boolean;
   text?: string;
+  shortcut?: CommandShortcut;
 }
 
 export interface CommandGroup {
@@ -43,6 +51,7 @@ export const COMMAND_GROUPS: CommandGroup[] = [
         label: '一级标题',
         description: '大标题',
         keywords: ['heading', 'title', 'h1', '标题'],
+        shortcut: { key: '1', ctrl: true },
       },
       {
         id: 'h2',
@@ -50,6 +59,7 @@ export const COMMAND_GROUPS: CommandGroup[] = [
         label: '二级标题',
         description: '中标题',
         keywords: ['heading', 'title', 'h2', '标题'],
+        shortcut: { key: '2', ctrl: true },
       },
       {
         id: 'h3',
@@ -57,19 +67,35 @@ export const COMMAND_GROUPS: CommandGroup[] = [
         label: '三级标题',
         description: '小标题',
         keywords: ['heading', 'title', 'h3', '标题'],
+        shortcut: { key: '3', ctrl: true },
       },
     ],
   },
   {
     items: [
-      { id: 'bold', icon: Bold, label: '粗体', description: '加粗文字', keywords: ['bold', 'strong', '加粗'] },
-      { id: 'italic', icon: Italic, label: '斜体', description: '倾斜文字', keywords: ['italic', 'em', '斜体'] },
+      {
+        id: 'bold',
+        icon: Bold,
+        label: '粗体',
+        description: '加粗文字',
+        keywords: ['bold', 'strong', '加粗'],
+        shortcut: { key: 'b', ctrl: true },
+      },
+      {
+        id: 'italic',
+        icon: Italic,
+        label: '斜体',
+        description: '倾斜文字',
+        keywords: ['italic', 'em', '斜体'],
+        shortcut: { key: 'i', ctrl: true },
+      },
       {
         id: 'strikethrough',
         icon: Strikethrough,
         label: '删除线',
         description: '划掉文字',
         keywords: ['strikethrough', 'del', '删除'],
+        shortcut: { key: 's', ctrl: true, shift: true },
       },
     ],
   },
@@ -81,6 +107,7 @@ export const COMMAND_GROUPS: CommandGroup[] = [
         label: '行内代码',
         description: '内联代码',
         keywords: ['code', 'inline', '代码'],
+        shortcut: { key: 'e', ctrl: true },
       },
       {
         id: 'codeBlock',
@@ -90,13 +117,28 @@ export const COMMAND_GROUPS: CommandGroup[] = [
         keywords: ['code', 'block', '代码块'],
         isText: true,
         text: '</>',
+        shortcut: { key: 'k', ctrl: true, shift: true },
       },
     ],
   },
   {
     items: [
-      { id: 'link', icon: Link, label: '链接', description: '插入链接', keywords: ['link', 'url', '链接'] },
-      { id: 'image', icon: Image, label: '图片', description: '插入图片', keywords: ['image', 'img', '图片'] },
+      {
+        id: 'link',
+        icon: Link,
+        label: '链接',
+        description: '插入链接',
+        keywords: ['link', 'url', '链接'],
+        shortcut: { key: 'k', ctrl: true },
+      },
+      {
+        id: 'image',
+        icon: Image,
+        label: '图片',
+        description: '插入图片',
+        keywords: ['image', 'img', '图片'],
+        shortcut: { key: 'i', ctrl: true, shift: true },
+      },
     ],
   },
   {
@@ -107,6 +149,7 @@ export const COMMAND_GROUPS: CommandGroup[] = [
         label: '无序列表',
         description: '项目符号列表',
         keywords: ['list', 'ul', '列表', '无序'],
+        shortcut: { key: 'u', ctrl: true },
       },
       {
         id: 'ol',
@@ -114,8 +157,16 @@ export const COMMAND_GROUPS: CommandGroup[] = [
         label: '有序列表',
         description: '数字编号列表',
         keywords: ['list', 'ol', 'ordered', '列表', '有序'],
+        shortcut: { key: 'o', ctrl: true, shift: true },
       },
-      { id: 'quote', icon: Quote, label: '引用', description: '引用块', keywords: ['quote', 'blockquote', '引用'] },
+      {
+        id: 'quote',
+        icon: Quote,
+        label: '引用',
+        description: '引用块',
+        keywords: ['quote', 'blockquote', '引用'],
+        shortcut: { key: 'q', ctrl: true, shift: true },
+      },
     ],
   },
   {
@@ -226,4 +277,33 @@ export function filterCommands(commands: CommandItem[], filter: string): Command
       cmd.description?.toLowerCase().includes(lowerFilter) ||
       cmd.keywords?.some((k) => k.toLowerCase().includes(lowerFilter)),
   );
+}
+
+// 检测是否为 Mac 系统
+export const isMac = typeof navigator !== 'undefined' && /Mac|iPod|iPhone|iPad/.test(navigator.platform);
+
+// 格式化快捷键显示文本
+export function formatShortcut(shortcut: CommandShortcut): string {
+  const parts: string[] = [];
+  if (shortcut.ctrl) parts.push(isMac ? '⌘' : 'Ctrl');
+  if (shortcut.shift) parts.push(isMac ? '⇧' : 'Shift');
+  if (shortcut.alt) parts.push(isMac ? '⌥' : 'Alt');
+  parts.push(shortcut.key.toUpperCase());
+  return parts.join(isMac ? '' : '+');
+}
+
+// 检查键盘事件是否匹配快捷键
+export function matchShortcut(e: KeyboardEvent, shortcut: CommandShortcut): boolean {
+  const ctrlOrMeta = isMac ? e.metaKey : e.ctrlKey;
+  return (
+    e.key.toLowerCase() === shortcut.key.toLowerCase() &&
+    ctrlOrMeta === !!shortcut.ctrl &&
+    e.shiftKey === !!shortcut.shift &&
+    e.altKey === !!shortcut.alt
+  );
+}
+
+// 根据快捷键查找命令
+export function findCommandByShortcut(e: KeyboardEvent): CommandItem | undefined {
+  return ALL_COMMANDS.find((cmd) => cmd.shortcut && matchShortcut(e, cmd.shortcut));
 }
