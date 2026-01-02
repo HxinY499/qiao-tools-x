@@ -2,7 +2,6 @@ import { List, Pin, PinOff } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/utils';
 
 export interface TocItem {
@@ -148,14 +147,9 @@ export function Toc({ htmlContent, previewRef, className, pinned, onPinChange }:
         <List className="h-3.5 w-3.5" />
         <span>目录</span>
         <span className="text-[10px] opacity-60">{tocItems.length}</span>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-6 w-6 ml-auto" onClick={() => onPinChange?.(!pinned)}>
-              {pinned ? <PinOff className="h-3 w-3" /> : <Pin className="h-3 w-3" />}
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="left">{pinned ? '取消固定' : '固定目录'}</TooltipContent>
-        </Tooltip>
+        <Button variant="ghost" size="icon" className="h-6 w-6 ml-auto" onClick={() => onPinChange?.(!pinned)}>
+          {pinned ? <PinOff className="h-3 w-3" /> : <Pin className="h-3 w-3" />}
+        </Button>
       </div>
 
       {/* 目录列表 */}

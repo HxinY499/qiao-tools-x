@@ -6,8 +6,11 @@ import { ThemeName } from './themes';
 interface MarkdownEditorState {
   content: string;
   previewTheme: ThemeName;
+  /** 预览区缩放百分比（50-200） */
+  previewZoom: number;
   setContent: (content: string) => void;
   setPreviewTheme: (theme: ThemeName) => void;
+  setPreviewZoom: (zoom: number) => void;
   clear: () => void;
 }
 
@@ -68,8 +71,10 @@ export const useMarkdownEditorStore = create<MarkdownEditorState>()(
     (set) => ({
       content: DEFAULT_CONTENT,
       previewTheme: 'notion-style-light',
+      previewZoom: 100,
       setContent: (content) => set({ content }),
       setPreviewTheme: (previewTheme) => set({ previewTheme }),
+      setPreviewZoom: (previewZoom) => set({ previewZoom }),
       clear: () => set({ content: '' }),
     }),
     {
