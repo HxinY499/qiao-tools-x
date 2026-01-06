@@ -1,6 +1,7 @@
 import 'katex/dist/katex.min.css';
 
 import {
+  ChevronDown,
   Download,
   FileText,
   Globe,
@@ -12,7 +13,10 @@ import {
   Minimize2,
   Moon,
   Palette,
+  RotateCcw,
   Sun,
+  ZoomIn,
+  ZoomOut,
 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
@@ -26,6 +30,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Slider } from '@/components/ui/slider';
 import { Textarea } from '@/components/ui/textarea';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -46,7 +51,41 @@ import {
 } from './utils';
 
 export default function MarkdownEditorPage() {
-  const { content, previewTheme, setContent, setPreviewTheme } = useMarkdownEditorStore();
+  const { content, previewTheme, previewZoom, setContent, setPreviewTheme, setPreviewZoom } = useMarkdownEditorStore();
+
+  const ZOOM_MIN = 50;
+  const ZOOM_MAX = 200;
+  // 按钮步进（更像 PDF 阅读器）
+  const ZOOM_STEP = 10;
+  // 滑杆步进（支持 75%/125% 等常用档位）
+  const ZOOM_SLIDER_STEP = 5;
+
+  const clampZoom = useCallback(
+    (next: number) => {
+      const rounded = Math.round(next);
+      return Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, rounded));
+    },
+    [ZOOM_MAX, ZOOM_MIN],
+  );
+
+  const applyZoom = useCallback(
+    (next: number) => {
+      setPreviewZoom(clampZoom(next));
+    },
+    [clampZoom, setPreviewZoom],
+  );
+
+  const handleZoomOut = useCallback(() => {
+    applyZoom(previewZoom - ZOOM_STEP);
+  }, [applyZoom, previewZoom, ZOOM_STEP]);
+
+  const handleZoomIn = useCallback(() => {
+    applyZoom(previewZoom + ZOOM_STEP);
+  }, [applyZoom, previewZoom, ZOOM_STEP]);
+
+  const handleZoomReset = useCallback(() => {
+    setPreviewZoom(100);
+  }, [setPreviewZoom]);
 
   // 获取当前主题是否为暗色主题
   const isDarkTheme = THEME_LIST.find((t) => t.name === previewTheme)?.isDark || false;
@@ -63,6 +102,7 @@ export default function MarkdownEditorPage() {
   const [tocOpen, setTocOpen] = useState(false);
   const [tocPinned, setTocPinned] = useState(false);
   const [htmlContent, setHtmlContent] = useState('<p><em>开始输入以查看预览...</em></p>');
+  const [readingProgress, setReadingProgress] = useState(0);
 
   useEffect(() => {
     loadThemeStyle(previewTheme).then(setThemeStyle);
@@ -84,6 +124,35 @@ export default function MarkdownEditorPage() {
 
     processMarkdown();
   }, [content, themeStyle]);
+
+  const updateReadingProgress = useCallback(() => {
+    const preview = previewRef.current;
+    if (!preview) return;
+    const max = preview.scrollHeight - preview.clientHeight;
+    if (max <= 0) {
+      setReadingProgress(0);
+      return;
+    }
+    const ratio = preview.scrollTop / max;
+    setReadingProgress(Math.min(100, Math.max(0, Math.round(ratio * 100))));
+  }, []);
+
+  useEffect(() => {
+    const preview = previewRef.current;
+    if (!preview) return;
+
+    const handleScroll = () => updateReadingProgress();
+    preview.addEventListener('scroll', handleScroll);
+    // 初始化
+    updateReadingProgress();
+
+    return () => preview.removeEventListener('scroll', handleScroll);
+  }, [previewRef, updateReadingProgress]);
+
+  useEffect(() => {
+    const timer = setTimeout(updateReadingProgress, 80);
+    return () => clearTimeout(timer);
+  }, [htmlContent, updateReadingProgress]);
 
   // ESC 键退出全屏
   useEffect(() => {
@@ -422,6 +491,89 @@ export default function MarkdownEditorPage() {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+
+        <div className="flex items-center gap-0.5 rounded-md border border-border/50 bg-background/40 px-0.5 py-0.5">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7"
+                onClick={handleZoomOut}
+                disabled={previewZoom <= ZOOM_MIN}
+                tabIndex={-1}
+              >
+                <ZoomOut className="h-3.5 w-3.5" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>缩小</TooltipContent>
+          </Tooltip>
+
+          <Popover>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <PopoverTrigger asChild>
+                  <Button variant="ghost" size="sm" className="h-7 gap-1" tabIndex={-1}>
+                    <span className="text-xs tabular-nums">{previewZoom}%</span>
+                    <ChevronDown className="h-3.5 w-3.5 opacity-70" />
+                  </Button>
+                </PopoverTrigger>
+              </TooltipTrigger>
+              <TooltipContent>缩放</TooltipContent>
+            </Tooltip>
+            <PopoverContent align="end" className="w-72 p-3">
+              <div className="flex items-center justify-between">
+                <div className="text-xs font-medium">缩放</div>
+                <Button variant="ghost" size="sm" className="h-7 px-2 text-xs" onClick={handleZoomReset}>
+                  <RotateCcw className="h-3.5 w-3.5 mr-1" />
+                  重置
+                </Button>
+              </div>
+              <div className="mt-3">
+                <Slider
+                  min={ZOOM_MIN}
+                  max={ZOOM_MAX}
+                  step={ZOOM_SLIDER_STEP}
+                  value={[previewZoom]}
+                  onValueChange={(v) => applyZoom(v[0] ?? 100)}
+                />
+                <div className="mt-2 flex items-center justify-between text-[11px] text-muted-foreground">
+                  <span>{ZOOM_MIN}%</span>
+                  <span>{ZOOM_MAX}%</span>
+                </div>
+              </div>
+              <div className="mt-3 grid grid-cols-4 gap-1">
+                {[50, 75, 100, 125, 150, 175, 200].map((z) => (
+                  <Button
+                    key={z}
+                    variant={previewZoom === z ? 'secondary' : 'ghost'}
+                    size="sm"
+                    className="h-7 px-2 text-xs"
+                    onClick={() => setPreviewZoom(z)}
+                  >
+                    {z}%
+                  </Button>
+                ))}
+              </div>
+            </PopoverContent>
+          </Popover>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7"
+                onClick={handleZoomIn}
+                disabled={previewZoom >= ZOOM_MAX}
+                tabIndex={-1}
+              >
+                <ZoomIn className="h-3.5 w-3.5" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>放大</TooltipContent>
+          </Tooltip>
+        </div>
         <Popover open={tocOpen} onOpenChange={(open) => !tocPinned && setTocOpen(open)}>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -465,7 +617,15 @@ export default function MarkdownEditorPage() {
           <TooltipContent>{isFullscreen ? '退出全屏 (ESC)' : '全屏预览'}</TooltipContent>
         </Tooltip>
       </header>
-      <div ref={previewRef} className="flex-1 min-h-0 min-w-0 overflow-auto custom-scrollbar">
+      <div className="sticky top-0 z-10 bg-transparent">
+        <div className="h-[2px] w-full bg-transparent">
+          <div
+            className="h-full bg-primary transition-all duration-150 ease-out"
+            style={{ width: `${readingProgress}%` }}
+          />
+        </div>
+      </div>
+      <div ref={previewRef} className="flex-1 min-h-0 min-w-0 overflow-auto custom-scrollbar group">
         <style>{`
           .markdown-body ul { list-style-type: disc; }
           .markdown-body ol { list-style-type: decimal; }
@@ -473,6 +633,7 @@ export default function MarkdownEditorPage() {
         <style>{themeStyle}</style>
         <article
           className="markdown-body max-w-full overflow-x-auto"
+          style={{ zoom: previewZoom / 100 }}
           dangerouslySetInnerHTML={{ __html: htmlContent }}
         />
       </div>
