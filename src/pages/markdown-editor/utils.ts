@@ -1,7 +1,4 @@
-import { Document, HeadingLevel, Packer, Paragraph, TextRun } from 'docx';
 import { saveAs } from 'file-saver';
-import html2canvas from 'html2canvas';
-import { jsPDF } from 'jspdf';
 
 import { TableConfig } from './types';
 
@@ -472,12 +469,15 @@ async function createScreenshotElement(
 }
 
 /**
- * 导出为 PDF
+ * 导出为 PDF（动态导入 html2canvas 和 jsPDF）
  */
 export async function exportToPdf(previewElement: HTMLElement, isDark = false, filename = 'document.pdf') {
   const { container, cleanup, backgroundColor } = await createScreenshotElement(previewElement, isDark);
 
   try {
+    // 动态导入 html2canvas 和 jsPDF
+    const [{ default: html2canvas }, { jsPDF }] = await Promise.all([import('html2canvas'), import('jspdf')]);
+
     const canvas = await html2canvas(container, {
       scale: 2,
       useCORS: true,
@@ -531,11 +531,67 @@ export async function exportToPdf(previewElement: HTMLElement, isDark = false, f
 }
 
 /**
- * 导出为 DOCX
+ * 导出为 DOCX（动态导入 docx 库）
  */
 export async function exportToDocx(content: string, filename = 'document.docx') {
+  // 动态导入 docx 库
+  const { Document, HeadingLevel, Packer, Paragraph, TextRun } = await import('docx');
+
+  // 解析行内 Markdown 格式
+  function parseInlineMarkdown(text: string): InstanceType<typeof TextRun>[] {
+    const runs: InstanceType<typeof TextRun>[] = [];
+    let remaining = text;
+
+    while (remaining.length > 0) {
+      // 粗体
+      const boldMatch = remaining.match(/^\*\*(.+?)\*\*/);
+      if (boldMatch) {
+        runs.push(new TextRun({ text: boldMatch[1], bold: true }));
+        remaining = remaining.slice(boldMatch[0].length);
+        continue;
+      }
+
+      // 斜体
+      const italicMatch = remaining.match(/^\*(.+?)\*/);
+      if (italicMatch) {
+        runs.push(new TextRun({ text: italicMatch[1], italics: true }));
+        remaining = remaining.slice(italicMatch[0].length);
+        continue;
+      }
+
+      // 行内代码
+      const codeMatch = remaining.match(/^`(.+?)`/);
+      if (codeMatch) {
+        runs.push(
+          new TextRun({
+            text: codeMatch[1],
+            font: 'Courier New',
+          }),
+        );
+        remaining = remaining.slice(codeMatch[0].length);
+        continue;
+      }
+
+      // 普通文本（取到下一个特殊字符或结束）
+      const nextSpecial = remaining.search(/[*`]/);
+      if (nextSpecial === -1) {
+        runs.push(new TextRun({ text: remaining }));
+        break;
+      } else if (nextSpecial === 0) {
+        // 特殊字符但不匹配格式，作为普通文本
+        runs.push(new TextRun({ text: remaining[0] }));
+        remaining = remaining.slice(1);
+      } else {
+        runs.push(new TextRun({ text: remaining.slice(0, nextSpecial) }));
+        remaining = remaining.slice(nextSpecial);
+      }
+    }
+
+    return runs.length > 0 ? runs : [new TextRun({ text: '' })];
+  }
+
   const lines = content.split('\n');
-  const children: Paragraph[] = [];
+  const children: InstanceType<typeof Paragraph>[] = [];
 
   for (const line of lines) {
     // 标题
@@ -591,67 +647,15 @@ export async function exportToDocx(content: string, filename = 'document.docx') 
 }
 
 /**
- * 解析行内 Markdown 格式
- */
-function parseInlineMarkdown(text: string): TextRun[] {
-  const runs: TextRun[] = [];
-  let remaining = text;
-
-  while (remaining.length > 0) {
-    // 粗体
-    const boldMatch = remaining.match(/^\*\*(.+?)\*\*/);
-    if (boldMatch) {
-      runs.push(new TextRun({ text: boldMatch[1], bold: true }));
-      remaining = remaining.slice(boldMatch[0].length);
-      continue;
-    }
-
-    // 斜体
-    const italicMatch = remaining.match(/^\*(.+?)\*/);
-    if (italicMatch) {
-      runs.push(new TextRun({ text: italicMatch[1], italics: true }));
-      remaining = remaining.slice(italicMatch[0].length);
-      continue;
-    }
-
-    // 行内代码
-    const codeMatch = remaining.match(/^`(.+?)`/);
-    if (codeMatch) {
-      runs.push(
-        new TextRun({
-          text: codeMatch[1],
-          font: 'Courier New',
-        }),
-      );
-      remaining = remaining.slice(codeMatch[0].length);
-      continue;
-    }
-
-    // 普通文本（取到下一个特殊字符或结束）
-    const nextSpecial = remaining.search(/[*`]/);
-    if (nextSpecial === -1) {
-      runs.push(new TextRun({ text: remaining }));
-      break;
-    } else if (nextSpecial === 0) {
-      // 特殊字符但不匹配格式，作为普通文本
-      runs.push(new TextRun({ text: remaining[0] }));
-      remaining = remaining.slice(1);
-    } else {
-      runs.push(new TextRun({ text: remaining.slice(0, nextSpecial) }));
-      remaining = remaining.slice(nextSpecial);
-    }
-  }
-
-  return runs.length > 0 ? runs : [new TextRun({ text: '' })];
-}
-
-/**
- * 导出为图片 (JPG)
+ * 导出为图片 (JPG)（动态导入 html2canvas）
  */
 export async function exportToImage(previewElement: HTMLElement, isDark = false, filename = 'document.jpg') {
   const { container, cleanup, backgroundColor } = await createScreenshotElement(previewElement, isDark);
 
   try {
+    // 动态导入 html2canvas
+    const { default: html2canvas } = await import('html2canvas');
+
     const canvas = await html2canvas(container, {
       scale: 2,
       useCORS: true,

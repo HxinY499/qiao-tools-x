@@ -1,7 +1,6 @@
 import { Marked, type Tokens } from 'marked';
 import markedKatex from 'marked-katex-extension';
-import { createHighlighter, type Highlighter } from 'shiki';
-import { createCssVariablesTheme } from 'shiki/core';
+import type { Highlighter } from 'shiki';
 
 // 配置 marked（不带代码高亮，后续用 shiki 处理）
 const marked = new Marked();
@@ -34,54 +33,32 @@ marked.setOptions({
   breaks: true,
 });
 
-// 创建 CSS 变量主题
-const cssVarsTheme = createCssVariablesTheme({
-  name: 'css-variables',
-  variablePrefix: '--shiki-',
-  variableDefaults: {},
-  fontStyle: true,
-});
-
 // Shiki highlighter 单例
 let highlighter: Highlighter | null = null;
+let cssVarsTheme: ReturnType<typeof import('shiki/core').createCssVariablesTheme> | null = null;
 
-// 常用语言列表
-const COMMON_LANGS = [
-  'javascript',
-  'typescript',
-  'jsx',
-  'tsx',
-  'json',
-  'html',
-  'css',
-  'scss',
-  'markdown',
-  'python',
-  'java',
-  'c',
-  'cpp',
-  'csharp',
-  'go',
-  'rust',
-  'ruby',
-  'php',
-  'swift',
-  'kotlin',
-  'sql',
-  'bash',
-  'shell',
-  'yaml',
-  'xml',
-  'diff',
-  'text',
-];
+// 基础语言列表（只加载最常用的几种，其他按需加载）
+const BASE_LANGS = ['javascript', 'typescript', 'json', 'html', 'css', 'markdown', 'text'];
 
-// 初始化 highlighter
+// 初始化 highlighter（动态导入 shiki，只加载基础语言）
 async function getHighlighter(): Promise<Highlighter> {
   if (!highlighter) {
+    const [{ createHighlighter }, { createCssVariablesTheme }] = await Promise.all([
+      import('shiki'),
+      import('shiki/core'),
+    ]);
+
+    // 创建 CSS 变量主题
+    cssVarsTheme = createCssVariablesTheme({
+      name: 'css-variables',
+      variablePrefix: '--shiki-',
+      variableDefaults: {},
+      fontStyle: true,
+    });
+
     highlighter = await createHighlighter({
       themes: [cssVarsTheme],
-      langs: COMMON_LANGS,
+      langs: BASE_LANGS,
     });
   }
   return highlighter;
