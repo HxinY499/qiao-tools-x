@@ -230,9 +230,15 @@ export default function JsonFormatterPage() {
       <div className="flex-1 relative min-h-0 min-w-0 overflow-auto custom-scrollbar">
         {jsonData !== null ? (
           settings.simpleMode ? (
-            <CodeArea code={getDisplayCode()} language="json" className="h-full border-none bg-transparent" />
+            <CodeArea
+              code={getDisplayCode()}
+              showCopyButton={false}
+              language="json"
+              className="h-full bg-transparent"
+              codeClassName="border-none"
+            />
           ) : (
-            <div className="min-h-full w-full p-2">
+            <div className="min-h-full w-full">
               <JsonEditor
                 data={jsonData}
                 setData={handleTreeUpdate}
