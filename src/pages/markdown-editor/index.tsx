@@ -12,6 +12,7 @@ import {
   Menu,
   Minimize2,
   Moon,
+  MoreVertical,
   Palette,
   RotateCcw,
   Sun,
@@ -23,10 +24,15 @@ import { toast } from 'sonner';
 
 import { ResizablePanels } from '@/components/resizable-panels';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -37,7 +43,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { findCommandByShortcut, getCommandExecutor } from './commands';
 import { parseMarkdown } from './renderer';
 import { useMarkdownEditorStore } from './store';
-import { getThemeLabel, getThemesByCategory, loadThemeStyle, THEME_LIST, ThemeName } from './themes';
+import { getThemesByCategory, loadThemeStyle, THEME_LIST, ThemeName } from './themes';
 import { Toc } from './toc';
 import { Toolbar } from './toolbar';
 import {
@@ -51,7 +57,16 @@ import {
 } from './utils';
 
 export default function MarkdownEditorPage() {
-  const { content, previewTheme, previewZoom, setContent, setPreviewTheme, setPreviewZoom } = useMarkdownEditorStore();
+  const {
+    content,
+    previewTheme,
+    previewZoom,
+    showProgressBar,
+    setContent,
+    setPreviewTheme,
+    setPreviewZoom,
+    setShowProgressBar,
+  } = useMarkdownEditorStore();
 
   const ZOOM_MIN = 50;
   const ZOOM_MAX = 200;
@@ -358,7 +373,7 @@ export default function MarkdownEditorPage() {
 
   const editorPanel = (
     <>
-      <header className="flex items-center justify-between gap-2 px-3 py-1 border-b border-border bg-muted/30 min-w-0">
+      <header className="flex items-center justify-between gap-2 px-3 py-1 border-b border-border bg-muted/30 min-w-0 h-10">
         <Toolbar textareaRef={textareaRef} content={content} onSelectionChange={handleSelectionChange} />
         <input
           ref={fileInputRef}
@@ -401,93 +416,108 @@ export default function MarkdownEditorPage() {
 
   const previewPanel = (
     <div className={`flex flex-col h-full ${isFullscreen ? 'fixed inset-0 z-50 bg-background' : ''}`}>
-      <header className="flex items-center justify-end gap-1 px-3 py-1 border-b border-border bg-muted/30">
+      <header className="flex items-center justify-end gap-1 px-3 py-1 border-b border-border bg-muted/30 h-10">
+        {/* 设置下拉菜单 - 多级结构 */}
         <DropdownMenu>
           <Tooltip>
             <TooltipTrigger asChild>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-7 gap-1.5" tabIndex={-1}>
-                  <Palette className="h-3.5 w-3.5" />
-                  <span className="text-xs">{getThemeLabel(previewTheme)}</span>
+                <Button variant="ghost" size="icon" className="h-7 w-7" tabIndex={-1}>
+                  <MoreVertical className="h-3.5 w-3.5" />
                 </Button>
               </DropdownMenuTrigger>
             </TooltipTrigger>
-            <TooltipContent>切换预览主题</TooltipContent>
+            <TooltipContent>设置与导出</TooltipContent>
           </Tooltip>
-          <DropdownMenuContent align="end">
-            {(() => {
-              const { light, dark } = getThemesByCategory();
-              return (
-                <>
-                  {/* 亮色主题 */}
-                  {light.length > 0 && (
+          <DropdownMenuContent align="end" className="w-48">
+            {/* 导出子菜单 */}
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>
+                <Download className="h-4 w-4 mr-2" />
+                <span>导出</span>
+              </DropdownMenuSubTrigger>
+              <DropdownMenuSubContent>
+                <DropdownMenuItem onClick={handleExportMd} disabled={!content}>
+                  <Download className="h-4 w-4 mr-2" />
+                  导出 Markdown
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleExportHtml} disabled={!content}>
+                  <Globe className="h-4 w-4 mr-2" />
+                  导出 HTML
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleExportPdf} disabled={!content}>
+                  <FileText className="h-4 w-4 mr-2" />
+                  导出 PDF
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleExportDocx} disabled={!content}>
+                  <FileText className="h-4 w-4 mr-2" />
+                  导出 Word
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleExportImage} disabled={!content}>
+                  <Image className="h-4 w-4 mr-2" />
+                  导出图片
+                </DropdownMenuItem>
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+
+            {/* 主题子菜单 */}
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>
+                <Palette className="h-4 w-4 mr-2" />
+                <span>预览主题</span>
+              </DropdownMenuSubTrigger>
+              <DropdownMenuSubContent>
+                {(() => {
+                  const { light, dark } = getThemesByCategory();
+                  return (
                     <>
-                      <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">亮色主题</div>
-                      {light.map((theme) => (
-                        <DropdownMenuItem
-                          key={theme.name}
-                          onClick={() => setPreviewTheme(theme.name as ThemeName)}
-                          className={previewTheme === theme.name ? 'bg-accent' : ''}
-                        >
-                          <Sun className="h-3.5 w-3.5 mr-2 text-amber-500" />
-                          {theme.label}
-                        </DropdownMenuItem>
-                      ))}
+                      {/* 亮色主题 */}
+                      {light.length > 0 && (
+                        <>
+                          <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">亮色主题</div>
+                          {light.map((theme) => (
+                            <DropdownMenuItem
+                              key={theme.name}
+                              onClick={() => setPreviewTheme(theme.name as ThemeName)}
+                              className={previewTheme === theme.name ? 'bg-accent' : ''}
+                            >
+                              <Sun className="h-3.5 w-3.5 mr-2 text-amber-500" />
+                              {theme.label}
+                            </DropdownMenuItem>
+                          ))}
+                        </>
+                      )}
+                      {/* 暗色主题 */}
+                      {dark.length > 0 && (
+                        <>
+                          <DropdownMenuSeparator />
+                          <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">暗色主题</div>
+                          {dark.map((theme) => (
+                            <DropdownMenuItem
+                              key={theme.name}
+                              onClick={() => setPreviewTheme(theme.name as ThemeName)}
+                              className={previewTheme === theme.name ? 'bg-accent' : ''}
+                            >
+                              <Moon className="h-3.5 w-3.5 mr-2 text-indigo-400" />
+                              {theme.label}
+                            </DropdownMenuItem>
+                          ))}
+                        </>
+                      )}
                     </>
-                  )}
-                  {/* 暗色主题 */}
-                  {dark.length > 0 && (
-                    <>
-                      <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground mt-1">暗色主题</div>
-                      {dark.map((theme) => (
-                        <DropdownMenuItem
-                          key={theme.name}
-                          onClick={() => setPreviewTheme(theme.name as ThemeName)}
-                          className={previewTheme === theme.name ? 'bg-accent' : ''}
-                        >
-                          <Moon className="h-3.5 w-3.5 mr-2 text-indigo-400" />
-                          {theme.label}
-                        </DropdownMenuItem>
-                      ))}
-                    </>
-                  )}
-                </>
-              );
-            })()}
-          </DropdownMenuContent>
-        </DropdownMenu>
-        <DropdownMenu>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-7 gap-1.5" tabIndex={-1}>
-                  <Download className="h-3.5 w-3.5" />
-                  <span className="text-xs">导出</span>
-                </Button>
-              </DropdownMenuTrigger>
-            </TooltipTrigger>
-            <TooltipContent>导出选项</TooltipContent>
-          </Tooltip>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={handleExportMd} disabled={!content}>
-              <Download className="h-4 w-4 mr-2" />
-              导出 Markdown
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleExportHtml} disabled={!content}>
-              <Globe className="h-4 w-4 mr-2" />
-              导出 HTML
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleExportPdf} disabled={!content}>
-              <FileText className="h-4 w-4 mr-2" />
-              导出 PDF
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleExportDocx} disabled={!content}>
-              <FileText className="h-4 w-4 mr-2" />
-              导出 Word
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleExportImage} disabled={!content}>
-              <Image className="h-4 w-4 mr-2" />
-              导出图片
+                  );
+                })()}
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+
+            <DropdownMenuSeparator />
+
+            {/* 直接的设置选项 - 不需要子菜单 */}
+            <DropdownMenuItem onClick={() => setShowProgressBar(!showProgressBar)} className="cursor-pointer">
+              <div className="flex items-center space-x-2 w-full">
+                <Checkbox checked={showProgressBar} onChange={() => {}} className="pointer-events-none" />
+                <span>显示阅读进度条</span>
+              </div>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -617,14 +647,16 @@ export default function MarkdownEditorPage() {
           <TooltipContent>{isFullscreen ? '退出全屏 (ESC)' : '全屏预览'}</TooltipContent>
         </Tooltip>
       </header>
-      <div className="sticky top-0 z-10 bg-transparent">
-        <div className="h-[2px] w-full bg-transparent">
-          <div
-            className="h-full bg-primary transition-all duration-150 ease-out"
-            style={{ width: `${readingProgress}%` }}
-          />
+      {showProgressBar && (
+        <div className="sticky top-0 z-10 bg-transparent">
+          <div className="h-[2px] w-full bg-transparent">
+            <div
+              className="h-full bg-primary transition-all duration-150 ease-out"
+              style={{ width: `${readingProgress}%` }}
+            />
+          </div>
         </div>
-      </div>
+      )}
       <div ref={previewRef} className="flex-1 min-h-0 min-w-0 overflow-auto custom-scrollbar group">
         <style>{`
           .markdown-body ul { list-style-type: disc; }
