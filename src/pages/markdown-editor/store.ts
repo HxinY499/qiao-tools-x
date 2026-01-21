@@ -10,10 +10,13 @@ interface MarkdownEditorState {
   previewZoom: number;
   /** 是否显示阅读进度条 */
   showProgressBar: boolean;
+  /** 全屏时是否隐藏预览区 header */
+  isPreviewHeaderHidden: boolean;
   setContent: (content: string) => void;
   setPreviewTheme: (theme: ThemeName) => void;
   setPreviewZoom: (zoom: number) => void;
   setShowProgressBar: (show: boolean) => void;
+  setPreviewHeaderHidden: (hidden: boolean) => void;
   clear: () => void;
 }
 
@@ -76,10 +79,12 @@ export const useMarkdownEditorStore = create<MarkdownEditorState>()(
       previewTheme: 'notion-style-light',
       previewZoom: 100,
       showProgressBar: false,
+      isPreviewHeaderHidden: false,
       setContent: (content) => set({ content }),
       setPreviewTheme: (previewTheme) => set({ previewTheme }),
       setPreviewZoom: (previewZoom) => set({ previewZoom }),
       setShowProgressBar: (showProgressBar) => set({ showProgressBar }),
+      setPreviewHeaderHidden: (isPreviewHeaderHidden) => set({ isPreviewHeaderHidden }),
       clear: () => set({ content: '' }),
     }),
     {

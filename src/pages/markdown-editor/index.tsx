@@ -2,6 +2,7 @@ import 'katex/dist/katex.min.css';
 
 import {
   ChevronDown,
+  ChevronUp,
   Download,
   FileText,
   Globe,
@@ -14,6 +15,7 @@ import {
   Moon,
   MoreVertical,
   Palette,
+  PanelTop,
   RotateCcw,
   Sun,
   ZoomIn,
@@ -62,10 +64,12 @@ export default function MarkdownEditorPage() {
     previewTheme,
     previewZoom,
     showProgressBar,
+    isPreviewHeaderHidden,
     setContent,
     setPreviewTheme,
     setPreviewZoom,
     setShowProgressBar,
+    setPreviewHeaderHidden,
   } = useMarkdownEditorStore();
 
   const ZOOM_MIN = 50;
@@ -174,11 +178,12 @@ export default function MarkdownEditorPage() {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isFullscreen) {
         setIsFullscreen(false);
+        setPreviewHeaderHidden(false); // 退出全屏时重置 header 状态
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isFullscreen]);
+  }, [isFullscreen, setPreviewHeaderHidden]);
 
   // 同步滚动：编辑区 -> 预览区
   const syncScrollToPreview = useCallback(() => {
@@ -416,237 +421,290 @@ export default function MarkdownEditorPage() {
 
   const previewPanel = (
     <div className={`flex flex-col h-full ${isFullscreen ? 'fixed inset-0 z-50 bg-background' : ''}`}>
-      <header className="flex items-center justify-end gap-1 px-3 py-1 border-b border-border bg-muted/30 h-10">
-        {/* 设置下拉菜单 - 多级结构 */}
-        <DropdownMenu>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-7 w-7" tabIndex={-1}>
-                  <MoreVertical className="h-3.5 w-3.5" />
-                </Button>
-              </DropdownMenuTrigger>
-            </TooltipTrigger>
-            <TooltipContent>设置与导出</TooltipContent>
-          </Tooltip>
-          <DropdownMenuContent align="end" className="w-48">
-            {/* 导出子菜单 */}
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger>
-                <Download className="h-4 w-4 mr-2" />
-                <span>导出</span>
-              </DropdownMenuSubTrigger>
-              <DropdownMenuSubContent>
-                <DropdownMenuItem onClick={handleExportMd} disabled={!content}>
-                  <Download className="h-4 w-4 mr-2" />
-                  导出 Markdown
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleExportHtml} disabled={!content}>
-                  <Globe className="h-4 w-4 mr-2" />
-                  导出 HTML
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleExportPdf} disabled={!content}>
-                  <FileText className="h-4 w-4 mr-2" />
-                  导出 PDF
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleExportDocx} disabled={!content}>
-                  <FileText className="h-4 w-4 mr-2" />
-                  导出 Word
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleExportImage} disabled={!content}>
-                  <Image className="h-4 w-4 mr-2" />
-                  导出图片
-                </DropdownMenuItem>
-              </DropdownMenuSubContent>
-            </DropdownMenuSub>
-
-            {/* 主题子菜单 */}
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger>
-                <Palette className="h-4 w-4 mr-2" />
-                <span>预览主题</span>
-              </DropdownMenuSubTrigger>
-              <DropdownMenuSubContent>
-                {(() => {
-                  const { light, dark } = getThemesByCategory();
-                  return (
-                    <>
-                      {/* 亮色主题 */}
-                      {light.length > 0 && (
-                        <>
-                          <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">亮色主题</div>
-                          {light.map((theme) => (
-                            <DropdownMenuItem
-                              key={theme.name}
-                              onClick={() => setPreviewTheme(theme.name as ThemeName)}
-                              className={previewTheme === theme.name ? 'bg-accent' : ''}
-                            >
-                              <Sun className="h-3.5 w-3.5 mr-2 text-amber-500" />
-                              {theme.label}
-                            </DropdownMenuItem>
-                          ))}
-                        </>
-                      )}
-                      {/* 暗色主题 */}
-                      {dark.length > 0 && (
-                        <>
-                          <DropdownMenuSeparator />
-                          <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">暗色主题</div>
-                          {dark.map((theme) => (
-                            <DropdownMenuItem
-                              key={theme.name}
-                              onClick={() => setPreviewTheme(theme.name as ThemeName)}
-                              className={previewTheme === theme.name ? 'bg-accent' : ''}
-                            >
-                              <Moon className="h-3.5 w-3.5 mr-2 text-indigo-400" />
-                              {theme.label}
-                            </DropdownMenuItem>
-                          ))}
-                        </>
-                      )}
-                    </>
-                  );
-                })()}
-              </DropdownMenuSubContent>
-            </DropdownMenuSub>
-
-            <DropdownMenuSeparator />
-
-            {/* 直接的设置选项 - 不需要子菜单 */}
-            <DropdownMenuItem onClick={() => setShowProgressBar(!showProgressBar)} className="cursor-pointer">
-              <div className="flex items-center space-x-2 w-full">
-                <Checkbox checked={showProgressBar} onChange={() => {}} className="pointer-events-none" />
-                <span>显示阅读进度条</span>
-              </div>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        <div className="flex items-center gap-0.5 rounded-md border border-border/50 bg-background/40 px-0.5 py-0.5">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-7 w-7"
-                onClick={handleZoomOut}
-                disabled={previewZoom <= ZOOM_MIN}
-                tabIndex={-1}
-              >
-                <ZoomOut className="h-3.5 w-3.5" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>缩小</TooltipContent>
-          </Tooltip>
-
-          <Popover>
+      {/* Header 区域 - 带动画 */}
+      <div
+        className={`overflow-hidden transition-all duration-300 ease-in-out ${
+          isFullscreen && isPreviewHeaderHidden ? 'max-h-0 opacity-0' : 'max-h-20 opacity-100'
+        }`}
+      >
+        <header className="flex items-center justify-end gap-1 px-3 py-1 border-b border-border bg-muted/30 h-10">
+          {/* 全屏时显示隐藏 header 按钮 */}
+          {isFullscreen && (
             <Tooltip>
               <TooltipTrigger asChild>
-                <PopoverTrigger asChild>
-                  <Button variant="ghost" size="sm" className="h-7 gap-1" tabIndex={-1}>
-                    <span className="text-xs tabular-nums">{previewZoom}%</span>
-                    <ChevronDown className="h-3.5 w-3.5 opacity-70" />
-                  </Button>
-                </PopoverTrigger>
-              </TooltipTrigger>
-              <TooltipContent>缩放</TooltipContent>
-            </Tooltip>
-            <PopoverContent align="end" className="w-72 p-3">
-              <div className="flex items-center justify-between">
-                <div className="text-xs font-medium">缩放</div>
-                <Button variant="ghost" size="sm" className="h-7 px-2 text-xs" onClick={handleZoomReset}>
-                  <RotateCcw className="h-3.5 w-3.5 mr-1" />
-                  重置
-                </Button>
-              </div>
-              <div className="mt-3">
-                <Slider
-                  min={ZOOM_MIN}
-                  max={ZOOM_MAX}
-                  step={ZOOM_SLIDER_STEP}
-                  value={[previewZoom]}
-                  onValueChange={(v) => applyZoom(v[0] ?? 100)}
-                />
-                <div className="mt-2 flex items-center justify-between text-[11px] text-muted-foreground">
-                  <span>{ZOOM_MIN}%</span>
-                  <span>{ZOOM_MAX}%</span>
-                </div>
-              </div>
-              <div className="mt-3 grid grid-cols-4 gap-1">
-                {[50, 75, 100, 125, 150, 175, 200].map((z) => (
-                  <Button
-                    key={z}
-                    variant={previewZoom === z ? 'secondary' : 'ghost'}
-                    size="sm"
-                    className="h-7 px-2 text-xs"
-                    onClick={() => setPreviewZoom(z)}
-                  >
-                    {z}%
-                  </Button>
-                ))}
-              </div>
-            </PopoverContent>
-          </Popover>
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-7 w-7"
-                onClick={handleZoomIn}
-                disabled={previewZoom >= ZOOM_MAX}
-                tabIndex={-1}
-              >
-                <ZoomIn className="h-3.5 w-3.5" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>放大</TooltipContent>
-          </Tooltip>
-        </div>
-        <Popover open={tocOpen} onOpenChange={(open) => !tocPinned && setTocOpen(open)}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <PopoverTrigger asChild>
                 <Button
                   variant="ghost"
                   size="icon"
                   className="h-7 w-7"
+                  onClick={() => setPreviewHeaderHidden(true)}
                   tabIndex={-1}
-                  onClick={() => {
-                    if (tocPinned) {
-                      setTocPinned(false);
-                      setTocOpen(false);
-                    } else {
-                      setTocOpen(!tocOpen);
-                    }
-                  }}
                 >
-                  <List className="h-3.5 w-3.5" />
+                  <ChevronUp className="h-3.5 w-3.5" />
                 </Button>
-              </PopoverTrigger>
+              </TooltipTrigger>
+              <TooltipContent>隐藏工具栏</TooltipContent>
+            </Tooltip>
+          )}
+          {/* 设置下拉菜单 - 多级结构 */}
+          <DropdownMenu>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-7 w-7" tabIndex={-1}>
+                    <MoreVertical className="h-3.5 w-3.5" />
+                  </Button>
+                </DropdownMenuTrigger>
+              </TooltipTrigger>
+              <TooltipContent>设置与导出</TooltipContent>
+            </Tooltip>
+            <DropdownMenuContent align="end" className="w-48">
+              {/* 导出子菜单 */}
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <Download className="h-4 w-4 mr-2" />
+                  <span>导出</span>
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>
+                  <DropdownMenuItem onClick={handleExportMd} disabled={!content}>
+                    <Download className="h-4 w-4 mr-2" />
+                    导出 Markdown
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleExportHtml} disabled={!content}>
+                    <Globe className="h-4 w-4 mr-2" />
+                    导出 HTML
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleExportPdf} disabled={!content}>
+                    <FileText className="h-4 w-4 mr-2" />
+                    导出 PDF
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleExportDocx} disabled={!content}>
+                    <FileText className="h-4 w-4 mr-2" />
+                    导出 Word
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleExportImage} disabled={!content}>
+                    <Image className="h-4 w-4 mr-2" />
+                    导出图片
+                  </DropdownMenuItem>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+
+              {/* 主题子菜单 */}
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <Palette className="h-4 w-4 mr-2" />
+                  <span>预览主题</span>
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>
+                  {(() => {
+                    const { light, dark } = getThemesByCategory();
+                    return (
+                      <>
+                        {/* 亮色主题 */}
+                        {light.length > 0 && (
+                          <>
+                            <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">亮色主题</div>
+                            {light.map((theme) => (
+                              <DropdownMenuItem
+                                key={theme.name}
+                                onClick={() => setPreviewTheme(theme.name as ThemeName)}
+                                className={previewTheme === theme.name ? 'bg-accent' : ''}
+                              >
+                                <Sun className="h-3.5 w-3.5 mr-2 text-amber-500" />
+                                {theme.label}
+                              </DropdownMenuItem>
+                            ))}
+                          </>
+                        )}
+                        {/* 暗色主题 */}
+                        {dark.length > 0 && (
+                          <>
+                            <DropdownMenuSeparator />
+                            <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">暗色主题</div>
+                            {dark.map((theme) => (
+                              <DropdownMenuItem
+                                key={theme.name}
+                                onClick={() => setPreviewTheme(theme.name as ThemeName)}
+                                className={previewTheme === theme.name ? 'bg-accent' : ''}
+                              >
+                                <Moon className="h-3.5 w-3.5 mr-2 text-indigo-400" />
+                                {theme.label}
+                              </DropdownMenuItem>
+                            ))}
+                          </>
+                        )}
+                      </>
+                    );
+                  })()}
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+
+              <DropdownMenuSeparator />
+
+              {/* 直接的设置选项 - 不需要子菜单 */}
+              <DropdownMenuItem onClick={() => setShowProgressBar(!showProgressBar)} className="cursor-pointer">
+                <div className="flex items-center space-x-2 w-full">
+                  <Checkbox checked={showProgressBar} onChange={() => {}} className="pointer-events-none" />
+                  <span>显示阅读进度条</span>
+                </div>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <div className="flex items-center gap-0.5 rounded-md border border-border/50 bg-background/40 px-0.5 py-0.5">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7"
+                  onClick={handleZoomOut}
+                  disabled={previewZoom <= ZOOM_MIN}
+                  tabIndex={-1}
+                >
+                  <ZoomOut className="h-3.5 w-3.5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>缩小</TooltipContent>
+            </Tooltip>
+
+            <Popover>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <PopoverTrigger asChild>
+                    <Button variant="ghost" size="sm" className="h-7 gap-1" tabIndex={-1}>
+                      <span className="text-xs tabular-nums">{previewZoom}%</span>
+                      <ChevronDown className="h-3.5 w-3.5 opacity-70" />
+                    </Button>
+                  </PopoverTrigger>
+                </TooltipTrigger>
+                <TooltipContent>缩放</TooltipContent>
+              </Tooltip>
+              <PopoverContent align="end" className="w-72 p-3">
+                <div className="flex items-center justify-between">
+                  <div className="text-xs font-medium">缩放</div>
+                  <Button variant="ghost" size="sm" className="h-7 px-2 text-xs" onClick={handleZoomReset}>
+                    <RotateCcw className="h-3.5 w-3.5 mr-1" />
+                    重置
+                  </Button>
+                </div>
+                <div className="mt-3">
+                  <Slider
+                    min={ZOOM_MIN}
+                    max={ZOOM_MAX}
+                    step={ZOOM_SLIDER_STEP}
+                    value={[previewZoom]}
+                    onValueChange={(v) => applyZoom(v[0] ?? 100)}
+                  />
+                  <div className="mt-2 flex items-center justify-between text-[11px] text-muted-foreground">
+                    <span>{ZOOM_MIN}%</span>
+                    <span>{ZOOM_MAX}%</span>
+                  </div>
+                </div>
+                <div className="mt-3 grid grid-cols-4 gap-1">
+                  {[50, 75, 100, 125, 150, 175, 200].map((z) => (
+                    <Button
+                      key={z}
+                      variant={previewZoom === z ? 'secondary' : 'ghost'}
+                      size="sm"
+                      className="h-7 px-2 text-xs"
+                      onClick={() => setPreviewZoom(z)}
+                    >
+                      {z}%
+                    </Button>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7"
+                  onClick={handleZoomIn}
+                  disabled={previewZoom >= ZOOM_MAX}
+                  tabIndex={-1}
+                >
+                  <ZoomIn className="h-3.5 w-3.5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>放大</TooltipContent>
+            </Tooltip>
+          </div>
+          <Popover open={tocOpen} onOpenChange={(open) => !tocPinned && setTocOpen(open)}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7"
+                    tabIndex={-1}
+                    onClick={() => {
+                      if (tocPinned) {
+                        setTocPinned(false);
+                        setTocOpen(false);
+                      } else {
+                        setTocOpen(!tocOpen);
+                      }
+                    }}
+                  >
+                    <List className="h-3.5 w-3.5" />
+                  </Button>
+                </PopoverTrigger>
+              </TooltipTrigger>
+              <TooltipContent>目录大纲</TooltipContent>
+            </Tooltip>
+            <PopoverContent align="end" className="w-64 p-0 max-h-[calc(100vh-8rem)] overflow-hidden flex flex-col">
+              <Toc htmlContent={htmlContent} previewRef={previewRef} pinned={tocPinned} onPinChange={setTocPinned} />
+            </PopoverContent>
+          </Popover>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7"
+                onClick={() => {
+                  const newFullscreen = !isFullscreen;
+                  setIsFullscreen(newFullscreen);
+                  if (!newFullscreen) {
+                    setPreviewHeaderHidden(false); // 退出全屏时重置 header 状态
+                  }
+                }}
+                tabIndex={-1}
+              >
+                {isFullscreen ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
+              </Button>
             </TooltipTrigger>
-            <TooltipContent>目录大纲</TooltipContent>
+            <TooltipContent>{isFullscreen ? '退出全屏 (ESC)' : '全屏预览'}</TooltipContent>
           </Tooltip>
-          <PopoverContent align="end" className="w-64 p-0 max-h-[calc(100vh-8rem)] overflow-hidden flex flex-col">
-            <Toc htmlContent={htmlContent} previewRef={previewRef} pinned={tocPinned} onPinChange={setTocPinned} />
-          </PopoverContent>
-        </Popover>
+        </header>
+      </div>
+
+      {/* 全屏时隐藏 header 后的展开按钮 */}
+      <div
+        className={`absolute top-3 right-3 z-10 transition-all duration-300 ease-out ${
+          isFullscreen && isPreviewHeaderHidden
+            ? 'opacity-100 translate-y-0 pointer-events-auto'
+            : 'opacity-0 -translate-y-2 pointer-events-none'
+        }`}
+      >
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
-              variant="ghost"
+              variant="secondary"
               size="icon"
-              className="h-7 w-7"
-              onClick={() => setIsFullscreen(!isFullscreen)}
-              tabIndex={-1}
+              className="h-8 w-8 rounded-full shadow-md opacity-60 hover:opacity-100 transition-opacity duration-200"
+              onClick={() => setPreviewHeaderHidden(false)}
             >
-              {isFullscreen ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
+              <PanelTop className="h-4 w-4" />
             </Button>
           </TooltipTrigger>
-          <TooltipContent>{isFullscreen ? '退出全屏 (ESC)' : '全屏预览'}</TooltipContent>
+          <TooltipContent>显示工具栏</TooltipContent>
         </Tooltip>
-      </header>
+      </div>
       {showProgressBar && (
         <div className="sticky top-0 z-10 bg-transparent">
           <div className="h-[2px] w-full bg-transparent">
