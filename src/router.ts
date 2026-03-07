@@ -14,6 +14,7 @@ import {
   Monitor,
   Palette,
   QrCode,
+  Radio,
   Rainbow,
   Regex,
   ScrollText,
@@ -366,6 +367,20 @@ export const toolRoutes: ToolRoute[] = [
     seo: {
       description: '免费在线 Markdown 编辑器，支持实时预览、表格生成、代码高亮、GFM 语法，提供丰富的工具栏快捷操作。',
       keywords: 'Markdown编辑器,Markdown预览,Markdown表格,在线Markdown,MD编辑器,Markdown工具',
+    },
+  },
+  {
+    key: ToolKey.SseToJson,
+    path: '/sse-to-json',
+    title: 'SSE to JSON',
+    subtitle: '从 SSE (Server-Sent Events) 原始数据中提取 data 字段并逐条解析为格式化 JSON',
+    icon: Radio,
+    component: lazy(() => import('@/pages/sse-to-json')),
+    category: 'dev',
+    seo: {
+      description:
+        '免费在线 SSE to JSON 解析工具，从 Server-Sent Events 流数据中提取 data 字段，逐条解析为格式化 JSON，支持语法高亮和一键复制。',
+      keywords: 'SSE解析,SSE转JSON,Server-Sent Events,SSE数据提取,JSON格式化,EventStream解析',
     },
   },
 ];
