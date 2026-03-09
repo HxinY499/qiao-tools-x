@@ -29,28 +29,27 @@ import { ToolPage } from './tool-page';
 
 function App() {
   const location = useLocation();
-  const { pinnedPaths, togglePin, isPinned } = useMenuStore();
+  const pinnedPaths = useMenuStore((s) => s.pinnedPaths);
+  const togglePin = useMenuStore((s) => s.togglePin);
 
-  // 分组逻辑
+  // 分组逻辑：单次遍历 + Set 查找
   const groupedRoutes = useMemo(() => {
-    // 1. 先找出所有置顶的工具，它们不参与后续的分类展示
-    const pinnedRoutes = toolRoutes.filter((route) => pinnedPaths.includes(route.path));
-
-    // 2. 找出未置顶的工具，并按 category 分组
-    const unpinnedRoutes = toolRoutes.filter((route) => !pinnedPaths.includes(route.path));
+    const pinnedSet = new Set(pinnedPaths);
+    const pinnedRoutes: typeof toolRoutes = [];
     const groups: Record<string, typeof toolRoutes> = {};
 
-    unpinnedRoutes.forEach((route) => {
-      const category = route.category;
-      if (!groups[category]) {
-        groups[category] = [];
+    for (const route of toolRoutes) {
+      if (pinnedSet.has(route.path)) {
+        pinnedRoutes.push(route);
+      } else {
+        (groups[route.category] ??= []).push(route);
       }
-      groups[category].push(route);
-    });
+    }
 
     return {
       pinned: pinnedRoutes,
-      categories: CATEGORY_ORDER.filter((cat) => groups[cat] && groups[cat].length > 0).map((cat) => ({
+      pinnedSet,
+      categories: CATEGORY_ORDER.filter((cat) => groups[cat]?.length).map((cat) => ({
         id: cat,
         title: CATEGORY_LABELS[cat],
         routes: groups[cat],
@@ -66,7 +65,7 @@ function App() {
 
   const renderMenuItem = (route: (typeof toolRoutes)[0]) => {
     const Icon = route.icon;
-    const pinned = isPinned(route.path);
+    const pinned = groupedRoutes.pinnedSet.has(route.path);
     const isActive = location.pathname === route.path;
 
     return (

@@ -35,13 +35,15 @@ const SseBlock = memo(function SseBlock({
 }: {
   block: SseDataBlock;
   collapsed: boolean;
-  onToggle: () => void;
+  onToggle: (index: number) => void;
 }) {
+  const handleToggle = useCallback(() => onToggle(block.index), [onToggle, block.index]);
+
   return (
     <div className="relative">
       <div className="flex items-center gap-1.5 mb-1">
         <button
-          onClick={onToggle}
+          onClick={handleToggle}
           className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground hover:text-foreground"
         >
           {collapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
@@ -177,6 +179,8 @@ export default function SseToJsonPage() {
   const [collapsedSet, setCollapsedSet] = useState<Set<number>>(new Set());
 
   const { blocks, validCount, invalidCount, signalCount } = parseResult;
+  const blocksRef = useRef(blocks);
+  blocksRef.current = blocks;
 
   const handleParse = useCallback((text: string) => {
     const result = parseSseToJson(text);
@@ -218,8 +222,8 @@ export default function SseToJsonPage() {
   const expandAll = useCallback(() => setCollapsedSet(new Set()), []);
 
   const collapseAll = useCallback(() => {
-    setCollapsedSet(new Set(blocks.map((b) => b.index)));
-  }, [blocks]);
+    setCollapsedSet(new Set(blocksRef.current.map((b) => b.index)));
+  }, []);
 
   // 合并所有有效 JSON 为数组的字符串
   const mergedJson = useMemo(() => {
@@ -341,7 +345,7 @@ export default function SseToJsonPage() {
             key={block.index}
             block={block}
             collapsed={collapsedSet.has(block.index)}
-            onToggle={() => toggleBlock(block.index)}
+            onToggle={toggleBlock}
           />
         ))}
       </div>

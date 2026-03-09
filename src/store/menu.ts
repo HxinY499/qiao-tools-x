@@ -10,13 +10,11 @@ type MenuState = {
   unpinTool: (path: string) => void;
   // 切换置顶状态
   togglePin: (path: string) => void;
-  // 检查是否已置顶
-  isPinned: (path: string) => boolean;
 };
 
 export const useMenuStore = create<MenuState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       pinnedPaths: [],
       pinTool: (path) =>
         set((state) => {
@@ -27,15 +25,13 @@ export const useMenuStore = create<MenuState>()(
         set((state) => ({
           pinnedPaths: state.pinnedPaths.filter((p) => p !== path),
         })),
-      togglePin: (path) => {
-        const { pinnedPaths } = get();
-        if (pinnedPaths.includes(path)) {
-          get().unpinTool(path);
-        } else {
-          get().pinTool(path);
-        }
-      },
-      isPinned: (path) => get().pinnedPaths.includes(path),
+      togglePin: (path) =>
+        set((state) => {
+          if (state.pinnedPaths.includes(path)) {
+            return { pinnedPaths: state.pinnedPaths.filter((p) => p !== path) };
+          }
+          return { pinnedPaths: [...state.pinnedPaths, path] };
+        }),
     }),
     {
       name: 'qiao-tools-x-persist-menu',

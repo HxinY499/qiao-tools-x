@@ -9,7 +9,13 @@ const __dirname = path.dirname(__filename);
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react({
+      babel: {
+        plugins: [['babel-plugin-direct-import', { modules: ['lucide-react'] }]],
+      },
+    }),
+  ],
   server: {
     open: true,
     port: 3000,
@@ -20,6 +26,8 @@ export default defineConfig({
     },
   },
   build: {
+    target: 'es2022',
+    cssCodeSplit: true,
     rollupOptions: {
       output: {
         manualChunks: {
@@ -44,8 +52,6 @@ export default defineConfig({
             '@radix-ui/react-toggle-group',
             '@radix-ui/react-collapsible',
           ],
-          // 图标库单独分包
-          'vendor-icons': ['lucide-react'],
           // 工具库
           'vendor-utils': ['clsx', 'tailwind-merge', 'class-variance-authority', 'zustand', 'date-fns'],
         },

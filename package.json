@@ -97,6 +97,7 @@
     "@vercel/node": "^5.5.14",
     "@vitejs/plugin-react": "^5.1.1",
     "autoprefixer": "^10.4.20",
+    "babel-plugin-direct-import": "^1.0.0",
     "eslint": "^9.9.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.1",

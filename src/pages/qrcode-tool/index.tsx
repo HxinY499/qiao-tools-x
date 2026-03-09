@@ -65,8 +65,21 @@ type QRStore = QRCodeStore;
 
 export default function QRCodeToolPage() {
   const store = useQRCodeStore();
-  const { tab, mode, text, wifi, contact, sms, location, style, qrDataUrl, parseResult, parseError } = store;
-  const { setQRDataUrl, setParseResult, setParseError, setStyle } = store;
+  const tab = useQRCodeStore((s) => s.tab);
+  const mode = useQRCodeStore((s) => s.mode);
+  const text = useQRCodeStore((s) => s.text);
+  const wifi = useQRCodeStore((s) => s.wifi);
+  const contact = useQRCodeStore((s) => s.contact);
+  const sms = useQRCodeStore((s) => s.sms);
+  const location = useQRCodeStore((s) => s.location);
+  const style = useQRCodeStore((s) => s.style);
+  const qrDataUrl = useQRCodeStore((s) => s.qrDataUrl);
+  const parseResult = useQRCodeStore((s) => s.parseResult);
+  const parseError = useQRCodeStore((s) => s.parseError);
+  const setQRDataUrl = useQRCodeStore((s) => s.setQRDataUrl);
+  const setParseResult = useQRCodeStore((s) => s.setParseResult);
+  const setParseError = useQRCodeStore((s) => s.setParseError);
+  const setStyle = useQRCodeStore((s) => s.setStyle);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const logoInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);

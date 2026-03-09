@@ -21,7 +21,7 @@ import {
   ZoomIn,
   ZoomOut,
 } from 'lucide-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { startTransition, useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 import { ResizablePanels } from '@/components/resizable-panels';
@@ -58,34 +58,29 @@ import {
   insertTextAtCursor,
 } from './utils';
 
+// ZOOM 常量提升到模块级别，避免每次渲染重新创建
+const ZOOM_MIN = 50;
+const ZOOM_MAX = 200;
+const ZOOM_STEP = 10;
+const ZOOM_SLIDER_STEP = 5;
+
 export default function MarkdownEditorPage() {
-  const {
-    content,
-    previewTheme,
-    previewZoom,
-    showProgressBar,
-    isPreviewHeaderHidden,
-    setContent,
-    setPreviewTheme,
-    setPreviewZoom,
-    setShowProgressBar,
-    setPreviewHeaderHidden,
-  } = useMarkdownEditorStore();
+  // 使用 selector 细粒度订阅，避免无关字段变化触发重渲染
+  const content = useMarkdownEditorStore((s) => s.content);
+  const previewTheme = useMarkdownEditorStore((s) => s.previewTheme);
+  const previewZoom = useMarkdownEditorStore((s) => s.previewZoom);
+  const showProgressBar = useMarkdownEditorStore((s) => s.showProgressBar);
+  const isPreviewHeaderHidden = useMarkdownEditorStore((s) => s.isPreviewHeaderHidden);
+  const setContent = useMarkdownEditorStore((s) => s.setContent);
+  const setPreviewTheme = useMarkdownEditorStore((s) => s.setPreviewTheme);
+  const setPreviewZoom = useMarkdownEditorStore((s) => s.setPreviewZoom);
+  const setShowProgressBar = useMarkdownEditorStore((s) => s.setShowProgressBar);
+  const setPreviewHeaderHidden = useMarkdownEditorStore((s) => s.setPreviewHeaderHidden);
 
-  const ZOOM_MIN = 50;
-  const ZOOM_MAX = 200;
-  // 按钮步进（更像 PDF 阅读器）
-  const ZOOM_STEP = 10;
-  // 滑杆步进（支持 75%/125% 等常用档位）
-  const ZOOM_SLIDER_STEP = 5;
-
-  const clampZoom = useCallback(
-    (next: number) => {
-      const rounded = Math.round(next);
-      return Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, rounded));
-    },
-    [ZOOM_MAX, ZOOM_MIN],
-  );
+  const clampZoom = useCallback((next: number) => {
+    const rounded = Math.round(next);
+    return Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, rounded));
+  }, []);
 
   const applyZoom = useCallback(
     (next: number) => {
@@ -96,11 +91,11 @@ export default function MarkdownEditorPage() {
 
   const handleZoomOut = useCallback(() => {
     applyZoom(previewZoom - ZOOM_STEP);
-  }, [applyZoom, previewZoom, ZOOM_STEP]);
+  }, [applyZoom, previewZoom]);
 
   const handleZoomIn = useCallback(() => {
     applyZoom(previewZoom + ZOOM_STEP);
-  }, [applyZoom, previewZoom, ZOOM_STEP]);
+  }, [applyZoom, previewZoom]);
 
   const handleZoomReset = useCallback(() => {
     setPreviewZoom(100);
@@ -149,11 +144,11 @@ export default function MarkdownEditorPage() {
     if (!preview) return;
     const max = preview.scrollHeight - preview.clientHeight;
     if (max <= 0) {
-      setReadingProgress(0);
+      startTransition(() => setReadingProgress(0));
       return;
     }
     const ratio = preview.scrollTop / max;
-    setReadingProgress(Math.min(100, Math.max(0, Math.round(ratio * 100))));
+    startTransition(() => setReadingProgress(Math.min(100, Math.max(0, Math.round(ratio * 100)))));
   }, []);
 
   useEffect(() => {

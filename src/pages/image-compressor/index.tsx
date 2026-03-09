@@ -1,6 +1,6 @@
 import imageCompression from 'browser-image-compression';
 import { HelpCircle, Image as ImageIcon, Lock, Unlock } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react';
 import { toast } from 'sonner';
 
 import { FileDragUploader } from '@/components/file-drag-uploader';
@@ -97,125 +97,155 @@ const PRESETS: Record<PresetType, PresetConfig> = {
   },
 };
 
+// ─── useReducer 替代 17 个 useState ───────────────────────────
+
+interface CompressorState {
+  originalFile: File | null;
+  originalUrl: string | null;
+  originalSize: number | null;
+  originalWidth: number | null;
+  originalHeight: number | null;
+  originalType: string | null;
+  originalPlaceholder: string;
+  hasAlpha: boolean | null;
+
+  compressedBlob: Blob | null;
+  compressedUrl: string | null;
+  compressedSize: number | null;
+  compressedWidth: number | null;
+  compressedHeight: number | null;
+  compressedPlaceholder: string;
+
+  formatValue: 'auto' | 'image/jpeg' | 'image/png' | 'image/webp';
+  quality: number;
+  targetWidth: string;
+  targetHeight: string;
+  keepAspectRatio: boolean;
+  scalePercentage: number;
+  currentPreset: PresetType;
+  isCompressing: boolean;
+  skipCompression: boolean;
+}
+
+const INITIAL_STATE: CompressorState = {
+  originalFile: null,
+  originalUrl: null,
+  originalSize: null,
+  originalWidth: null,
+  originalHeight: null,
+  originalType: null,
+  originalPlaceholder: '上传后在此处显示原图预览',
+  hasAlpha: null,
+
+  compressedBlob: null,
+  compressedUrl: null,
+  compressedSize: null,
+  compressedWidth: null,
+  compressedHeight: null,
+  compressedPlaceholder: '调整参数并执行压缩后显示效果',
+
+  formatValue: 'auto',
+  quality: 80,
+  targetWidth: '',
+  targetHeight: '',
+  keepAspectRatio: true,
+  scalePercentage: 100,
+  currentPreset: 'custom',
+  isCompressing: false,
+  skipCompression: false,
+};
+
+type CompressorAction =
+  | { type: 'RESET' }
+  | { type: 'UPDATE'; payload: Partial<CompressorState> };
+
+function compressorReducer(state: CompressorState, action: CompressorAction): CompressorState {
+  switch (action.type) {
+    case 'RESET':
+      return INITIAL_STATE;
+    case 'UPDATE':
+      return { ...state, ...action.payload };
+    default:
+      return state;
+  }
+}
+
 function ImageCompressorPage() {
-  const [originalFile, setOriginalFile] = useState<File | null>(null);
-  const [originalUrl, setOriginalUrl] = useState<string | null>(null);
-  const [originalSize, setOriginalSize] = useState<number | null>(null);
-  const [originalWidth, setOriginalWidth] = useState<number | null>(null);
-  const [originalHeight, setOriginalHeight] = useState<number | null>(null);
-  const [originalType, setOriginalType] = useState<string | null>(null);
-  const [originalPlaceholder, setOriginalPlaceholder] = useState('上传后在此处显示原图预览');
-  const [hasAlpha, setHasAlpha] = useState<boolean | null>(null);
+  const [state, dispatch] = useReducer(compressorReducer, INITIAL_STATE);
+  const {
+    originalFile, originalUrl, originalSize, originalWidth, originalHeight,
+    originalType, originalPlaceholder, hasAlpha,
+    compressedBlob, compressedUrl, compressedSize, compressedWidth, compressedHeight,
+    compressedPlaceholder, formatValue, quality, targetWidth, targetHeight,
+    keepAspectRatio, scalePercentage, currentPreset, isCompressing, skipCompression,
+  } = state;
 
-  const [compressedBlob, setCompressedBlob] = useState<Blob | null>(null);
-  const [compressedUrl, setCompressedUrl] = useState<string | null>(null);
-  const [compressedSize, setCompressedSize] = useState<number | null>(null);
-  const [compressedWidth, setCompressedWidth] = useState<number | null>(null);
-  const [compressedHeight, setCompressedHeight] = useState<number | null>(null);
-  const [compressedPlaceholder, setCompressedPlaceholder] = useState('调整参数并执行压缩后显示效果');
-
-  const [formatValue, setFormatValue] = useState<'auto' | 'image/jpeg' | 'image/png' | 'image/webp'>('auto');
-
-  const [quality, setQuality] = useState(80);
-
-  // 尺寸调整相关
-  const [targetWidth, setTargetWidth] = useState<string>('');
-  const [targetHeight, setTargetHeight] = useState<string>('');
-  const [keepAspectRatio, setKeepAspectRatio] = useState(true);
-  const [scalePercentage, setScalePercentage] = useState(100);
-
-  // 预设模板
-  const [currentPreset, setCurrentPreset] = useState<PresetType>('custom');
-
-  // 是否正在压缩（用于显示加载状态）
-  const [isCompressing, setIsCompressing] = useState(false);
-
-  // 是否禁用压缩（直接使用原图）
-  const [skipCompression, setSkipCompression] = useState(false);
+  // 用于稳定化 compress 中对最新 state 的访问
+  const stateRef = useRef(state);
+  stateRef.current = state;
+  const update = useCallback((payload: Partial<CompressorState>) => {
+    dispatch({ type: 'UPDATE', payload });
+  }, []);
 
   useEffect(() => {
     return () => {
-      if (originalUrl) URL.revokeObjectURL(originalUrl);
-      if (compressedUrl) URL.revokeObjectURL(compressedUrl);
+      if (stateRef.current.originalUrl) URL.revokeObjectURL(stateRef.current.originalUrl);
+      if (stateRef.current.compressedUrl) URL.revokeObjectURL(stateRef.current.compressedUrl);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function resetAll() {
     if (originalUrl) URL.revokeObjectURL(originalUrl);
     if (compressedUrl) URL.revokeObjectURL(compressedUrl);
-
-    setOriginalFile(null);
-    setOriginalUrl(null);
-    setOriginalSize(null);
-    setOriginalWidth(null);
-    setOriginalHeight(null);
-    setOriginalType(null);
-    setOriginalPlaceholder('上传后在此处显示原图预览');
-    setHasAlpha(null);
-
-    setCompressedBlob(null);
-    setCompressedUrl(null);
-    setCompressedSize(null);
-    setCompressedWidth(null);
-    setCompressedHeight(null);
-    setCompressedPlaceholder('调整参数并执行压缩后显示效果');
-
-    setQuality(80);
-    setFormatValue('auto');
-    setTargetWidth('');
-    setTargetHeight('');
-    setKeepAspectRatio(true);
-    setScalePercentage(100);
-    setCurrentPreset('custom');
-    setIsCompressing(false);
-    setSkipCompression(false);
+    dispatch({ type: 'RESET' });
   }
 
   function handleFile(file: File) {
     resetAll();
 
-    setOriginalFile(file);
-    setOriginalSize(file.size);
-    setOriginalType(file.type);
+    update({
+      originalFile: file,
+      originalSize: file.size,
+      originalType: file.type,
+    });
 
     const reader = new FileReader();
     reader.onload = () => {
       const url = typeof reader.result === 'string' ? reader.result : '';
       if (!url) {
-        setOriginalPlaceholder('原图加载失败，请重试或更换文件');
+        update({ originalPlaceholder: '原图加载失败，请重试或更换文件' });
         toast.error('图片加载失败，请尝试更换文件。');
         return;
       }
       const img = new Image();
       img.onload = async () => {
-        setOriginalUrl(url);
-        setOriginalWidth(img.width);
-        setOriginalHeight(img.height);
-        setOriginalPlaceholder('上传后在此处显示原图预览');
-
-        // 初始化目标尺寸为原始尺寸
-        setTargetWidth(img.width.toString());
-        setTargetHeight(img.height.toString());
+        update({
+          originalUrl: url,
+          originalWidth: img.width,
+          originalHeight: img.height,
+          originalPlaceholder: '上传后在此处显示原图预览',
+          targetWidth: img.width.toString(),
+          targetHeight: img.height.toString(),
+        });
 
         toast.success('图片上传成功');
 
         // PNG 智能提示逻辑
         if (file.type === 'image/png') {
           const alphaDetected = await checkImageHasAlpha(url);
-          setHasAlpha(alphaDetected);
+          update({ hasAlpha: alphaDetected });
         } else {
-          setHasAlpha(null);
+          update({ hasAlpha: null });
         }
       };
       img.onerror = () => {
-        setOriginalPlaceholder('原图加载失败，请重试或更换文件');
+        update({ originalPlaceholder: '原图加载失败，请重试或更换文件' });
         toast.error('图片加载失败，请尝试更换文件。');
       };
       img.src = url;
     };
     reader.onerror = () => {
-      setOriginalPlaceholder('原图加载失败，请重试或更换文件');
+      update({ originalPlaceholder: '原图加载失败，请重试或更换文件' });
       toast.error('文件读取失败，请重试。');
     };
 
@@ -225,139 +255,123 @@ function ImageCompressorPage() {
   // 处理宽度变化
   function handleWidthChange(value: string) {
     const numValue = parseInt(value) || 0;
-    setTargetWidth(value);
+    const changes: Partial<CompressorState> = { targetWidth: value, currentPreset: 'custom' };
 
     if (keepAspectRatio && originalWidth && originalHeight && numValue > 0) {
       const ratio = originalHeight / originalWidth;
-      const newHeight = Math.round(numValue * ratio);
-      setTargetHeight(newHeight.toString());
-
-      // 同步更新百分比
-      const percentage = Math.round((numValue / originalWidth) * 100);
-      setScalePercentage(percentage);
+      changes.targetHeight = Math.round(numValue * ratio).toString();
+      changes.scalePercentage = Math.round((numValue / originalWidth) * 100);
     }
 
-    // 切换到自定义模式
-    setCurrentPreset('custom');
+    update(changes);
   }
 
   // 处理高度变化
   function handleHeightChange(value: string) {
     const numValue = parseInt(value) || 0;
-    setTargetHeight(value);
+    const changes: Partial<CompressorState> = { targetHeight: value, currentPreset: 'custom' };
 
     if (keepAspectRatio && originalWidth && originalHeight && numValue > 0) {
       const ratio = originalWidth / originalHeight;
-      const newWidth = Math.round(numValue * ratio);
-      setTargetWidth(newWidth.toString());
-
-      // 同步更新百分比
-      const percentage = Math.round((numValue / originalHeight) * 100);
-      setScalePercentage(percentage);
+      changes.targetWidth = Math.round(numValue * ratio).toString();
+      changes.scalePercentage = Math.round((numValue / originalHeight) * 100);
     }
 
-    // 切换到自定义模式
-    setCurrentPreset('custom');
+    update(changes);
   }
 
   // 处理百分比缩放
   function handleScaleChange(percentage: number) {
-    setScalePercentage(percentage);
+    const changes: Partial<CompressorState> = { scalePercentage: percentage, currentPreset: 'custom' };
 
     if (originalWidth && originalHeight) {
-      const newWidth = Math.round((originalWidth * percentage) / 100);
-      const newHeight = Math.round((originalHeight * percentage) / 100);
-      setTargetWidth(newWidth.toString());
-      setTargetHeight(newHeight.toString());
+      changes.targetWidth = Math.round((originalWidth * percentage) / 100).toString();
+      changes.targetHeight = Math.round((originalHeight * percentage) / 100).toString();
     }
 
-    // 切换到自定义模式
-    setCurrentPreset('custom');
+    update(changes);
   }
 
-  // 切换宽高比锁定
+  // 切换宽高比锁定 —— 使用函数式更新防止 stale closure
   function toggleAspectRatio() {
-    setKeepAspectRatio(!keepAspectRatio);
+    update({ keepAspectRatio: !keepAspectRatio });
   }
 
   // 应用预设
   function applyPreset(preset: PresetType) {
-    setCurrentPreset(preset);
     const config = PRESETS[preset];
-
-    setQuality(config.quality);
-    setFormatValue(config.format);
+    const changes: Partial<CompressorState> = {
+      currentPreset: preset,
+      quality: config.quality,
+      formatValue: config.format,
+    };
 
     if (config.maxWidth && originalWidth && originalHeight) {
-      // 如果原图宽度大于预设最大宽度，则缩放
       if (originalWidth > config.maxWidth) {
         const ratio = originalHeight / originalWidth;
         const newWidth = config.maxWidth;
         const newHeight = Math.round(newWidth * ratio);
-        setTargetWidth(newWidth.toString());
-        setTargetHeight(newHeight.toString());
-        setScalePercentage(Math.round((newWidth / originalWidth) * 100));
+        changes.targetWidth = newWidth.toString();
+        changes.targetHeight = newHeight.toString();
+        changes.scalePercentage = Math.round((newWidth / originalWidth) * 100);
       } else {
-        // 否则保持原尺寸
-        setTargetWidth(originalWidth.toString());
-        setTargetHeight(originalHeight.toString());
-        setScalePercentage(100);
+        changes.targetWidth = originalWidth.toString();
+        changes.targetHeight = originalHeight.toString();
+        changes.scalePercentage = 100;
       }
     }
+
+    update(changes);
   }
 
-  async function compress() {
-    if (!originalFile || !originalWidth || !originalHeight) return;
+  // 稳定化的 compress 函数，通过 stateRef 获取最新状态
+  const compress = useCallback(async () => {
+    const s = stateRef.current;
+    if (!s.originalFile || !s.originalWidth || !s.originalHeight) return;
 
-    // 使用目标尺寸，如果没有设置则使用原尺寸
-    const finalWidth = parseInt(targetWidth) || originalWidth;
-    const finalHeight = parseInt(targetHeight) || originalHeight;
+    const finalWidth = parseInt(s.targetWidth) || s.originalWidth;
+    const finalHeight = parseInt(s.targetHeight) || s.originalHeight;
 
-    // 验证尺寸有效性
     if (finalWidth <= 0 || finalHeight <= 0) {
       toast.error('图片尺寸无效');
       return;
     }
 
     try {
-      setIsCompressing(true);
-      setCompressedPlaceholder('正在压缩中，请稍候...');
+      dispatch({ type: 'UPDATE', payload: { isCompressing: true, compressedPlaceholder: '正在压缩中，请稍候...' } });
 
       // 如果启用了"不压缩"且尺寸未变：直接使用原图
-      if (skipCompression && finalWidth === originalWidth && finalHeight === originalHeight) {
-        setCompressedBlob(originalFile);
-        setCompressedUrl(originalUrl);
-        setCompressedSize(originalFile.size);
-        setCompressedWidth(originalWidth);
-        setCompressedHeight(originalHeight);
-        setCompressedPlaceholder('调整参数并执行压缩后显示效果');
-        setIsCompressing(false);
+      if (s.skipCompression && finalWidth === s.originalWidth && finalHeight === s.originalHeight) {
+        dispatch({
+          type: 'UPDATE',
+          payload: {
+            compressedBlob: s.originalFile,
+            compressedUrl: s.originalUrl,
+            compressedSize: s.originalFile.size,
+            compressedWidth: s.originalWidth,
+            compressedHeight: s.originalHeight,
+            compressedPlaceholder: '调整参数并执行压缩后显示效果',
+            isCompressing: false,
+          },
+        });
         return;
       }
 
       // 确定输出格式
-      let fileType: string = formatValue;
+      let fileType: string = s.formatValue;
       if (fileType === 'auto') {
-        fileType = originalFile.type || 'image/jpeg';
+        fileType = s.originalFile.type || 'image/jpeg';
       }
 
-      // 构建 browser-image-compression 的配置
-      const options: {
-        maxWidthOrHeight: number;
-        initialQuality: number;
-        fileType: string;
-        useWebWorker: boolean;
-      } = {
+      const options = {
         maxWidthOrHeight: Math.max(finalWidth, finalHeight),
-        initialQuality: quality / 100,
+        initialQuality: s.quality / 100,
         fileType,
-        useWebWorker: true, // 关键：启用 Web Worker，避免阻塞主线程
+        useWebWorker: true,
       };
 
-      // 执行压缩（在 Web Worker 中运行，不会阻塞页面）
-      const compressedFile = await imageCompression(originalFile, options);
+      const compressedFile = await imageCompression(s.originalFile, options);
 
-      // 读取压缩后的图片尺寸
       const compressedImage = await imageCompression.getDataUrlFromFile(compressedFile);
       const img = await new Promise<HTMLImageElement>((resolve, reject) => {
         const image = new Image();
@@ -366,13 +380,11 @@ function ImageCompressorPage() {
         image.src = compressedImage;
       });
 
-      // 如果设置了精确的目标尺寸，需要进行二次裁剪
       let finalBlob: Blob = compressedFile;
       let finalCompressedWidth = img.width;
       let finalCompressedHeight = img.height;
 
       if (finalWidth !== finalCompressedWidth || finalHeight !== finalCompressedHeight) {
-        // 使用 canvas 进行精确尺寸调整
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
         if (!ctx) throw new Error('no-context');
@@ -388,7 +400,7 @@ function ImageCompressorPage() {
               else resolve(b);
             },
             fileType,
-            quality / 100,
+            s.quality / 100,
           );
         });
 
@@ -396,37 +408,47 @@ function ImageCompressorPage() {
         finalCompressedHeight = finalHeight;
       }
 
-      // 生成预览 URL
       const previewUrl = URL.createObjectURL(finalBlob);
 
-      // 释放旧的 URL（优化内存）
-      if (compressedUrl && compressedUrl !== originalUrl) {
-        URL.revokeObjectURL(compressedUrl);
+      // 释放旧的 URL
+      const currentCompressedUrl = stateRef.current.compressedUrl;
+      if (currentCompressedUrl && currentCompressedUrl !== stateRef.current.originalUrl) {
+        URL.revokeObjectURL(currentCompressedUrl);
       }
 
-      setCompressedBlob(finalBlob);
-      setCompressedUrl(previewUrl);
-      setCompressedSize(finalBlob.size);
-      setCompressedWidth(finalCompressedWidth);
-      setCompressedHeight(finalCompressedHeight);
-      setCompressedPlaceholder('调整参数并执行压缩后显示效果');
+      dispatch({
+        type: 'UPDATE',
+        payload: {
+          compressedBlob: finalBlob,
+          compressedUrl: previewUrl,
+          compressedSize: finalBlob.size,
+          compressedWidth: finalCompressedWidth,
+          compressedHeight: finalCompressedHeight,
+          compressedPlaceholder: '调整参数并执行压缩后显示效果',
+          isCompressing: false,
+        },
+      });
     } catch (error) {
       console.error(error);
-      setCompressedPlaceholder('压缩预览生成失败，请调整参数后重试');
+      dispatch({
+        type: 'UPDATE',
+        payload: {
+          compressedPlaceholder: '压缩预览生成失败，请调整参数后重试',
+          isCompressing: false,
+        },
+      });
       toast.error('压缩过程中出现错误，请尝试降低尺寸或更换图片。');
-    } finally {
-      setIsCompressing(false);
     }
-  }
+  }, []);
 
+  // 当压缩参数变化时触发压缩
   useEffect(() => {
     if (!originalUrl || !originalFile) return;
     const timer = window.setTimeout(() => {
       compress();
     }, 260);
     return () => window.clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [quality, formatValue, targetWidth, targetHeight, skipCompression, originalUrl, originalFile]);
+  }, [quality, formatValue, targetWidth, targetHeight, skipCompression, originalUrl, originalFile, compress]);
 
   function handleDownload() {
     if (!compressedBlob || !originalFile) return;
@@ -453,12 +475,12 @@ function ImageCompressorPage() {
 
   const canDownload = Boolean(compressedBlob);
 
-  const compressRatioText = (() => {
+  const compressRatioText = useMemo(() => {
     if (!originalSize || !compressedSize || originalSize <= 0) return '-';
     const ratio = (compressedSize / originalSize) * 100;
     const delta = 100 - ratio;
     return `${delta >= 0 ? '减少' : '增大'} ${Math.abs(delta).toFixed(1)}%（${ratio.toFixed(1)}% 原始体积）`;
-  })();
+  }, [originalSize, compressedSize]);
 
   const isCompressedSmaller = Boolean(originalSize && compressedSize && compressedSize <= originalSize);
 
@@ -523,8 +545,7 @@ function ImageCompressorPage() {
                     size="sm"
                     className="h-6 px-2 text-[10px]"
                     onClick={() => {
-                      setSkipCompression(!skipCompression);
-                      setCurrentPreset('custom');
+                      update({ skipCompression: !skipCompression, currentPreset: 'custom' });
                     }}
                   >
                     {skipCompression ? (
@@ -561,7 +582,7 @@ function ImageCompressorPage() {
             </div>
             {!skipCompression && (
               <>
-                <Slider value={[quality]} min={10} max={100} step={1} onValueChange={([v]) => setQuality(v)} />
+                <Slider value={[quality]} min={10} max={100} step={1} onValueChange={([v]) => update({ quality: v })} />
                 <p className="mt-1.5 text-[11px] leading-relaxed text-muted-foreground">
                   数值越低，体积越小，但画质会降低
                 </p>
@@ -578,7 +599,7 @@ function ImageCompressorPage() {
             <Label htmlFor="formatSelect" className="mb-1.5 block text-xs">
               输出格式
             </Label>
-            <Select value={formatValue} onValueChange={(val) => setFormatValue(val as typeof formatValue)}>
+            <Select value={formatValue} onValueChange={(val) => update({ formatValue: val as typeof formatValue })}>
               <SelectTrigger id="formatSelect" className="h-8 text-xs">
                 <SelectValue placeholder="保持原格式" />
               </SelectTrigger>
@@ -597,27 +618,21 @@ function ImageCompressorPage() {
                 </SelectItem>
               </SelectContent>
             </Select>
-            {(() => {
-              // 只有原图是 PNG 且检测过透明度时才显示智能提示
-              if (originalType === 'image/png' && hasAlpha !== null) {
-                return (
-                  <div className="mt-2 rounded-md bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 px-3 py-2">
-                    <p className="text-[11px] leading-relaxed text-blue-700 dark:text-blue-300">
-                      {hasAlpha ? (
-                        <>
-                          💡 检测到透明背景，建议保持 <strong>PNG</strong> 或切换为 <strong>WebP</strong> 格式
-                        </>
-                      ) : (
-                        <>
-                          💡 未检测到透明背景，建议切换为 <strong>JPEG</strong> 或 <strong>WebP</strong> 以获得更小体积
-                        </>
-                      )}
-                    </p>
-                  </div>
-                );
-              }
-              return null;
-            })()}
+            {originalType === 'image/png' && hasAlpha !== null && (
+              <div className="mt-2 rounded-md bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 px-3 py-2">
+                <p className="text-[11px] leading-relaxed text-blue-700 dark:text-blue-300">
+                  {hasAlpha ? (
+                    <>
+                      💡 检测到透明背景，建议保持 <strong>PNG</strong> 或切换为 <strong>WebP</strong> 格式
+                    </>
+                  ) : (
+                    <>
+                      💡 未检测到透明背景，建议切换为 <strong>JPEG</strong> 或 <strong>WebP</strong> 以获得更小体积
+                    </>
+                  )}
+                </p>
+              </div>
+            )}
           </div>
 
           {/* 尺寸调整 */}

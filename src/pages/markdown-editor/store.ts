@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
+import { persist } from 'zustand/middleware';
 
 import { ThemeName } from './themes';
 
@@ -89,7 +89,6 @@ export const useMarkdownEditorStore = create<MarkdownEditorState>()(
     }),
     {
       name: 'qiao-tools-x-persist-markdown-editor',
-      storage: createJSONStorage(() => localStorage),
     },
   ),
 );

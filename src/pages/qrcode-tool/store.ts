@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
+import { persist } from 'zustand/middleware';
 
 import type { ContactData, LocationData, QRCodeState, QRMode, QRStyleConfig, QRTab, SMSData, WifiData } from './types';
 
@@ -132,7 +132,6 @@ export const useQRCodeStore = create<QRCodeStore>()(
     }),
     {
       name: 'qiao-tools-x-persist-qrcode-tool',
-      storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         tab: state.tab,
         mode: state.mode,
