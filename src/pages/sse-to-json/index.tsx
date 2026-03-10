@@ -3,6 +3,7 @@ import {
   ChevronDown,
   ChevronRight,
   ClipboardPaste,
+  FileText,
   FoldVertical,
   Radio,
   Trash2,
@@ -161,6 +162,32 @@ function SseInputDialog({
   );
 }
 
+// ─── SSE 原始文本查看弹窗 ────────────────────────────────────
+
+function RawTextDialog({
+  open,
+  onOpenChange,
+  rawText,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  rawText: string;
+}) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-3xl max-h-[80vh] flex flex-col">
+        <DialogHeader>
+          <DialogTitle>SSE 原始文本</DialogTitle>
+          <DialogDescription>以下是导入时的 SSE 原始数据</DialogDescription>
+        </DialogHeader>
+        <div className="flex-1 min-h-0 overflow-hidden">
+          <CodeArea code={rawText} language="text" className="h-[60vh]" codeClassName="!text-[11px]" />
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 // ─── 默认折叠阈值：超过此数量时默认折叠后面的块 ─────────────────
 
 const AUTO_COLLAPSE_THRESHOLD = 20;
@@ -175,6 +202,8 @@ export default function SseToJsonPage() {
     signalCount: 0,
   });
   const [open, setOpen] = useState(false);
+  const [rawTextOpen, setRawTextOpen] = useState(false);
+  const [rawSseText, setRawSseText] = useState('');
   // 使用 Set 跟踪折叠状态（存储被折叠的 block index）
   const [collapsedSet, setCollapsedSet] = useState<Set<number>>(new Set());
 
@@ -185,6 +214,7 @@ export default function SseToJsonPage() {
   const handleParse = useCallback((text: string) => {
     const result = parseSseToJson(text);
     setParseResult(result);
+    setRawSseText(text);
     // 超过阈值时，默认折叠后面的块
     if (result.blocks.length > AUTO_COLLAPSE_THRESHOLD) {
       const collapsed = new Set<number>();
@@ -208,6 +238,7 @@ export default function SseToJsonPage() {
   const handleClear = useCallback(() => {
     setParseResult({ blocks: [], validCount: 0, invalidCount: 0, signalCount: 0 });
     setCollapsedSet(new Set());
+    setRawSseText('');
   }, []);
 
   const toggleBlock = useCallback((index: number) => {
@@ -248,6 +279,7 @@ export default function SseToJsonPage() {
       e.preventDefault();
       const result = parseSseToJson(text);
       setParseResult(result);
+      setRawSseText(text);
       if (result.blocks.length > AUTO_COLLAPSE_THRESHOLD) {
         const collapsed = new Set<number>();
         result.blocks.forEach((b) => {
@@ -286,6 +318,7 @@ export default function SseToJsonPage() {
   return (
     <div className="max-w-5xl w-full mx-auto px-4 pb-5 lg:py-8">
       <SseInputDialog open={open} onOpenChange={setOpen} onConfirm={handleConfirmFromDialog} />
+      <RawTextDialog open={rawTextOpen} onOpenChange={setRawTextOpen} rawText={rawSseText} />
 
       <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
         <div className="flex items-center gap-2">
@@ -307,6 +340,13 @@ export default function SseToJsonPage() {
           <Button size="sm" variant="ghost" onClick={collapseAll} title="全部折叠">
             <FoldVertical className="h-3.5 w-3.5 mr-1.5" />
             折叠
+          </Button>
+
+          <div className="h-4 w-px bg-border" />
+
+          <Button size="sm" variant="ghost" onClick={() => setRawTextOpen(true)} title="查看原始 SSE 文本">
+            <FileText className="h-3.5 w-3.5 mr-1.5" />
+            原始文本
           </Button>
 
           {mergedJson && (
@@ -341,12 +381,7 @@ export default function SseToJsonPage() {
 
       <div className="space-y-3">
         {blocks.map((block) => (
-          <SseBlock
-            key={block.index}
-            block={block}
-            collapsed={collapsedSet.has(block.index)}
-            onToggle={toggleBlock}
-          />
+          <SseBlock key={block.index} block={block} collapsed={collapsedSet.has(block.index)} onToggle={toggleBlock} />
         ))}
       </div>
     </div>
