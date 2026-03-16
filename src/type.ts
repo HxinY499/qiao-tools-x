@@ -20,7 +20,6 @@ export enum ToolKey {
   WordCount = 'word-count',
   TextDiff = 'text-diff',
   TextEscaper = 'text-escaper',
-  PasswordGenerator = 'password-generator',
   SeoAnalyzer = 'seo-analyzer',
   UserAgentParser = 'user-agent-parser',
   QRCodeTool = 'qrcode-tool',

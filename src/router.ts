@@ -19,7 +19,6 @@ import {
   Regex,
   ScrollText,
   Search,
-  Shield,
   Square,
 } from 'lucide-react';
 import { lazy } from 'react';
@@ -41,7 +40,6 @@ const WordCountAndProcessPage = lazy(() => import('@/pages/word-count-and-proces
 const TextDiffPage = lazy(() => import('@/pages/text-diff'));
 const TextEscaperPage = lazy(() => import('@/pages/text-escaper'));
 const UserAgentParserPage = lazy(() => import('@/pages/user-agent-parser'));
-const PasswordGeneratorPage = lazy(() => import('@/pages/password-generator'));
 const SeoAnalyzerPage = lazy(() => import('@/pages/seo-analyzer'));
 const QRCodeToolPage = lazy(() => import('@/pages/qrcode-tool'));
 const JsonSchemaConverterPage = lazy(() => import('@/pages/json-schema-converter'));
@@ -273,20 +271,7 @@ export const toolRoutes: ToolRoute[] = [
       keywords: 'HTML转义,Unicode转义,JS转义,文本转义,反转义,HTML实体,Unicode编码,字符串转义',
     },
   },
-  {
-    key: ToolKey.PasswordGenerator,
-    path: '/password-generator',
-    title: '密码生成器',
-    subtitle: '根据长度与字符类型选项生成高强度随机密码，适用于网站账号和重要服务',
-    icon: Shield,
-    component: PasswordGeneratorPage,
-    category: 'text',
-    seo: {
-      description:
-        '免费在线密码生成器，支持自定义密码长度和字符类型，生成高强度随机密码，保护账号安全。所有处理在本地完成。',
-      keywords: '密码生成器,随机密码,强密码生成,安全密码,密码工具,在线密码生成',
-    },
-  },
+
   {
     key: ToolKey.UserAgentParser,
     path: '/user-agent-parser',
