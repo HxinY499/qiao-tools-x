@@ -1,5 +1,5 @@
-import { HelpCircle, Pin } from 'lucide-react';
-import { useMemo } from 'react';
+import { ArrowLeft, HelpCircle, Pin } from 'lucide-react';
+import { lazy, Suspense, useMemo } from 'react';
 import { Navigate, NavLink, Route, Routes, useLocation } from 'react-router-dom';
 
 import {
@@ -27,7 +27,10 @@ import { cn } from '@/utils';
 import { CATEGORY_LABELS, CATEGORY_ORDER } from './constant';
 import { ToolPage } from './tool-page';
 
-function App() {
+const HomePage = lazy(() => import('@/pages/home'));
+
+// ─── 带 Sidebar 的工具页面布局 ──────────────────────────────────
+function ToolLayout() {
   const location = useLocation();
   const pinnedPaths = useMenuStore((s) => s.pinnedPaths);
   const togglePin = useMenuStore((s) => s.togglePin);
@@ -56,12 +59,6 @@ function App() {
       })),
     };
   }, [pinnedPaths]);
-
-  // 计算默认跳转路径：如果有置顶，跳转第一个置顶；否则跳转第一个分类的第一个工具
-  const firstPath =
-    groupedRoutes.pinned.length > 0
-      ? groupedRoutes.pinned[0].path
-      : (groupedRoutes.categories[0]?.routes[0]?.path ?? '/');
 
   const renderMenuItem = (route: (typeof toolRoutes)[0]) => {
     const Icon = route.icon;
@@ -94,12 +91,18 @@ function App() {
   return (
     <SidebarProvider>
       <Sidebar collapsible="offcanvas">
-        {/* Sidebar Header */}
+        {/* Sidebar Header - 点击 Logo 回首页 */}
         <SidebarHeader className="border-b border-sidebar-border h-16">
-          <div className="flex flex-col justify-center h-14 pl-12">
-            <span className="text-[10px] uppercase tracking-[0.3em] text-sidebar-foreground/50 font-medium">QIAO</span>
-            <span className="text-base font-semibold tracking-wide text-sidebar-foreground">Tools</span>
-          </div>
+          <NavLink
+            to="/"
+            className="group flex items-center h-14 pl-12 transition-opacity hover:opacity-80"
+          >
+            <div className="flex flex-col">
+              <span className="text-[10px] uppercase tracking-[0.3em] text-sidebar-foreground/50 font-medium">QIAO</span>
+              <span className="text-base font-semibold tracking-wide text-sidebar-foreground">Tools</span>
+            </div>
+            <ArrowLeft className="ml-2 h-3.5 w-3.5 text-sidebar-foreground/0 transition-all duration-200 group-hover:text-sidebar-foreground/50 group-hover:-translate-x-0.5" />
+          </NavLink>
         </SidebarHeader>
 
         {/* Sidebar Content */}
@@ -150,17 +153,36 @@ function App() {
 
       {/* 右侧内容区 */}
       <SidebarInset>
-        <Routes key={location.pathname}>
+        <Routes>
           {toolRoutes.map((route) => (
             <Route key={route.path} path={route.path} element={<ToolPage route={route} />} />
           ))}
-          {/* 默认重定向到第一个工具 */}
-          <Route path="*" element={<Navigate to={firstPath} replace />} />
+          {/* 未匹配的工具路径重定向到首页 */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </SidebarInset>
       <Toaster />
     </SidebarProvider>
   );
+}
+
+// ─── 根组件：首页独立布局，工具页带侧边栏 ────────────────────────
+function App() {
+  const location = useLocation();
+  const isHome = location.pathname === '/';
+
+  if (isHome) {
+    return (
+      <>
+        <Suspense fallback={null}>
+          <HomePage />
+        </Suspense>
+        <Toaster />
+      </>
+    );
+  }
+
+  return <ToolLayout />;
 }
 
 export default App;
