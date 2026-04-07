@@ -6,6 +6,8 @@ export interface SseDataBlock {
   raw: string;
   /** 解析后的 JSON 对象（非 json 类型为 null） */
   parsed: unknown | null;
+  /** 格式化后的 JSON 字符串（仅 json 类型有值） */
+  formatted?: string;
   /** 是否解析成功 */
   valid: boolean;
   /** 块类型：json（正常 JSON）、signal（[DONE] 等标记）、text（无法解析的文本） */
@@ -34,6 +36,13 @@ const KNOWN_SIGNALS = new Set(['[DONE]', '[END]', '[COMPLETE]']);
 
 function isSignal(raw: string): boolean {
   return KNOWN_SIGNALS.has(raw);
+}
+
+/**
+ * SSE 规范：字段值前如果有一个空格则去掉，否则原样保留
+ */
+function stripLeadingSpace(s: string): string {
+  return s.startsWith(' ') ? s.slice(1) : s;
 }
 
 /**
@@ -100,6 +109,7 @@ export function parseSseToJson(sseText: string): ParseResult {
     } else {
       try {
         block.parsed = JSON.parse(raw);
+        block.formatted = JSON.stringify(block.parsed, null, 2);
         block.valid = true;
         block.type = 'json';
         validCount++;
@@ -137,30 +147,27 @@ export function parseSseToJson(sseText: string): ParseResult {
       if (dataLines.length > 0) {
         flushBlock();
       }
-      currentEvent = trimmed.slice(6).trim() || undefined;
+      currentEvent = stripLeadingSpace(trimmed.slice(6)) || undefined;
       continue;
     }
 
     // id: 字段
     if (trimmed.startsWith('id:')) {
-      currentId = trimmed.slice(3).trim() || undefined;
+      currentId = stripLeadingSpace(trimmed.slice(3)) || undefined;
       continue;
     }
 
     // retry: 字段
     if (trimmed.startsWith('retry:')) {
-      const val = parseInt(trimmed.slice(6).trim(), 10);
+      const val = parseInt(stripLeadingSpace(trimmed.slice(6)), 10);
       currentRetry = isNaN(val) ? undefined : val;
       continue;
     }
 
     // data: 字段 — 累积（支持多行 data 拼接）
+    // SSE 规范：空 data: 行也要保留（拼接为空行），用于多行 JSON 等场景
     if (trimmed.startsWith('data:')) {
-      const content = trimmed.slice(5).trimStart();
-      // 跳过纯空 data: 行
-      if (content) {
-        dataLines.push(content);
-      }
+      dataLines.push(stripLeadingSpace(trimmed.slice(5)));
       continue;
     }
   }

@@ -75,7 +75,7 @@ const SseBlock = memo(function SseBlock({
         <>
           {block.type === 'json' && (
             <CodeArea
-              code={JSON.stringify(block.parsed, null, 2)}
+              code={block.formatted ?? ''}
               language="json"
               className="min-h-0"
               codeClassName="!text-[11px]"
@@ -133,6 +133,16 @@ function SseInputDialog({
     onConfirm(value);
   }, [onConfirm]);
 
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+        e.preventDefault();
+        handleConfirm();
+      }
+    },
+    [handleConfirm],
+  );
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
@@ -147,6 +157,7 @@ function SseInputDialog({
           placeholder={`event: message\ndata: {"key": "value"}\n\nevent: message\ndata: {"another": "object"}`}
           className="h-80 w-full font-mono text-xs resize-none p-3 leading-relaxed custom-scrollbar rounded-md border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
           spellCheck={false}
+          onKeyDown={handleKeyDown}
         />
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
@@ -155,6 +166,7 @@ function SseInputDialog({
           <Button onClick={handleConfirm}>
             <Braces className="h-3.5 w-3.5 mr-1.5" />
             解析
+            <kbd className="ml-1.5 text-[10px] opacity-60">{isMac() ? '⌘↵' : 'Ctrl+↵'}</kbd>
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -211,7 +223,7 @@ export default function SseToJsonPage() {
   const blocksRef = useRef(blocks);
   blocksRef.current = blocks;
 
-  const handleParse = useCallback((text: string) => {
+  const handleParse = useCallback((text: string): ParseResult => {
     const result = parseSseToJson(text);
     setParseResult(result);
     setRawSseText(text);
@@ -225,6 +237,7 @@ export default function SseToJsonPage() {
     } else {
       setCollapsedSet(new Set());
     }
+    return result;
   }, []);
 
   const handleConfirmFromDialog = useCallback(
@@ -274,26 +287,24 @@ export default function SseToJsonPage() {
   useEffect(() => {
     const handlePasteEvent = (e: ClipboardEvent) => {
       if (open) return;
+      // 避免劫持输入元素中的粘贴操作
+      const active = document.activeElement;
+      if (
+        active instanceof HTMLInputElement ||
+        active instanceof HTMLTextAreaElement ||
+        (active instanceof HTMLElement && active.isContentEditable)
+      ) {
+        return;
+      }
       const text = e.clipboardData?.getData('text/plain');
       if (!text || !looksLikeSse(text)) return;
       e.preventDefault();
-      const result = parseSseToJson(text);
-      setParseResult(result);
-      setRawSseText(text);
-      if (result.blocks.length > AUTO_COLLAPSE_THRESHOLD) {
-        const collapsed = new Set<number>();
-        result.blocks.forEach((b) => {
-          if (b.index >= AUTO_COLLAPSE_THRESHOLD) collapsed.add(b.index);
-        });
-        setCollapsedSet(collapsed);
-      } else {
-        setCollapsedSet(new Set());
-      }
+      const result = handleParse(text);
       toast.success(`已解析 ${result.blocks.length} 条 SSE 数据`);
     };
     document.addEventListener('paste', handlePasteEvent);
     return () => document.removeEventListener('paste', handlePasteEvent);
-  }, [open]);
+  }, [open, handleParse]);
 
   if (blocks.length === 0) {
     return (
