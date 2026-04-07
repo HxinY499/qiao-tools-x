@@ -1,4 +1,5 @@
 import {
+  ArrowUp,
   Braces,
   ChevronDown,
   ChevronRight,
@@ -200,6 +201,36 @@ function RawTextDialog({
   );
 }
 
+// ─── 回到顶部按钮 ─────────────────────────────────────────────
+
+function ScrollToTop() {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setVisible(window.scrollY > 400);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = useCallback(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
+  if (!visible) return null;
+
+  return (
+    <Button
+      size="icon"
+      variant="outline"
+      className="fixed bottom-6 right-6 z-50 h-9 w-9 rounded-full shadow-md bg-background/80 backdrop-blur-sm"
+      onClick={scrollToTop}
+      title="回到顶部"
+    >
+      <ArrowUp className="h-4 w-4" />
+    </Button>
+  );
+}
+
 // ─── 默认折叠阈值：超过此数量时默认折叠后面的块 ─────────────────
 
 const AUTO_COLLAPSE_THRESHOLD = 20;
@@ -331,7 +362,7 @@ export default function SseToJsonPage() {
       <SseInputDialog open={open} onOpenChange={setOpen} onConfirm={handleConfirmFromDialog} />
       <RawTextDialog open={rawTextOpen} onOpenChange={setRawTextOpen} rawText={rawSseText} />
 
-      <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+      <div className="sticky top-0 z-10 flex items-center justify-between mb-4 flex-wrap gap-2 py-2 -mx-4 px-4 bg-background/80 backdrop-blur-sm">
         <div className="flex items-center gap-2">
           <Button size="sm" variant="outline" onClick={() => setOpen(true)}>
             <ClipboardPaste className="h-3.5 w-3.5 mr-1.5" />
@@ -395,6 +426,8 @@ export default function SseToJsonPage() {
           <SseBlock key={block.index} block={block} collapsed={collapsedSet.has(block.index)} onToggle={toggleBlock} />
         ))}
       </div>
+
+      <ScrollToTop />
     </div>
   );
 }
