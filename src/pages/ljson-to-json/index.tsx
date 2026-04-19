@@ -5,8 +5,8 @@ import {
   ChevronRight,
   ClipboardPaste,
   FileText,
+  FileType2,
   FoldVertical,
-  Radio,
   Trash2,
   UnfoldVertical,
 } from 'lucide-react';
@@ -26,16 +26,16 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 
-import { isMac, looksLikeSse, type ParseResult, parseSseToJson, type SseDataBlock } from './utils';
+import { isMac, type LjsonLineBlock, looksLikeLjson, type ParseResult, parseLjsonToJson } from './utils';
 
-// ─── 单条 SSE 块 ────────────────────────────────────────────
+// ─── 单条 ljson 行 ──────────────────────────────────────────
 
-const SseBlock = memo(function SseBlock({
+const LjsonBlock = memo(function LjsonBlock({
   block,
   collapsed,
   onToggle,
 }: {
-  block: SseDataBlock;
+  block: LjsonLineBlock;
   collapsed: boolean;
   onToggle: (index: number) => void;
 }) {
@@ -49,24 +49,9 @@ const SseBlock = memo(function SseBlock({
           className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground hover:text-foreground"
         >
           {collapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
-          <span>#{block.index + 1}</span>
+          <span>L{block.lineNo}</span>
         </button>
-        {block.event && (
-          <Badge variant="outline" className="text-[10px] h-4 px-1.5 font-mono">
-            {block.event}
-          </Badge>
-        )}
-        {block.id && (
-          <Badge variant="outline" className="text-[10px] h-4 px-1.5 font-mono text-muted-foreground">
-            id: {block.id}
-          </Badge>
-        )}
-        {block.type === 'signal' && (
-          <Badge className="text-[10px] h-4 px-1.5 bg-blue-500/15 text-blue-600 dark:text-blue-400 hover:bg-blue-500/15">
-            {block.raw}
-          </Badge>
-        )}
-        {block.type === 'text' && !block.valid && (
+        {!block.valid && (
           <Badge variant="destructive" className="text-[10px] h-4 px-1.5">
             解析失败
           </Badge>
@@ -74,7 +59,7 @@ const SseBlock = memo(function SseBlock({
       </div>
       {!collapsed && (
         <>
-          {block.type === 'json' && (
+          {block.valid && (
             <CodeArea
               code={block.formatted ?? ''}
               language="json"
@@ -83,12 +68,7 @@ const SseBlock = memo(function SseBlock({
               showCopyButton={false}
             />
           )}
-          {block.type === 'signal' && (
-            <div className="text-xs text-blue-600 dark:text-blue-400 bg-blue-500/10 rounded-md px-3 py-2 font-mono">
-              流信号: {block.raw}
-            </div>
-          )}
-          {block.type === 'text' && !block.valid && (
+          {!block.valid && (
             <div className="space-y-1.5">
               <div className="text-xs text-destructive bg-destructive/10 rounded-md px-3 py-2 font-mono">
                 {block.error}
@@ -102,9 +82,9 @@ const SseBlock = memo(function SseBlock({
   );
 });
 
-// ─── SSE 输入弹窗 ───────────────────────────────────────────
+// ─── 粘贴输入弹窗 ───────────────────────────────────────────
 
-function SseInputDialog({
+function LjsonInputDialog({
   open,
   onOpenChange,
   onConfirm,
@@ -115,10 +95,8 @@ function SseInputDialog({
 }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // 每次弹窗打开时清空 textarea
   useEffect(() => {
     if (open) {
-      // 使用 requestAnimationFrame 确保 DOM 已渲染
       requestAnimationFrame(() => {
         if (textareaRef.current) {
           textareaRef.current.value = '';
@@ -148,14 +126,14 @@ function SseInputDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>粘贴 SSE 原始数据</DialogTitle>
+          <DialogTitle>粘贴 ljson 原始数据</DialogTitle>
           <DialogDescription>
-            将 SSE (Server-Sent Events) 原始文本粘贴到下方，点击解析后提取所有 data 字段
+            将 ljson (JSON Lines / NDJSON) 原始文本粘贴到下方，一行一个 JSON 对象
           </DialogDescription>
         </DialogHeader>
         <textarea
           ref={textareaRef}
-          placeholder={`event: message\ndata: {"key": "value"}\n\nevent: message\ndata: {"another": "object"}`}
+          placeholder={`{"id":"1","type":"message","text":"hello"}\n{"id":"2","type":"topic","topic":"greeting"}`}
           className="h-80 w-full font-mono text-xs resize-none p-3 leading-relaxed custom-scrollbar rounded-md border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
           spellCheck={false}
           onKeyDown={handleKeyDown}
@@ -175,7 +153,7 @@ function SseInputDialog({
   );
 }
 
-// ─── SSE 原始文本查看弹窗 ────────────────────────────────────
+// ─── 原始文本查看弹窗 ────────────────────────────────────────
 
 function RawTextDialog({
   open,
@@ -190,8 +168,8 @@ function RawTextDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl max-h-[80vh] flex flex-col">
         <DialogHeader>
-          <DialogTitle>SSE 原始文本</DialogTitle>
-          <DialogDescription>以下是导入时的 SSE 原始数据</DialogDescription>
+          <DialogTitle>ljson 原始文本</DialogTitle>
+          <DialogDescription>以下是导入时的 ljson 原始数据</DialogDescription>
         </DialogHeader>
         <div className="flex-1 min-h-0 overflow-hidden">
           <CodeArea code={rawText} language="text" className="h-[60vh]" codeClassName="!text-[11px]" />
@@ -201,9 +179,8 @@ function RawTextDialog({
   );
 }
 
-// ─── 回到顶部按钮 ─────────────────────────────────────────────
+// ─── 回到顶部按钮（监听最近的滚动祖先） ─────────────────────────
 
-// 向上查找最近的可滚动祖先（overflow-y 为 auto/scroll/overlay），找不到则回退到 window
 function findScrollParent(el: HTMLElement | null): HTMLElement | Window {
   let node = el?.parentElement ?? null;
   while (node) {
@@ -249,7 +226,6 @@ function ScrollToTop() {
 
   return (
     <>
-      {/* 用于定位滚动祖先的锚点 */}
       <div ref={anchorRef} className="hidden" aria-hidden />
       {visible && (
         <Button
@@ -266,34 +242,31 @@ function ScrollToTop() {
   );
 }
 
-// ─── 默认折叠阈值：超过此数量时默认折叠后面的块 ─────────────────
+// ─── 默认折叠阈值 ─────────────────────────────────────────────
 
 const AUTO_COLLAPSE_THRESHOLD = 20;
 
 // ─── 主页面 ─────────────────────────────────────────────────
 
-export default function SseToJsonPage() {
+export default function LjsonToJsonPage() {
   const [parseResult, setParseResult] = useState<ParseResult>({
     blocks: [],
     validCount: 0,
     invalidCount: 0,
-    signalCount: 0,
   });
   const [open, setOpen] = useState(false);
   const [rawTextOpen, setRawTextOpen] = useState(false);
-  const [rawSseText, setRawSseText] = useState('');
-  // 使用 Set 跟踪折叠状态（存储被折叠的 block index）
+  const [rawLjsonText, setRawLjsonText] = useState('');
   const [collapsedSet, setCollapsedSet] = useState<Set<number>>(new Set());
 
-  const { blocks, validCount, invalidCount, signalCount } = parseResult;
+  const { blocks, validCount, invalidCount } = parseResult;
   const blocksRef = useRef(blocks);
   blocksRef.current = blocks;
 
   const handleParse = useCallback((text: string): ParseResult => {
-    const result = parseSseToJson(text);
+    const result = parseLjsonToJson(text);
     setParseResult(result);
-    setRawSseText(text);
-    // 超过阈值时，默认折叠后面的块
+    setRawLjsonText(text);
     if (result.blocks.length > AUTO_COLLAPSE_THRESHOLD) {
       const collapsed = new Set<number>();
       result.blocks.forEach((b) => {
@@ -315,9 +288,9 @@ export default function SseToJsonPage() {
   );
 
   const handleClear = useCallback(() => {
-    setParseResult({ blocks: [], validCount: 0, invalidCount: 0, signalCount: 0 });
+    setParseResult({ blocks: [], validCount: 0, invalidCount: 0 });
     setCollapsedSet(new Set());
-    setRawSseText('');
+    setRawLjsonText('');
   }, []);
 
   const toggleBlock = useCallback((index: number) => {
@@ -337,7 +310,7 @@ export default function SseToJsonPage() {
 
   // 合并所有有效 JSON 为数组的字符串
   const mergedJson = useMemo(() => {
-    const validBlocks = blocks.filter((b) => b.type === 'json' && b.valid);
+    const validBlocks = blocks.filter((b) => b.valid);
     if (validBlocks.length === 0) return '';
     return JSON.stringify(
       validBlocks.map((b) => b.parsed),
@@ -346,14 +319,12 @@ export default function SseToJsonPage() {
     );
   }, [blocks]);
 
-  // 快捷键提示
   const pasteShortcut = useMemo(() => (isMac() ? '⌘V' : 'Ctrl+V'), []);
 
   // 全局粘贴事件
   useEffect(() => {
     const handlePasteEvent = (e: ClipboardEvent) => {
       if (open) return;
-      // 避免劫持输入元素中的粘贴操作
       const active = document.activeElement;
       if (
         active instanceof HTMLInputElement ||
@@ -363,10 +334,10 @@ export default function SseToJsonPage() {
         return;
       }
       const text = e.clipboardData?.getData('text/plain');
-      if (!text || !looksLikeSse(text)) return;
+      if (!text || !looksLikeLjson(text)) return;
       e.preventDefault();
       const result = handleParse(text);
-      toast.success(`已解析 ${result.blocks.length} 条 SSE 数据`, { position: 'top-right' });
+      toast.success(`已解析 ${result.blocks.length} 条 ljson 数据`, { position: 'top-right' });
     };
     document.addEventListener('paste', handlePasteEvent);
     return () => document.removeEventListener('paste', handlePasteEvent);
@@ -375,20 +346,20 @@ export default function SseToJsonPage() {
   if (blocks.length === 0) {
     return (
       <div className="flex min-h-[calc(100vh-8rem)] flex-col items-center justify-center gap-5 px-4">
-        <SseInputDialog open={open} onOpenChange={setOpen} onConfirm={handleConfirmFromDialog} />
+        <LjsonInputDialog open={open} onOpenChange={setOpen} onConfirm={handleConfirmFromDialog} />
         <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-muted/50">
-          <Radio className="h-8 w-8 text-muted-foreground/50" strokeWidth={1.5} />
+          <FileType2 className="h-8 w-8 text-muted-foreground/50" strokeWidth={1.5} />
         </div>
         <div className="text-center space-y-1.5">
           <p className="text-sm text-muted-foreground">
             直接按 <kbd className="px-1.5 py-0.5 rounded border bg-muted text-[11px] font-mono">{pasteShortcut}</kbd>{' '}
-            粘贴 SSE 数据即可自动解析
+            粘贴 ljson 数据即可自动解析
           </p>
           <p className="text-xs text-muted-foreground/60">或点击下方按钮手动输入</p>
         </div>
         <Button onClick={() => setOpen(true)}>
           <ClipboardPaste className="h-4 w-4 mr-2" />
-          粘贴 SSE 数据
+          粘贴 ljson 数据
         </Button>
       </div>
     );
@@ -396,11 +367,11 @@ export default function SseToJsonPage() {
 
   return (
     <div className="max-w-5xl w-full mx-auto px-4 pb-5 lg:py-8">
-      <SseInputDialog open={open} onOpenChange={setOpen} onConfirm={handleConfirmFromDialog} />
-      <RawTextDialog open={rawTextOpen} onOpenChange={setRawTextOpen} rawText={rawSseText} />
+      <LjsonInputDialog open={open} onOpenChange={setOpen} onConfirm={handleConfirmFromDialog} />
+      <RawTextDialog open={rawTextOpen} onOpenChange={setRawTextOpen} rawText={rawLjsonText} />
 
       <div className="sticky top-0 z-30 -mx-4 mb-4 flex items-center gap-3 px-4 py-2 bg-background/80 backdrop-blur-sm border-b border-border/40">
-        {/* 左侧：操作按钮组（小屏可横向滚动，不再折行） */}
+        {/* 左侧：操作按钮组 */}
         <div className="flex items-center gap-1 overflow-x-auto custom-scrollbar -my-1 py-1 flex-1 min-w-0">
           <Button size="sm" variant="outline" onClick={() => setOpen(true)}>
             <ClipboardPaste className="h-3.5 w-3.5 mr-1.5" />
@@ -424,7 +395,7 @@ export default function SseToJsonPage() {
 
           <div className="h-4 w-px bg-border mx-1 shrink-0" />
 
-          <Button size="sm" variant="ghost" onClick={() => setRawTextOpen(true)} title="查看原始 SSE 文本">
+          <Button size="sm" variant="ghost" onClick={() => setRawTextOpen(true)} title="查看原始 ljson 文本">
             <FileText className="h-3.5 w-3.5 mr-1.5" />
             原始文本
           </Button>
@@ -437,7 +408,7 @@ export default function SseToJsonPage() {
           )}
         </div>
 
-        {/* 右侧：统计 Badges（锁住不折行、不参与横滚） */}
+        {/* 右侧：统计 Badges */}
         <div className="flex items-center gap-1.5 shrink-0">
           <Badge variant="secondary" className="text-[10px] h-5">
             共 {blocks.length} 条
@@ -445,11 +416,6 @@ export default function SseToJsonPage() {
           {validCount > 0 && (
             <Badge className="text-[10px] h-5 bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/15">
               {validCount} 成功
-            </Badge>
-          )}
-          {signalCount > 0 && (
-            <Badge className="text-[10px] h-5 bg-blue-500/15 text-blue-600 dark:text-blue-400 hover:bg-blue-500/15">
-              {signalCount} 信号
             </Badge>
           )}
           {invalidCount > 0 && (
@@ -463,7 +429,7 @@ export default function SseToJsonPage() {
       <div className="divide-y divide-border/40">
         {blocks.map((block) => (
           <div key={block.index} className="py-3 first:pt-0 last:pb-0">
-            <SseBlock block={block} collapsed={collapsedSet.has(block.index)} onToggle={toggleBlock} />
+            <LjsonBlock block={block} collapsed={collapsedSet.has(block.index)} onToggle={toggleBlock} />
           </div>
         ))}
       </div>

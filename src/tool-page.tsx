@@ -58,11 +58,11 @@ export function ToolPage({ route }: { route: ToolRoute }) {
         />
       )}
 
-      <div className="flex flex-col min-h-screen overflow-hidden">
-        {/* 页面 Header */}
+      <div className="flex flex-col h-screen overflow-hidden">
+        {/* 页面 Header（固定在顶部，不随内容滚动） */}
         <header
           className={cn(
-            'h-16 px-6 flex items-center sticky top-0 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-40',
+            'h-16 px-6 flex items-center shrink-0 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-40',
           )}
         >
           <div className="flex items-center flex-1 min-w-0">
@@ -135,8 +135,8 @@ export function ToolPage({ route }: { route: ToolRoute }) {
           </div>
         </header>
 
-        {/* 页面内容 */}
-        <div className="flex-1 min-w-0 overflow-hidden">
+        {/* 页面内容（独立滚动容器，工具内的 sticky 相对于此容器吸顶） */}
+        <div className="flex-1 min-w-0 overflow-y-auto overflow-x-clip custom-scrollbar">
           <Suspense fallback={<RouteLoadingFallback />}>
             <route.component />
           </Suspense>

@@ -15,37 +15,38 @@ import { useThemeStore } from '@/store/theme';
 import { ToolCategory } from '@/type';
 import { cn } from '@/utils';
 
-// ─── 分类卡片样式 ─────────────────────────────────────────────
-const CARD_ACCENT: Record<ToolCategory, { icon: string; bg: string; dot: string }> = {
+// ─── 分类配色 ─────────────────────────────────────────────────
+// 只在图标色与 hover 边框高光上使用分类色，保持整体克制与简约
+const CARD_ACCENT: Record<ToolCategory, { icon: string; hoverBorder: string; hoverBg: string }> = {
   image: {
     icon: 'text-rose-600 dark:text-rose-400',
-    bg: 'bg-rose-500/10 dark:bg-rose-500/15',
-    dot: 'bg-rose-500',
+    hoverBorder: 'group-hover:border-rose-500/40 dark:group-hover:border-rose-400/40',
+    hoverBg: 'group-hover:bg-rose-500/5 dark:group-hover:bg-rose-400/10',
   },
   css: {
     icon: 'text-violet-600 dark:text-violet-400',
-    bg: 'bg-violet-500/10 dark:bg-violet-500/15',
-    dot: 'bg-violet-500',
+    hoverBorder: 'group-hover:border-violet-500/40 dark:group-hover:border-violet-400/40',
+    hoverBg: 'group-hover:bg-violet-500/5 dark:group-hover:bg-violet-400/10',
   },
   dev: {
     icon: 'text-blue-600 dark:text-blue-400',
-    bg: 'bg-blue-500/10 dark:bg-blue-500/15',
-    dot: 'bg-blue-500',
+    hoverBorder: 'group-hover:border-blue-500/40 dark:group-hover:border-blue-400/40',
+    hoverBg: 'group-hover:bg-blue-500/5 dark:group-hover:bg-blue-400/10',
   },
   text: {
     icon: 'text-amber-600 dark:text-amber-400',
-    bg: 'bg-amber-500/10 dark:bg-amber-500/15',
-    dot: 'bg-amber-500',
+    hoverBorder: 'group-hover:border-amber-500/40 dark:group-hover:border-amber-400/40',
+    hoverBg: 'group-hover:bg-amber-500/5 dark:group-hover:bg-amber-400/10',
   },
   life: {
     icon: 'text-emerald-600 dark:text-emerald-400',
-    bg: 'bg-emerald-500/10 dark:bg-emerald-500/15',
-    dot: 'bg-emerald-500',
+    hoverBorder: 'group-hover:border-emerald-500/40 dark:group-hover:border-emerald-400/40',
+    hoverBg: 'group-hover:bg-emerald-500/5 dark:group-hover:bg-emerald-400/10',
   },
   other: {
     icon: 'text-muted-foreground',
-    bg: 'bg-muted/60',
-    dot: 'bg-muted-foreground',
+    hoverBorder: 'group-hover:border-foreground/25',
+    hoverBg: 'group-hover:bg-muted/40',
   },
 };
 
@@ -97,35 +98,43 @@ function ToolCard({ route }: { route: (typeof toolRoutes)[0] }) {
   return (
     <motion.button
       onClick={() => navigate(route.path)}
-      className="group relative flex flex-col gap-3 rounded-xl border border-border/50 bg-card p-5 text-left transition-all duration-300 hover:border-border hover:shadow-lg hover:shadow-black/[0.03] hover:-translate-y-0.5 dark:hover:shadow-black/20"
+      className={cn(
+        'group relative flex items-start gap-3.5 rounded-xl border border-border/60 bg-card p-4 text-left',
+        'transition-colors duration-200 ease-out',
+        accent.hoverBorder,
+      )}
       variants={gridItem}
     >
       {/* 图标 */}
-      <div className={cn('flex h-10 w-10 items-center justify-center rounded-lg', accent.bg)}>
-        <Icon className={cn('h-5 w-5', accent.icon)} strokeWidth={1.5} />
+      <div
+        className={cn(
+          'flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted/50 transition-colors duration-200',
+          accent.hoverBg,
+        )}
+      >
+        <Icon className={cn('h-[18px] w-[18px]', accent.icon)} strokeWidth={1.75} />
       </div>
 
-      {/* 标题 + 箭头 */}
-      <div className="flex items-center gap-1.5">
-        <span className="text-sm font-medium text-foreground">{route.title}</span>
-        <ArrowRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground/30 -translate-x-1 opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-60" />
+      {/* 文案 */}
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-1">
+          <span className="truncate text-sm font-medium text-foreground">{route.title}</span>
+          <ArrowRight className="h-3.5 w-3.5 shrink-0 -translate-x-1 text-muted-foreground opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100" />
+        </div>
+        {description && (
+          <p className="mt-1 text-xs leading-relaxed text-muted-foreground/80 line-clamp-2">{description}</p>
+        )}
       </div>
-
-      {/* 描述 */}
-      {description && (
-        <p className="text-xs leading-relaxed text-muted-foreground/80 line-clamp-2">{description}</p>
-      )}
     </motion.button>
   );
 }
 
 // ─── 分类标题 ──────────────────────────────────────────────────
-function SectionTitle({ label, category }: { label: string; category: ToolCategory }) {
-  const dot = CARD_ACCENT[category].dot;
+function SectionTitle({ label, count }: { label: string; count: number }) {
   return (
-    <div className="flex items-center gap-2.5 mb-4">
-      <div className={cn('h-2 w-2 rounded-full', dot)} />
-      <h2 className="text-sm font-semibold text-foreground">{label}</h2>
+    <div className="mb-4 flex items-baseline justify-between border-b border-border/50 pb-2.5">
+      <h2 className="text-sm font-semibold tracking-wide text-foreground">{label}</h2>
+      <span className="text-[11px] tabular-nums text-muted-foreground/70">{count} 个工具</span>
     </div>
   );
 }
@@ -390,12 +399,12 @@ export default function HomePage() {
               </Button>
             </motion.div>
           ) : groupedByCategory ? (
-            <div className="space-y-12">
+            <div className="space-y-10">
               {groupedByCategory.map((group) => (
                 <section key={group.category}>
-                  <SectionTitle label={group.label} category={group.category} />
+                  <SectionTitle label={group.label} count={group.routes.length} />
                   <motion.div
-                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"
                     variants={gridContainer}
                     initial="hidden"
                     whileInView="show"
@@ -410,7 +419,7 @@ export default function HomePage() {
             </div>
           ) : (
             <motion.div
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"
               variants={gridContainer}
               initial="hidden"
               whileInView="show"

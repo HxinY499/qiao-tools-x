@@ -6,6 +6,7 @@ import {
   Circle,
   FileDiff,
   FileImage,
+  FileJson,
   FileText,
   FileType2,
   Fingerprint,
@@ -366,6 +367,20 @@ export const toolRoutes: ToolRoute[] = [
       description:
         '免费在线 SSE to JSON 解析工具，从 Server-Sent Events 流数据中提取 data 字段，逐条解析为格式化 JSON，支持语法高亮和一键复制。',
       keywords: 'SSE解析,SSE转JSON,Server-Sent Events,SSE数据提取,JSON格式化,EventStream解析',
+    },
+  },
+  {
+    key: ToolKey.LjsonToJson,
+    path: '/ljson-to-json',
+    title: 'ljson to JSON',
+    subtitle: '将 JSON Lines / NDJSON 按行解析为格式化 JSON，支持批量合并与逐条查看',
+    icon: FileJson,
+    component: lazy(() => import('@/pages/ljson-to-json')),
+    category: 'dev',
+    seo: {
+      description:
+        '免费在线 ljson (JSON Lines / NDJSON) 解析工具，按行解析每一条 JSON，支持语法高亮、逐条查看、错误定位与一键合并复制。',
+      keywords: 'ljson解析,JSON Lines,NDJSON,jsonl解析,换行分隔JSON,日志JSON解析,JSON批量格式化',
     },
   },
 ];

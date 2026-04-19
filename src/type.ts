@@ -27,6 +27,7 @@ export enum ToolKey {
   RegexVisualizer = 'regex-visualizer',
   MarkdownEditor = 'markdown-editor',
   SseToJson = 'sse-to-json',
+  LjsonToJson = 'ljson-to-json',
 }
 
 export type ToolRoute = {
