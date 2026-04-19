@@ -21,7 +21,7 @@ import {
   ZoomIn,
   ZoomOut,
 } from 'lucide-react';
-import { startTransition, useCallback, useEffect, useRef, useState } from 'react';
+import { startTransition, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 import { ResizablePanels } from '@/components/resizable-panels';
@@ -101,8 +101,11 @@ export default function MarkdownEditorPage() {
     setPreviewZoom(100);
   }, [setPreviewZoom]);
 
-  // 获取当前主题是否为暗色主题
-  const isDarkTheme = THEME_LIST.find((t) => t.name === previewTheme)?.isDark || false;
+  // 获取当前主题是否为暗色主题（useMemo 避免每次渲染都遍历 THEME_LIST）
+  const isDarkTheme = useMemo(
+    () => THEME_LIST.find((t) => t.name === previewTheme)?.isDark || false,
+    [previewTheme],
+  );
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -711,10 +714,6 @@ export default function MarkdownEditorPage() {
         </div>
       )}
       <div ref={previewRef} className="flex-1 min-h-0 min-w-0 overflow-auto custom-scrollbar group">
-        <style>{`
-          .markdown-body ul { list-style-type: disc; }
-          .markdown-body ol { list-style-type: decimal; }
-        `}</style>
         <style>{themeStyle}</style>
         <article
           className="markdown-body max-w-full overflow-x-auto"

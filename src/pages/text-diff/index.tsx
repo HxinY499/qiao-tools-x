@@ -111,7 +111,7 @@ export default function TextDiffPage() {
 
   return (
     <div className="max-w-6xl w-full mx-auto px-4 pb-5 lg:py-8 space-y-4">
-      <Card className="shadow-sm border bg-card/80 backdrop-blur">
+      <Card className="shadow-sm border">
         <CardContent className="pt-4 space-y-4">
           <div className="flex flex-wrap items-center gap-2 justify-between">
             <div className="flex flex-wrap items-center gap-2">

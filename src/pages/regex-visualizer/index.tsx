@@ -72,7 +72,7 @@ export default function RegexVisualizerPage() {
   return (
     <div className="max-w-6xl w-full mx-auto px-4 pb-5 lg:py-8 space-y-4">
       {/* 输入区域 */}
-      <Card className="shadow-sm border bg-card/80 backdrop-blur">
+      <Card className="shadow-sm border">
         <CardContent className="pt-4 space-y-4">
           {/* 正则输入 */}
           <div className="space-y-2">
@@ -130,7 +130,7 @@ export default function RegexVisualizerPage() {
       </Card>
 
       {/* 可视化区域 */}
-      <Card className="shadow-sm border bg-card/80 backdrop-blur">
+      <Card className="shadow-sm border">
         <CardHeader className="pb-2">
           <CardTitle className="text-base flex items-center gap-2">可视化铁路图</CardTitle>
         </CardHeader>
@@ -142,7 +142,7 @@ export default function RegexVisualizerPage() {
       </Card>
 
       {/* 结果区域 */}
-      <Card className="shadow-sm border bg-card/80 backdrop-blur">
+      <Card className="shadow-sm border">
         <CardContent className="pt-4">
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="mb-4">
@@ -181,7 +181,7 @@ export default function RegexVisualizerPage() {
       </Card>
 
       {/* 图例说明 */}
-      <Card className="shadow-sm border bg-card/80 backdrop-blur">
+      <Card className="shadow-sm border">
         <CardContent className="pt-4">
           <h4 className="text-sm font-medium mb-3">图例说明</h4>
           <div className="flex flex-wrap gap-3 text-xs">

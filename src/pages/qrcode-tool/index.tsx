@@ -1,4 +1,3 @@
-import jsQR from 'jsqr';
 import {
   ChevronDown,
   ChevronUp,
@@ -17,7 +16,7 @@ import {
   Wifi,
   X,
 } from 'lucide-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { ColorPicker } from '@/components/color-picker';
 import { CopyButton } from '@/components/copy-button';
@@ -64,7 +63,7 @@ const ERROR_LEVEL_OPTIONS = [
 type QRStore = QRCodeStore;
 
 export default function QRCodeToolPage() {
-  const store = useQRCodeStore();
+  // 细粒度订阅：每个字段只在自身变化时触发重渲染
   const tab = useQRCodeStore((s) => s.tab);
   const mode = useQRCodeStore((s) => s.mode);
   const text = useQRCodeStore((s) => s.text);
@@ -76,10 +75,57 @@ export default function QRCodeToolPage() {
   const qrDataUrl = useQRCodeStore((s) => s.qrDataUrl);
   const parseResult = useQRCodeStore((s) => s.parseResult);
   const parseError = useQRCodeStore((s) => s.parseError);
+
+  // Actions（zustand 的 action 引用稳定，订阅不会触发额外重渲染）
+  const setTab = useQRCodeStore((s) => s.setTab);
+  const setMode = useQRCodeStore((s) => s.setMode);
+  const setText = useQRCodeStore((s) => s.setText);
+  const setWifi = useQRCodeStore((s) => s.setWifi);
+  const setContact = useQRCodeStore((s) => s.setContact);
+  const setSMS = useQRCodeStore((s) => s.setSMS);
+  const setLocation = useQRCodeStore((s) => s.setLocation);
+  const setStyle = useQRCodeStore((s) => s.setStyle);
   const setQRDataUrl = useQRCodeStore((s) => s.setQRDataUrl);
   const setParseResult = useQRCodeStore((s) => s.setParseResult);
   const setParseError = useQRCodeStore((s) => s.setParseError);
-  const setStyle = useQRCodeStore((s) => s.setStyle);
+  const resetCurrentMode = useQRCodeStore((s) => s.resetCurrentMode);
+  const resetStyle = useQRCodeStore((s) => s.resetStyle);
+
+  // 聚合给子组件使用的 store-like 对象（仅包含 actions，引用稳定）
+  const storeActions = useMemo<QRStore>(
+    () =>
+      ({
+        setTab,
+        setMode,
+        setText,
+        setWifi,
+        setContact,
+        setSMS,
+        setLocation,
+        setStyle,
+        setQRDataUrl,
+        setParseResult,
+        setParseError,
+        resetCurrentMode,
+        resetStyle,
+      }) as QRStore,
+    [
+      setTab,
+      setMode,
+      setText,
+      setWifi,
+      setContact,
+      setSMS,
+      setLocation,
+      setStyle,
+      setQRDataUrl,
+      setParseResult,
+      setParseError,
+      resetCurrentMode,
+      resetStyle,
+    ],
+  );
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const logoInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -114,7 +160,7 @@ export default function QRCodeToolPage() {
       const reader = new FileReader();
       reader.onload = (e) => {
         const img = new Image();
-        img.onload = () => {
+        img.onload = async () => {
           const canvas = document.createElement('canvas');
           canvas.width = img.width;
           canvas.height = img.height;
@@ -125,11 +171,17 @@ export default function QRCodeToolPage() {
           }
           ctx.drawImage(img, 0, 0);
           const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-          const code = jsQR(imageData.data, imageData.width, imageData.height);
-          if (code) {
-            setParseResult(code.data);
-          } else {
-            setParseError('未能识别二维码，请确保图片清晰且包含有效的二维码');
+          try {
+            // 动态加载 jsqr（~45KB），只在用户真正解析时下载
+            const { default: jsQR } = await import('jsqr');
+            const code = jsQR(imageData.data, imageData.width, imageData.height);
+            if (code) {
+              setParseResult(code.data);
+            } else {
+              setParseError('未能识别二维码，请确保图片清晰且包含有效的二维码');
+            }
+          } catch {
+            setParseError('二维码解析模块加载失败');
           }
         };
         img.onerror = () => {
@@ -191,13 +243,13 @@ export default function QRCodeToolPage() {
   const fillSample = () => {
     switch (mode) {
       case 'text':
-        store.setText('https://example.com');
+        setText('https://example.com');
         break;
       case 'wifi':
-        store.setWifi({ ssid: 'MyWiFi', password: '12345678', encryption: 'WPA', hidden: false });
+        setWifi({ ssid: 'MyWiFi', password: '12345678', encryption: 'WPA', hidden: false });
         break;
       case 'contact':
-        store.setContact({
+        setContact({
           name: '张三',
           phone: '13800138000',
           email: 'zhangsan@example.com',
@@ -206,10 +258,10 @@ export default function QRCodeToolPage() {
         });
         break;
       case 'sms':
-        store.setSMS({ phone: '10086', message: '查询话费余额' });
+        setSMS({ phone: '10086', message: '查询话费余额' });
         break;
       case 'location':
-        store.setLocation({ latitude: '39.9042', longitude: '116.4074', label: '北京天安门' });
+        setLocation({ latitude: '39.9042', longitude: '116.4074', label: '北京天安门' });
         break;
     }
   };
@@ -218,7 +270,7 @@ export default function QRCodeToolPage() {
     <div className="container mx-auto py-6 space-y-6 max-w-5xl">
       <Card>
         <CardContent>
-          <Tabs value={tab} onValueChange={(v) => store.setTab(v as QRTab)} className="w-full pt-6">
+          <Tabs value={tab} onValueChange={(v) => setTab(v as QRTab)} className="w-full pt-6">
             <TabsList className="grid w-full grid-cols-2 mb-6">
               <TabsTrigger value="generate" className="gap-2">
                 <QrCode className="w-4 h-4" />
@@ -240,7 +292,7 @@ export default function QRCodeToolPage() {
                 location={location}
                 style={style}
                 qrDataUrl={qrDataUrl}
-                store={store}
+                store={storeActions}
                 fillSample={fillSample}
                 styleOpen={styleOpen}
                 setStyleOpen={setStyleOpen}

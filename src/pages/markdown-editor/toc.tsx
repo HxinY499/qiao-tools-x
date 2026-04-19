@@ -1,5 +1,5 @@
 import { List, Pin, PinOff } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { cn } from '@/utils';
@@ -29,7 +29,6 @@ function extractHeadings(html: string): TocItem[] {
   return Array.from(headings).map((heading, index) => {
     const level = parseInt(heading.tagName[1], 10);
     const text = heading.textContent?.trim() || '';
-    // 生成唯一 ID
     const id = heading.id || `heading-${index}`;
     return { id, text, level };
   });
@@ -47,11 +46,46 @@ function ensureHeadingIds(previewElement: HTMLElement) {
   });
 }
 
+// ─── 单行（memo 化，activeId 变化只会重渲对应行） ─────────────
+interface TocRowProps {
+  item: TocItem;
+  isActive: boolean;
+  indent: number;
+  onClick: (id: string) => void;
+}
+
+const TocRow = memo(function TocRow({ item, isActive, indent, onClick }: TocRowProps) {
+  const handleClick = useCallback(() => onClick(item.id), [onClick, item.id]);
+  return (
+    <li>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={handleClick}
+        className={cn(
+          'w-full justify-start h-auto py-1.5 px-2 text-xs font-normal',
+          'hover:bg-accent/50 transition-colors',
+          isActive && 'bg-accent text-accent-foreground font-medium',
+        )}
+        style={{ paddingLeft: `${indent}px` }}
+      >
+        <span className="truncate">{item.text}</span>
+      </Button>
+    </li>
+  );
+});
+
 export function Toc({ htmlContent, previewRef, className, pinned, onPinChange }: TocProps) {
   const [activeId, setActiveId] = useState<string>('');
 
   // 提取目录
   const tocItems = useMemo(() => extractHeadings(htmlContent), [htmlContent]);
+
+  // 计算最小层级（稳定引用，防止 TocRow 的 indent 频繁变化）
+  const minLevel = useMemo(
+    () => (tocItems.length === 0 ? 0 : Math.min(...tocItems.map((item) => item.level))),
+    [tocItems],
+  );
 
   // 确保预览区标题有 ID
   useEffect(() => {
@@ -63,41 +97,50 @@ export function Toc({ htmlContent, previewRef, className, pinned, onPinChange }:
     }
   }, [htmlContent, previewRef]);
 
+  // 用 ref 持有最新 activeId，避免把它放进 scroll effect 的 deps
+  const activeIdRef = useRef(activeId);
+  activeIdRef.current = activeId;
+
   // 监听滚动，高亮当前可见的标题
   useEffect(() => {
     const preview = previewRef.current;
     if (!preview || tocItems.length === 0) return;
 
-    const handleScroll = () => {
+    // 缓存 headings 列表，避免 scroll 里每次都重查 DOM
+    let headings: HTMLElement[] = [];
+    const refreshHeadings = () => {
       const article = preview.querySelector('.markdown-body');
-      if (!article) return;
+      headings = article ? (Array.from(article.querySelectorAll('h1, h2, h3, h4, h5, h6')) as HTMLElement[]) : [];
+    };
+    refreshHeadings();
 
-      const headings = article.querySelectorAll('h1, h2, h3, h4, h5, h6');
+    const handleScroll = () => {
+      if (headings.length === 0) return;
       const scrollTop = preview.scrollTop;
-      const offset = 100; // 偏移量，提前高亮
+      const offset = 100;
+      const previewTop = preview.getBoundingClientRect().top;
 
       let currentId = '';
-      headings.forEach((heading) => {
+      for (const heading of headings) {
         const rect = heading.getBoundingClientRect();
-        const previewRect = preview.getBoundingClientRect();
-        const relativeTop = rect.top - previewRect.top + scrollTop;
-
+        const relativeTop = rect.top - previewTop + scrollTop;
         if (relativeTop <= scrollTop + offset) {
           currentId = heading.id;
+        } else {
+          break; // headings 按文档顺序，可以早退
         }
-      });
+      }
 
-      if (currentId !== activeId) {
+      if (currentId !== activeIdRef.current) {
         setActiveId(currentId);
       }
     };
 
-    preview.addEventListener('scroll', handleScroll);
-    // 初始化时也执行一次
+    preview.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll();
 
     return () => preview.removeEventListener('scroll', handleScroll);
-  }, [previewRef, tocItems, activeId]);
+  }, [previewRef, tocItems]);
 
   // 点击跳转
   const handleClick = useCallback(
@@ -137,9 +180,6 @@ export function Toc({ htmlContent, previewRef, className, pinned, onPinChange }:
     );
   }
 
-  // 计算最小层级，用于缩进
-  const minLevel = Math.min(...tocItems.map((item) => item.level));
-
   return (
     <div className={cn('flex flex-col min-h-0 h-full', className)}>
       {/* 标题栏 */}
@@ -156,23 +196,13 @@ export function Toc({ htmlContent, previewRef, className, pinned, onPinChange }:
       <nav className="flex-1 overflow-auto custom-scrollbar p-2 min-h-0">
         <ul className="space-y-0.5">
           {tocItems.map((item) => (
-            <li key={item.id}>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleClick(item.id)}
-                className={cn(
-                  'w-full justify-start h-auto py-1.5 px-2 text-xs font-normal',
-                  'hover:bg-accent/50 transition-colors',
-                  activeId === item.id && 'bg-accent text-accent-foreground font-medium',
-                )}
-                style={{
-                  paddingLeft: `${(item.level - minLevel) * 12 + 8}px`,
-                }}
-              >
-                <span className="truncate">{item.text}</span>
-              </Button>
-            </li>
+            <TocRow
+              key={item.id}
+              item={item}
+              isActive={activeId === item.id}
+              indent={(item.level - minLevel) * 12 + 8}
+              onClick={handleClick}
+            />
           ))}
         </ul>
       </nav>

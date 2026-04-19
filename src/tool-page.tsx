@@ -1,5 +1,5 @@
 import { Info, Laptop, Moon, Sun } from 'lucide-react';
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useCallback, useEffect, useState } from 'react';
 
 import { SEO } from '@/components/seo';
 import { Button } from '@/components/ui/button';
@@ -11,14 +11,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 import { useSidebar } from './components/ui/sidebar';
 import { LOADING_MESSAGES } from './constant';
 import { useIsMobile } from './hooks/use-mobile';
-import { useThemeStore } from './store/theme';
+import { useThemeStore, type ThemeSetting } from './store/theme';
 import { ToolRoute } from './type';
 import { cn } from './utils';
 
+// ─── 路由加载 fallback ────────────────────────────────────────
 function RouteLoadingFallback() {
   const [visible, setVisible] = useState(false);
   const [message] = useState(() => {
@@ -41,10 +43,49 @@ function RouteLoadingFallback() {
   );
 }
 
+// ─── 主题 cycle 按钮（light → dark → system → light） ──────────
+const THEME_CYCLE: ThemeSetting[] = ['light', 'dark', 'system'];
+const THEME_META: Record<ThemeSetting, { icon: typeof Sun; label: string }> = {
+  light: { icon: Sun, label: '浅色模式' },
+  dark: { icon: Moon, label: '深色模式' },
+  system: { icon: Laptop, label: '跟随系统' },
+};
+
+function ThemeToggleButton() {
+  const { themeSetting, setThemeSetting } = useThemeStore();
+  const meta = THEME_META[themeSetting];
+  const Icon = meta.icon;
+
+  const handleClick = useCallback(() => {
+    const idx = THEME_CYCLE.indexOf(themeSetting);
+    const next = THEME_CYCLE[(idx + 1) % THEME_CYCLE.length];
+    setThemeSetting(next);
+  }, [themeSetting, setThemeSetting]);
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/60"
+          onClick={handleClick}
+          aria-label={`切换主题（当前：${meta.label}）`}
+        >
+          <Icon className="h-3.5 w-3.5" />
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent side="bottom" className="text-xs">
+        主题：{meta.label}（点击切换）
+      </TooltipContent>
+    </Tooltip>
+  );
+}
+
+// ─── 工具页 ───────────────────────────────────────────────────
 export function ToolPage({ route }: { route: ToolRoute }) {
   const { open } = useSidebar();
   const isMobile = useIsMobile();
-  const { themeSetting, setThemeSetting } = useThemeStore();
 
   return (
     <>
@@ -59,81 +100,72 @@ export function ToolPage({ route }: { route: ToolRoute }) {
       )}
 
       <div className="flex flex-col h-screen overflow-hidden">
-        {/* 页面 Header（固定在顶部，不随内容滚动） */}
-        <header
-          className={cn(
-            'h-16 px-6 flex items-center shrink-0 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-40',
-          )}
-        >
-          <div className="flex items-center flex-1 min-w-0">
-            <div
-              className={cn('h-full w-8 bg-transparent transition-all shrink-0', open && 'w-1', isMobile && 'w-6')}
-            ></div>
-            <div className="flex flex-col min-w-0">
-              <h1 className="text-lg font-semibold tracking-tight truncate">{route.title}</h1>
-              {route.subtitle && <p className="text-xs text-muted-foreground mt-0.5 truncate">{route.subtitle}</p>}
-            </div>
-            <div className="ml-auto flex items-center gap-2 shrink-0">
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-10 bg-muted/60 hover:bg-muted">
-                    <Info className="h-3.5 w-3.5" />
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>数据安全说明</DialogTitle>
-                    <DialogDescription className="pt-2 space-y-2">
-                      <p>
-                        这个工具站不会往后端存储任何数据，所有数据均存储在客户端本地（如 LocalStorage、IndexedDB
-                        等），不用担心数据泄露风险。
-                      </p>
-                      <p>菜单置顶数据也保存在本地了，所以当切换浏览器或者清理缓存后指定数据会消失。</p>
-                    </DialogDescription>
-                  </DialogHeader>
-                </DialogContent>
-              </Dialog>
-              <div className="flex items-center gap-0.5 p-0.5 bg-muted/60 rounded-lg border border-border/40 h-8">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className={cn(
-                    'h-6 w-8 rounded-md hover:bg-background/50 text-muted-foreground',
-                    themeSetting === 'light' && 'bg-background shadow-sm text-primary hover:bg-background',
-                  )}
-                  onClick={() => setThemeSetting('light')}
-                  title="浅色模式"
-                >
-                  <Sun className="h-3.5 w-3.5" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className={cn(
-                    'h-6 w-8 rounded-md hover:bg-background/50 text-muted-foreground',
-                    themeSetting === 'dark' && 'bg-background shadow-sm text-primary hover:bg-background',
-                  )}
-                  onClick={() => setThemeSetting('dark')}
-                  title="深色模式"
-                >
-                  <Moon className="h-3.5 w-3.5" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className={cn(
-                    'h-6 w-8 rounded-md hover:bg-background/50 text-muted-foreground',
-                    themeSetting === 'system' && 'bg-background shadow-sm text-primary hover:bg-background',
-                  )}
-                  onClick={() => setThemeSetting('system')}
-                  title="跟随系统"
-                >
-                  <Laptop className="h-3.5 w-3.5" />
-                </Button>
+        {/* 顶部浮岛 Header —— 和 sidebar 的悬浮卡片风格保持一致 */}
+        <div className="shrink-0 px-2 pt-2 pb-0 z-40">
+          <TooltipProvider delayDuration={200}>
+            <header
+              className={cn(
+                'h-14 pl-3 pr-2.5 flex items-center gap-3',
+                'rounded-lg border border-sidebar-border bg-sidebar',
+                'animate-in fade-in slide-in-from-top-1 duration-300',
+              )}
+            >
+              {/* SidebarTrigger 占位（侧栏收起时让出空间） */}
+              <div
+                className={cn(
+                  'h-full bg-transparent transition-[width] duration-200 shrink-0',
+                  open ? 'w-0' : 'w-9',
+                  isMobile && 'w-7',
+                )}
+              />
+
+              {/* 标题 + 副标题 */}
+              <div className="flex flex-col min-w-0 flex-1">
+                <h1 className="text-[15px] font-semibold tracking-tight truncate leading-tight">{route.title}</h1>
+                {route.subtitle && (
+                  <p className="text-[11px] text-muted-foreground/80 mt-0.5 truncate leading-snug">{route.subtitle}</p>
+                )}
               </div>
-            </div>
-          </div>
-        </header>
+
+              {/* 右侧操作：Info + 主题切换 */}
+              <div className="flex items-center gap-0.5 shrink-0">
+                <Dialog>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <DialogTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/60"
+                          aria-label="数据安全说明"
+                        >
+                          <Info className="h-3.5 w-3.5" />
+                        </Button>
+                      </DialogTrigger>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" className="text-xs">
+                      数据安全说明
+                    </TooltipContent>
+                  </Tooltip>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>数据安全说明</DialogTitle>
+                      <DialogDescription className="pt-2 space-y-2">
+                        <p>
+                          这个工具站不会往后端存储任何数据，所有数据均存储在客户端本地（如 LocalStorage、IndexedDB
+                          等），不用担心数据泄露风险。
+                        </p>
+                        <p>菜单置顶数据也保存在本地了，所以当切换浏览器或者清理缓存后指定数据会消失。</p>
+                      </DialogDescription>
+                    </DialogHeader>
+                  </DialogContent>
+                </Dialog>
+
+                <ThemeToggleButton />
+              </div>
+            </header>
+          </TooltipProvider>
+        </div>
 
         {/* 页面内容（独立滚动容器，工具内的 sticky 相对于此容器吸顶） */}
         <div className="flex-1 min-w-0 overflow-y-auto overflow-x-clip custom-scrollbar">
@@ -145,3 +177,4 @@ export function ToolPage({ route }: { route: ToolRoute }) {
     </>
   );
 }
+

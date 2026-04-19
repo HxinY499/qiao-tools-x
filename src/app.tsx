@@ -90,7 +90,11 @@ function ToolLayout() {
 
   return (
     <SidebarProvider>
-      <Sidebar collapsible="offcanvas">
+      <Sidebar
+        collapsible="offcanvas"
+        variant="floating"
+        className="[&_[data-sidebar=sidebar]]:!shadow-none [&_[data-sidebar=sidebar]]:border-sidebar-border"
+      >
         {/* Sidebar Header - 点击 Logo 回首页 */}
         <SidebarHeader className="border-b border-sidebar-border h-16">
           <NavLink

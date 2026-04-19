@@ -1,6 +1,6 @@
 import { AlignCenter, AlignLeft, AlignRight, Minus, Plus, Trash2, Upload } from 'lucide-react';
 import { cloneElement, isValidElement, useRef, useState } from 'react';
-import * as XLSX from 'xlsx';
+import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -91,8 +91,10 @@ export function TableDialog({ trigger, onInsert }: TableDialogProps) {
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = (event) => {
+    reader.onload = async (event) => {
       try {
+        // 动态加载 xlsx（~1.3MB），只在用户真正导入时下载
+        const XLSX = await import('xlsx');
         const data = new Uint8Array(event.target?.result as ArrayBuffer);
         const workbook = XLSX.read(data, { type: 'array' });
         const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
@@ -124,8 +126,9 @@ export function TableDialog({ trigger, onInsert }: TableDialogProps) {
         };
 
         setConfig(newConfig);
-      } catch {
-        // 解析失败静默处理
+      } catch (err) {
+        console.error('Excel 解析失败:', err);
+        toast.error('Excel 解析失败，请检查文件格式');
       }
     };
     reader.readAsArrayBuffer(file);

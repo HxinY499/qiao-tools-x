@@ -109,7 +109,7 @@ export function TextDiffResultView({
   };
 
   return (
-    <Card className="shadow-sm border bg-card/80 backdrop-blur">
+    <Card className="shadow-sm border">
       <CardHeader className="pb-3 border-b border-border/60 space-y-3">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-2">

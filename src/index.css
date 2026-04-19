@@ -153,3 +153,7 @@ body > #d,
 body > .mermaid-error {
   display: none !important;
 }
+
+/* Markdown body 列表标记（从工具页移出来，避免 React 每次渲染都新建 <style>） */
+.markdown-body ul { list-style-type: disc; }
+.markdown-body ol { list-style-type: decimal; }
