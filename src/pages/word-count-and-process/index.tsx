@@ -25,6 +25,16 @@ import { cn } from '@/utils';
 
 import { useWordCountStore } from './store';
 
+// ─── 模块级常量：复用正则避免每次分析时重新编译 ─────────────────
+
+const CJK_REGEX = /[\u4E00-\u9FFF\u3400-\u4DBF\u20000-\u2A6DF\u3040-\u309F\u30A0-\u30FF\uAC00-\uD7AF]/g;
+const NON_CJK_WORD_REGEX = /[a-zA-Z0-9_\u00C0-\u00FF]+(['’\u2019-][a-zA-Z0-9_\u00C0-\u00FF]+)*/g;
+const SENTENCE_SPLIT_REGEX = /[.!?。！？…]+/;
+// 常见英文缩写（避免缩写里的"."被当成句号切分）
+// 用单个正则一次性替换所有缩写，避免 N 次 split/join
+const ABBREVIATION_REGEX = /\b(Mr|Mrs|Ms|Dr|Vs|vs|etc|e\.g|i\.e)\./g;
+const ABBREVIATION_PLACEHOLDER = '__DOT__';
+
 const calculateReadingTime = (cjkCount: number, nonCjkCount: number) => {
   const WORDS_PER_MINUTE_EN = 200;
   const CHARS_PER_MINUTE_CJK = 400;
@@ -50,24 +60,18 @@ const analyzeText = (text: string) => {
   const charsNoSpaces = text.replace(/\s/g, '').length;
   const paragraphs = text.split(/\n/).filter((line) => line.trim() !== '').length;
 
-  const cjkRegex = /[\u4E00-\u9FFF\u3400-\u4DBF\u20000-\u2A6DF\u3040-\u309F\u30A0-\u30FF\uAC00-\uD7AF]/g;
-  const cjkMatches = text.match(cjkRegex) || [];
+  const cjkMatches = text.match(CJK_REGEX) || [];
   const cjkCount = cjkMatches.length;
 
-  const nonCjkText = text.replace(cjkRegex, ' ');
-  const wordMatches = nonCjkText.match(/[a-zA-Z0-9_\u00C0-\u00FF]+(['’\u2019-][a-zA-Z0-9_\u00C0-\u00FF]+)*/g) || [];
+  const nonCjkText = text.replace(CJK_REGEX, ' ');
+  const wordMatches = nonCjkText.match(NON_CJK_WORD_REGEX) || [];
   const nonCjkCount = wordMatches.length;
 
   const words = cjkCount + nonCjkCount;
 
-  let tempText = text;
-  const abbreviations = ['Mr.', 'Mrs.', 'Ms.', 'Dr.', 'Vs.', 'vs.', 'etc.', 'e.g.', 'i.e.'];
-  abbreviations.forEach((abbr) => {
-    const replacement = abbr.replace('.', '__DOT__');
-    tempText = tempText.split(abbr).join(replacement);
-  });
-
-  const sentences = tempText.split(/[.!?。！？…]+/).filter((s) => s.trim().length > 0).length;
+  // 一次性替换所有缩写中的 "." 为占位符（避免 N 次 split/join）
+  const placeholderText = text.replace(ABBREVIATION_REGEX, (match) => match.replace(/\./g, ABBREVIATION_PLACEHOLDER));
+  const sentences = placeholderText.split(SENTENCE_SPLIT_REGEX).filter((s) => s.trim().length > 0).length;
 
   const rt = calculateReadingTime(cjkCount, nonCjkCount);
 
@@ -190,23 +194,19 @@ export default function WordCountAndProcessPage() {
 
       if (newText === text) {
         toast.info('未找到匹配内容或内容未发生变化');
-      } else {
-        let count = 0;
-        if (searchValue instanceof RegExp) {
-          if (searchValue.global) {
-            count = (text.match(searchValue) || []).length;
-          } else {
-            count = 1;
-          }
-        } else {
-          // 字符串替换模式，replace只替换第一个
-          count = 1;
-        }
-
-        setText(newText);
-        toast.success(`替换完成，共替换 ${count} 处`);
-        setReplacePopoverOpen(false);
+        return;
       }
+
+      // 仅在全局正则下需要 count：此时 String.prototype.replace 会扫描全文
+      // 再用 match 扫一遍是必要的代价（因为原生 replace 不返回次数）
+      let count = 1;
+      if (searchValue instanceof RegExp && searchValue.global) {
+        count = (text.match(searchValue) || []).length;
+      }
+
+      setText(newText);
+      toast.success(`替换完成，共替换 ${count} 处`);
+      setReplacePopoverOpen(false);
     } catch {
       toast.error('正则表达式错误');
     }

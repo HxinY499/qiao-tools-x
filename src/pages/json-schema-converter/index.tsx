@@ -1,5 +1,5 @@
 import { ArrowLeftRight, Braces, Code2, FileJson, Sparkles, Trash2 } from 'lucide-react';
-import { useCallback, useMemo, useState } from 'react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 
 import { CodeArea } from '@/components/code-area';
@@ -29,9 +29,9 @@ export default function JsonSchemaConverterPage() {
   const inputLabel = isSchemaToTs ? 'JSON Schema' : 'TypeScript';
   const outputLabel = isSchemaToTs ? 'TypeScript' : 'JSON Schema';
 
-  const hasInput = useMemo(() => input.trim().length > 0, [input]);
+  const hasInput = input.trim().length > 0;
 
-  const handleConvert = useCallback(() => {
+  const handleConvert = () => {
     if (!input.trim()) {
       setOutput('');
       setError(null);
@@ -66,7 +66,7 @@ export default function JsonSchemaConverterPage() {
       setError((e as Error).message);
       setOutput('');
     }
-  }, [input, isSchemaToTs, options]);
+  };
 
   const handleClear = () => {
     setInput('');

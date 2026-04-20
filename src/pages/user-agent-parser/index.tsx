@@ -1,4 +1,5 @@
 import { Cpu, Globe, Monitor, Smartphone, Trash2, User, Zap } from 'lucide-react';
+import { useMemo } from 'react';
 
 import { CodeArea } from '@/components/code-area';
 import { Button } from '@/components/ui/button';
@@ -7,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 
 import { useUserAgentParserStore } from './store';
+import { parseUserAgent } from './utils';
 
 // 示例 UA
 const EXAMPLE_UAS = [
@@ -30,7 +32,10 @@ const EXAMPLE_UAS = [
 
 export default function UserAgentParserPage() {
   const { data, setUserAgent, reset } = useUserAgentParserStore();
-  const { userAgent, parsedResult } = data;
+  const { userAgent } = data;
+
+  // 派生解析结果：userAgent 变化时自动重新解析，无需手动同步到 store
+  const parsedResult = useMemo(() => (userAgent ? parseUserAgent(userAgent) : null), [userAgent]);
 
   // 自动填充当前 UA
   const fillCurrentUA = () => {

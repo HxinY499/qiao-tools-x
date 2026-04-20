@@ -33,19 +33,9 @@ export default function BorderRadiusPage() {
   const updateCorner = (corner: keyof BorderRadiusState, updates: Partial<Corner>) => {
     setState((prev) => {
       if (!prev) return initialState;
-      const current = prev[corner];
-      const next = { ...current, ...updates };
-
-      // Handle locking logic
-      if (next.locked && !current.locked) {
-        // Just locked, sync Y to X
-        next.y = next.x;
-      } else if (next.locked && (updates.x !== undefined || updates.y !== undefined)) {
-        // If locked and updating X or Y, sync the other
-        if (updates.x !== undefined) next.y = updates.x;
-        if (updates.y !== undefined) next.x = updates.y;
-      }
-
+      const next = { ...prev[corner], ...updates };
+      // 锁定时始终保持 y === x（UI 在锁定态下不暴露 y 输入，直接同步即可）
+      if (next.locked) next.y = next.x;
       return { ...prev, [corner]: next };
     });
   };

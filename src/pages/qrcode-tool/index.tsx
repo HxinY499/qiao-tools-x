@@ -16,7 +16,7 @@ import {
   Wifi,
   X,
 } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { ColorPicker } from '@/components/color-picker';
 import { CopyButton } from '@/components/copy-button';
@@ -91,40 +91,22 @@ export default function QRCodeToolPage() {
   const resetCurrentMode = useQRCodeStore((s) => s.resetCurrentMode);
   const resetStyle = useQRCodeStore((s) => s.resetStyle);
 
-  // 聚合给子组件使用的 store-like 对象（仅包含 actions，引用稳定）
-  const storeActions = useMemo<QRStore>(
-    () =>
-      ({
-        setTab,
-        setMode,
-        setText,
-        setWifi,
-        setContact,
-        setSMS,
-        setLocation,
-        setStyle,
-        setQRDataUrl,
-        setParseResult,
-        setParseError,
-        resetCurrentMode,
-        resetStyle,
-      }) as QRStore,
-    [
-      setTab,
-      setMode,
-      setText,
-      setWifi,
-      setContact,
-      setSMS,
-      setLocation,
-      setStyle,
-      setQRDataUrl,
-      setParseResult,
-      setParseError,
-      resetCurrentMode,
-      resetStyle,
-    ],
-  );
+  // zustand action 引用天然稳定，无需 useMemo 包装
+  const storeActions = {
+    setTab,
+    setMode,
+    setText,
+    setWifi,
+    setContact,
+    setSMS,
+    setLocation,
+    setStyle,
+    setQRDataUrl,
+    setParseResult,
+    setParseError,
+    resetCurrentMode,
+    resetStyle,
+  } as QRStore;
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const logoInputRef = useRef<HTMLInputElement>(null);

@@ -137,6 +137,15 @@ function TimestampConverterPage() {
     return `UTC${sign}${hours}:${minutes}`;
   }, []);
 
+  // 批量计算所有常用格式，避免每次渲染在 JSX 中各自调用 formatter
+  const formatItemValues = useMemo(
+    () => COMMON_FORMAT_ITEMS.map((item) => ({ id: item.id, label: item.label, value: item.formatter(currentDate) })),
+    [currentDate],
+  );
+
+  // currentDate 格式化的标准字符串（标题和复制按钮共用，避免两次 format 调用）
+  const currentDateText = useMemo(() => format(currentDate, 'yyyy-MM-dd HH:mm:ss'), [currentDate]);
+
   useEffect(() => {
     if (!autoRefresh) return;
     const timer = window.setInterval(() => {
@@ -265,9 +274,9 @@ function TimestampConverterPage() {
             <div>
               <p className="text-sm font-medium text-muted-foreground">当前时间</p>
               <div className="flex items-center gap-2 mt-1">
-                <h2 className="text-2xl font-semibold">{format(currentDate, 'yyyy-MM-dd HH:mm:ss')}</h2>
+                <h2 className="text-2xl font-semibold">{currentDateText}</h2>
                 <CopyButton
-                  text={format(currentDate, 'yyyy-MM-dd HH:mm:ss')}
+                  text={currentDateText}
                   mode="icon"
                   variant="ghost"
                   size="icon"
@@ -291,21 +300,18 @@ function TimestampConverterPage() {
 
           <div className="space-y-3">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {COMMON_FORMAT_ITEMS.map((item) => {
-                const value = item.formatter(currentDate);
-                return (
-                  <div
-                    key={item.id}
-                    className="rounded-xl border bg-muted/40 px-4 py-3 flex items-center justify-between gap-3"
-                  >
-                    <div>
-                      <p className="text-xs text-muted-foreground">{item.label}</p>
-                      <p className="text-sm font-mono mt-1 break-all">{value}</p>
-                    </div>
-                    <CopyButton text={value} mode="icon" variant="ghost" size="icon" className="h-8 w-8 shrink-0" />
+              {formatItemValues.map((item) => (
+                <div
+                  key={item.id}
+                  className="rounded-xl border bg-muted/40 px-4 py-3 flex items-center justify-between gap-3"
+                >
+                  <div>
+                    <p className="text-xs text-muted-foreground">{item.label}</p>
+                    <p className="text-sm font-mono mt-1 break-all">{item.value}</p>
                   </div>
-                );
-              })}
+                  <CopyButton text={item.value} mode="icon" variant="ghost" size="icon" className="h-8 w-8 shrink-0" />
+                </div>
+              ))}
             </div>
           </div>
         </CardContent>

@@ -18,25 +18,17 @@ export type HSLColor = {
 };
 
 type ColorConverterStore = {
-  // 当前颜色（使用 RGB 作为内部存储）
   color: RGBColor;
-  // 更新颜色
   setColor: (color: Partial<RGBColor>) => void;
-  // 从 Hex 设置颜色
   setFromHex: (hex: string) => void;
-  // 从 HSL 设置颜色
   setFromHSL: (hsl: HSLColor) => void;
-  // 获取 Hex 格式
-  getHex: () => string;
-  // 获取 HSL 格式
-  getHSL: () => HSLColor;
 };
 
 const initialColor: RGBColor = { r: 255, g: 161, b: 22, a: 1 };
 
 export const useColorConverterStore = create<ColorConverterStore>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       color: initialColor,
 
       setColor: (newColor) => {
@@ -56,19 +48,20 @@ export const useColorConverterStore = create<ColorConverterStore>()(
         const rgb = hslToRgb(hsl.h, hsl.s, hsl.l, hsl.a);
         set({ color: rgb });
       },
-
-      getHex: () => {
-        const { r, g, b, a } = get().color;
-        return rgbToHex(r, g, b, a);
-      },
-
-      getHSL: () => {
-        const { r, g, b, a } = get().color;
-        return rgbToHsl(r, g, b, a);
-      },
     }),
     {
       name: 'qiao-tools-x-persist-color-converter',
     },
   ),
 );
+
+// 派生 selector：让 zustand 正确追踪 color 变化来派生 hex/hsl
+export function selectHex(state: ColorConverterStore): string {
+  const { r, g, b, a } = state.color;
+  return rgbToHex(r, g, b, a);
+}
+
+export function selectHSL(state: ColorConverterStore): HSLColor {
+  const { r, g, b, a } = state.color;
+  return rgbToHsl(r, g, b, a);
+}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -16,13 +16,15 @@ export function PasteImageDialog({ onConfirm }: PasteImageDialogProps) {
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    if (!open) {
+  function handleOpenChange(next: boolean) {
+    setOpen(next);
+    if (!next) {
+      // 关闭时重置内部状态
       setValue('');
       setError('');
       setIsSubmitting(false);
     }
-  }, [open]);
+  }
 
   function handleParse() {
     const raw = value.trim();
@@ -61,7 +63,7 @@ export function PasteImageDialog({ onConfirm }: PasteImageDialogProps) {
         从 Base64 粘贴图片
       </Button>
 
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog open={open} onOpenChange={handleOpenChange}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle className="text-sm">粘贴图片 Base64 / Data URL</DialogTitle>

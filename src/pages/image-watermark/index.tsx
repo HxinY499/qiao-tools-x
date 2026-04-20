@@ -1,6 +1,6 @@
 import { useDebounceEffect } from 'ahooks';
 import { Image as ImageIcon } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 import ColorPicker from '@/components/color-picker';
@@ -100,10 +100,7 @@ function ImageWatermarkPage() {
   const [resultDataUrl, setResultDataUrl] = useState<string | null>(null);
   const [exportFormat, setExportFormat] = useState<ExportFormat>('original');
 
-  const hasBaseImage = useMemo(
-    () => Boolean(baseImageUrl && baseImageWidth && baseImageHeight),
-    [baseImageUrl, baseImageWidth, baseImageHeight],
-  );
+  const hasBaseImage = Boolean(baseImageUrl && baseImageWidth && baseImageHeight);
 
   useEffect(() => {
     return () => {

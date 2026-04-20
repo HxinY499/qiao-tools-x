@@ -1,4 +1,5 @@
 import { ArrowRightLeft, Sparkles, Trash2 } from 'lucide-react';
+import { useMemo } from 'react';
 
 import { CodeArea } from '@/components/code-area';
 import { CopyButton } from '@/components/copy-button';
@@ -8,12 +9,15 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 
-import { useTextEscaperStore } from './store';
+import { computeEscapeOutput, useTextEscaperStore } from './store';
 import { EscapeType } from './utils';
 
 export default function TextEscaperPage() {
   const { data, setInput, setTab, setMode, reset } = useTextEscaperStore();
-  const { input, output, activeTab, mode } = data;
+  const { input, activeTab, mode } = data;
+
+  // 派生输出：input/activeTab/mode 任一变化都重新计算
+  const output = useMemo(() => computeEscapeOutput(input, activeTab, mode), [input, activeTab, mode]);
 
   const handleTabChange = (value: string) => {
     setTab(value as EscapeType);

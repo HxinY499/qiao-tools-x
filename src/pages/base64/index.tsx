@@ -44,7 +44,6 @@ type TextMode = 'text-to-base64' | 'base64-to-text';
 function Base64ToolPage() {
   const [textMode, setTextMode] = useState<TextMode>('text-to-base64');
   const [textInput, setTextInput] = useState('');
-  const [textError, setTextError] = useState('');
 
   const [fileName, setFileName] = useState('尚未选择图片文件');
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
@@ -53,15 +52,11 @@ function Base64ToolPage() {
   const [wrapDataUrl, setWrapDataUrl] = useState(false);
   const [dataUrlLineWidth, setDataUrlLineWidth] = useState(76);
 
-  const encodedResult = useMemo(() => {
-    if (!textInput) {
-      setTextError('');
-      return '';
-    }
+  const { result: encodedResult, error: textError } = useMemo<{ result: string; error: string }>(() => {
+    if (!textInput) return { result: '', error: '' };
 
     if (textMode === 'text-to-base64') {
-      setTextError('');
-      return encodeTextToBase64(textInput);
+      return { result: encodeTextToBase64(textInput), error: '' };
     }
 
     let value = textInput.trim();
@@ -75,17 +70,18 @@ function Base64ToolPage() {
     const compact = value.replace(/\s+/g, '');
 
     if (compact.length % 4 !== 0) {
-      setTextError('Base64 串长度必须是 4 的倍数');
-      return '';
+      return { result: '', error: 'Base64 串长度必须是 4 的倍数' };
     }
 
     if (!base64Pattern.test(compact)) {
-      setTextError('当前内容看起来不是合法的 Base64 字符串');
-      return '';
+      return { result: '', error: '当前内容看起来不是合法的 Base64 字符串' };
     }
 
-    setTextError('');
-    return decodeBase64ToText(compact);
+    try {
+      return { result: decodeBase64ToText(compact), error: '' };
+    } catch {
+      return { result: '', error: 'Base64 解码失败，请检查内容是否完整' };
+    }
   }, [textInput, textMode]);
 
   function handleTextChange(event: ChangeEvent<HTMLTextAreaElement>) {
@@ -125,7 +121,6 @@ function Base64ToolPage() {
 
   function handleClearText() {
     setTextInput('');
-    setTextError('');
   }
 
   function handleClearFile() {

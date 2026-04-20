@@ -1,6 +1,6 @@
 import { format } from 'date-fns';
 import { ChevronDown } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
@@ -37,34 +37,32 @@ export function DateTimePicker({
   timeLabel = '时间（精确到秒）',
 }: DateTimePickerProps) {
   const [open, setOpen] = useState(false);
-  const [timeValue, setTimeValue] = useState(() => format(value, 'HH:mm:ss'));
+  // 本地编辑态：仅在用户打字时使用；关闭后由 value 派生，不需 useEffect 同步
+  const [timeDraft, setTimeDraft] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!open) {
-      setTimeValue(format(value, 'HH:mm:ss'));
-    }
-  }, [value, open]);
+  const timeValue = timeDraft ?? format(value, 'HH:mm:ss');
 
-  const commitChange = (nextDate: Date) => {
-    onChange(nextDate);
+  const handleOpenChange = (next: boolean) => {
+    setOpen(next);
+    // 关闭时清理本地编辑态，下次打开会重新从最新 value 派生
+    if (!next) setTimeDraft(null);
   };
 
   const handleCalendarSelect = (date?: Date) => {
     if (!date) return;
     const combined = combineDateWithTime(date, timeValue);
-    commitChange(combined);
-    setOpen(false);
+    onChange(combined);
+    handleOpenChange(false);
   };
 
   const handleTimeChange = (newValue: string) => {
-    setTimeValue(newValue);
+    setTimeDraft(newValue);
     if (!newValue) return;
-    const combined = combineDateWithTime(value, newValue);
-    commitChange(combined);
+    onChange(combineDateWithTime(value, newValue));
   };
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
         <Button variant="outline" size="sm" className={cn('justify-between font-normal', buttonClassName)}>
           {format(value, 'yyyy-MM-dd')}

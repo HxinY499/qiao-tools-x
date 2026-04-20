@@ -64,6 +64,10 @@ const ZOOM_MAX = 200;
 const ZOOM_STEP = 10;
 const ZOOM_SLIDER_STEP = 5;
 
+function clampZoom(next: number) {
+  return Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, Math.round(next)));
+}
+
 export default function MarkdownEditorPage() {
   // 使用 selector 细粒度订阅，避免无关字段变化触发重渲染
   const content = useMarkdownEditorStore((s) => s.content);
@@ -77,16 +81,11 @@ export default function MarkdownEditorPage() {
   const setShowProgressBar = useMarkdownEditorStore((s) => s.setShowProgressBar);
   const setPreviewHeaderHidden = useMarkdownEditorStore((s) => s.setPreviewHeaderHidden);
 
-  const clampZoom = useCallback((next: number) => {
-    const rounded = Math.round(next);
-    return Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, rounded));
-  }, []);
-
   const applyZoom = useCallback(
     (next: number) => {
       setPreviewZoom(clampZoom(next));
     },
-    [clampZoom, setPreviewZoom],
+    [setPreviewZoom],
   );
 
   const handleZoomOut = useCallback(() => {

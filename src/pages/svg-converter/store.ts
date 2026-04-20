@@ -26,9 +26,6 @@ interface SvgConverterState {
   // Conversion
   convertItem: (id: string) => Promise<void>;
   convertAll: () => Promise<void>;
-
-  // Helper to get params for current view
-  getDisplayParams: () => ConversionParams;
 }
 
 const DEFAULT_PARAMS: ConversionParams = {
@@ -69,7 +66,7 @@ export const useSvgConverterStore = create<SvgConverterState>()((set, get) => ({
       }
 
       const newItem: SvgItem = {
-        id: `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
+        id: crypto.randomUUID(),
         file,
         content: parsed.content,
         originalWidth: parsed.width,
@@ -272,24 +269,24 @@ export const useSvgConverterStore = create<SvgConverterState>()((set, get) => ({
     const { items } = get();
     await Promise.all(items.map((item) => get().convertItem(item.id)));
   },
-
-  getDisplayParams: () => {
-    const { items, selectedId, isIndividualMode, globalParams } = get();
-    if (isIndividualMode && selectedId) {
-      const item = items.find((i) => i.id === selectedId);
-      if (item && item.customParams) {
-        // Merge with global defaults for safety, though customParams should be complete if set
-        return { ...globalParams, ...item.customParams };
-      }
-      // Fallback if customParams not set yet
-      if (item) {
-        return {
-          ...globalParams,
-          width: item.originalWidth,
-          height: item.originalHeight,
-        };
-      }
-    }
-    return globalParams;
-  },
 }));
+
+// 派生 selector：根据当前模式返回实际生效的参数
+// 作为 selector 使用时，zustand 能正确追踪 items/selectedId/isIndividualMode/globalParams 的变化
+export function selectDisplayParams(state: SvgConverterState): ConversionParams {
+  const { items, selectedId, isIndividualMode, globalParams } = state;
+  if (isIndividualMode && selectedId) {
+    const item = items.find((i) => i.id === selectedId);
+    if (item?.customParams) {
+      return { ...globalParams, ...item.customParams };
+    }
+    if (item) {
+      return {
+        ...globalParams,
+        width: item.originalWidth,
+        height: item.originalHeight,
+      };
+    }
+  }
+  return globalParams;
+}

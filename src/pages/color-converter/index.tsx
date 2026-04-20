@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { HexAlphaColorPicker } from 'react-colorful';
 
 import { CopyButton } from '@/components/copy-button';
@@ -7,43 +7,34 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 
-import { useColorConverterStore } from './store';
+import { selectHex, selectHSL, useColorConverterStore } from './store';
 
 function ColorConverterPage() {
-  const { color, setColor, setFromHex, setFromHSL, getHex, getHSL } = useColorConverterStore();
+  const { color, setColor, setFromHex, setFromHSL } = useColorConverterStore();
+  const hexValue = useColorConverterStore(selectHex);
+  const hslValue = useColorConverterStore(selectHSL);
 
-  // 获取各种格式的颜色值
-  const hexValue = getHex();
-  const hslValue = getHSL();
   const rgbaValue = `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a.toFixed(2)})`;
   const hslaValue = `hsla(${hslValue.h}, ${hslValue.s}%, ${hslValue.l}%, ${hslValue.a.toFixed(2)})`;
 
-  // 本地输入状态（用于实时显示用户输入）
-  const [hexInput, setHexInput] = useState(hexValue);
+  // hexInput 仅在用户主动编辑时使用本地值，其它情况跟随 store 派生的 hexValue
+  const [hexInputLocal, setHexInputLocal] = useState<string | null>(null);
   const [hexError, setHexError] = useState('');
+  const hexInputRef = useRef<HTMLInputElement>(null);
 
-  // 同步 hexValue 到 hexInput
+  const hexInput = hexInputLocal ?? hexValue;
+
+  // 更新页面背景色（合理的外部副作用）
   useEffect(() => {
-    setHexInput(hexValue);
-    setHexError('');
-  }, [hexValue]);
-
-  // 更新页面背景色
-  useEffect(() => {
-    const rgba = `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`;
-    document.body.style.backgroundColor = rgba;
-
-    // 清理函数：组件卸载时恢复默认背景色
+    document.body.style.backgroundColor = `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`;
     return () => {
       document.body.style.backgroundColor = '';
     };
   }, [color]);
 
-  // 处理 Hex 输入变化
   const handleHexChange = (value: string) => {
-    setHexInput(value);
+    setHexInputLocal(value);
 
-    // 验证 Hex 格式（支持 3/4/6/8 位）
     const hexRegex = /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{4}|[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$/;
 
     if (!value) {
@@ -56,7 +47,7 @@ function ColorConverterPage() {
       return;
     }
 
-    const validLengths = [4, 5, 7, 9]; // 包含 # 的总长度
+    const validLengths = [4, 5, 7, 9];
     if (!validLengths.includes(value.length)) {
       setHexError('长度必须为 4/5/7/9 位（含 #）');
       return;
@@ -67,9 +58,16 @@ function ColorConverterPage() {
       return;
     }
 
-    // 格式正确，更新颜色
     setHexError('');
     setFromHex(value);
+    setHexInputLocal(null);
+  };
+
+  const handleHexBlur = () => {
+    if (hexError) {
+      setHexInputLocal(null);
+      setHexError('');
+    }
   };
 
   // 处理 RGB 输入变化
@@ -146,8 +144,10 @@ function ColorConverterPage() {
             </div>
             <div>
               <Input
+                ref={hexInputRef}
                 value={hexInput}
                 onChange={(e) => handleHexChange(e.target.value)}
+                onBlur={handleHexBlur}
                 placeholder="#FF5733"
                 className={`font-mono text-sm ${hexError ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
               />

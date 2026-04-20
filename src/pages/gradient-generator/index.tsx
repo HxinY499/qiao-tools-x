@@ -12,47 +12,27 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import { type ColorStop, createNewStop, type GradientType, initialGradientConfig, useGradientStore } from './store';
 
-function buildGradientCss(type: GradientType, angle: number, stops: ColorStop[]): string {
-  if (!stops.length) return 'none';
-  const sortedStops = [...stops].sort((a, b) => a.position - b.position);
-  const stopStr = sortedStops.map((stop) => `${stop.color} ${stop.position}%`).join(', ');
-
-  if (type === 'radial') {
-    return `radial-gradient(circle at center, ${stopStr})`;
-  }
-  return `linear-gradient(${angle}deg, ${stopStr})`;
-}
-
-function buildCssSnippet(type: GradientType, angle: number, stops: ColorStop[]): string {
-  const gradient = buildGradientCss(type, angle, stops);
-  if (gradient === 'none') return 'background-image: none;';
-  return `.gradient-card {\n  background-image: ${gradient};\n}`;
-}
-
-function buildTailwindSnippet(type: GradientType, angle: number, stops: ColorStop[]): string {
-  const gradient = buildGradientCss(type, angle, stops);
-  if (gradient === 'none') return 'bg-none';
-  const arbitrary = gradient.replace(/\s+/g, '_');
-  return `bg-[${arbitrary}]`;
-}
-
 function GradientGeneratorPage() {
   const { config, setConfig } = useGradientStore();
 
-  const cssSnippet = useMemo(
-    () => buildCssSnippet(config.type, config.angle, config.stops),
-    [config.type, config.angle, config.stops],
-  );
+  const snippets = useMemo(() => {
+    const { type, angle, stops } = config;
+    if (!stops.length) {
+      return { preview: 'none', css: 'background-image: none;', tailwind: 'bg-none' };
+    }
+    const sortedStops = [...stops].sort((a, b) => a.position - b.position);
+    const stopStr = sortedStops.map((stop) => `${stop.color} ${stop.position}%`).join(', ');
+    const gradient =
+      type === 'radial'
+        ? `radial-gradient(circle at center, ${stopStr})`
+        : `linear-gradient(${angle}deg, ${stopStr})`;
 
-  const tailwindSnippet = useMemo(
-    () => buildTailwindSnippet(config.type, config.angle, config.stops),
-    [config.type, config.angle, config.stops],
-  );
-
-  const previewGradient = useMemo(
-    () => buildGradientCss(config.type, config.angle, config.stops),
-    [config.type, config.angle, config.stops],
-  );
+    return {
+      preview: gradient,
+      css: `.gradient-card {\n  background-image: ${gradient};\n}`,
+      tailwind: `bg-[${gradient.replace(/\s+/g, '_')}]`,
+    };
+  }, [config]);
 
   function updateType(type: GradientType) {
     setConfig((prev) => ({
@@ -226,7 +206,7 @@ function GradientGeneratorPage() {
         <div className="rounded-lg border bg-background p-12 flex items-center justify-center">
           <div
             className="size-52 rounded-xl border bg-card text-card-foreground flex items-center justify-center text-xs"
-            style={{ backgroundImage: previewGradient }}
+            style={{ backgroundImage: snippets.preview }}
           ></div>
         </div>
 
@@ -241,11 +221,11 @@ function GradientGeneratorPage() {
           </TabsList>
 
           <TabsContent value="css" className="mt-3 flex-1">
-            <CodeArea title="CSS background-image" code={cssSnippet} language="css" />
+            <CodeArea title="CSS background-image" code={snippets.css} language="css" />
           </TabsContent>
 
           <TabsContent value="tailwind" className="mt-3 flex-1">
-            <CodeArea title="Tailwind 渐变类名" code={tailwindSnippet} language="ts" />
+            <CodeArea title="Tailwind 渐变类名" code={snippets.tailwind} language="ts" />
           </TabsContent>
         </Tabs>
 

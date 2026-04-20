@@ -1,6 +1,6 @@
 import './index.css';
 
-import { type ChangeEvent, useEffect, useMemo, useState } from 'react';
+import { type ChangeEvent, useMemo } from 'react';
 
 import { CodeArea } from '@/components/code-area';
 import { ColorPicker } from '@/components/color-picker';
@@ -12,17 +12,6 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 import { BorderStyle, ConfigType, initConfig, useScrollbarStore } from './store';
-
-function loadBool(key: string, fallback: boolean): boolean {
-  if (typeof window === 'undefined') return fallback;
-  try {
-    const raw = window.localStorage.getItem(key);
-    if (!raw) return fallback;
-    return JSON.parse(raw) as boolean;
-  } catch {
-    return fallback;
-  }
-}
 
 function generateCss(config: ConfigType, hasHorizontal: boolean, showWhenHover: boolean): string {
   const width = config.scrollbar.width;
@@ -61,19 +50,13 @@ ${hoverPart}`;
 }
 
 function ScrollBarPage() {
-  const { config, setConfig } = useScrollbarStore();
-  const [hasHorizontal, setHasHorizontal] = useState<boolean>(() => loadBool('Scrollbar__hasHorizontal', false));
-  const [showWhenHover, setShowWhenHover] = useState<boolean>(() => loadBool('Scrollbar__showWhenHover', false));
-  const [cssCode, setCssCode] = useState('');
+  const { config, hasHorizontal, showWhenHover, setConfig, setHasHorizontal, setShowWhenHover } = useScrollbarStore();
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      window.localStorage.setItem('Scrollbar__config', JSON.stringify(config));
-      window.localStorage.setItem('Scrollbar__hasHorizontal', JSON.stringify(hasHorizontal));
-      window.localStorage.setItem('Scrollbar__showWhenHover', JSON.stringify(showWhenHover));
-    }
-    setCssCode(generateCss(config, hasHorizontal, showWhenHover));
-  }, [config, hasHorizontal, showWhenHover]);
+  // cssCode 是 config/hasHorizontal/showWhenHover 的纯派生值，无需 useState + useEffect
+  const cssCode = useMemo(
+    () => generateCss(config, hasHorizontal, showWhenHover),
+    [config, hasHorizontal, showWhenHover],
+  );
 
   const scrollVars = useMemo(
     () => ({

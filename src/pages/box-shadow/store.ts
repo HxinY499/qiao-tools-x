@@ -53,7 +53,7 @@ export const useBoxShadowStore = create<BoxShadowStore>()(
 );
 
 export function createNewLayer(baseIndex: number): ShadowLayer {
-  const id = `layer-${baseIndex}-${Date.now()}`;
+  const id = `layer-${crypto.randomUUID()}`;
   const offsetY = 6 + baseIndex * 4;
   const blurRadius = 18 + baseIndex * 6;
   const spreadRadius = -6 - baseIndex * 2;

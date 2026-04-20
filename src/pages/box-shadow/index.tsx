@@ -26,35 +26,26 @@ function buildLayerCss(layer: ShadowLayer): string {
   return parts.join(' ');
 }
 
-function buildCssSnippet(layers: ShadowLayer[]): string {
-  if (!layers.length) {
-    return 'box-shadow: none;';
-  }
-  const value = layers.map(buildLayerCss).join(',\n        ');
-  return `.box-shadow-card {\n  box-shadow: ${value};\n}`;
-}
-
-function buildTailwindSnippet(layers: ShadowLayer[]): string {
-  if (!layers.length) return 'shadow-none';
-  const encoded = layers.map((layer) => buildLayerCss(layer).replace(/\s+/g, '_')).join(',');
-  return `shadow-[${encoded}]`;
-}
-
-function buildThemeBoxShadowSnippet(layers: ShadowLayer[]): string {
-  const value = layers.length ? layers.map(buildLayerCss).join(',\n        ') : 'none';
-  return `// tailwind.config.js\nextend: {\n  boxShadow: {\n    'layered-card': \`${value}\`,\n  },\n},\n`;
-}
-
 function BoxShadowPage() {
   const { config, setConfig } = useBoxShadowStore();
-  const [activeLayerId, setActiveLayerId] = useState<string | null>(() => config.layers[0]?.id ?? null);
+  // activeLayerId 只作为"用户点选意图"的 raw 值；真正用到的 activeLayer 是派生值，
+  // 这样 store hydrate / 删除当前层 / 外部清空等场景都不会脱同步。
+  const [activeLayerIdRaw, setActiveLayerId] = useState<string | null>(null);
 
   const layers = config.layers;
 
-  const cssSnippet = useMemo(() => buildCssSnippet(layers), [layers]);
-  const tailwindSnippet = useMemo(() => buildTailwindSnippet(layers), [layers]);
-  const themeSnippet = useMemo(() => buildThemeBoxShadowSnippet(layers), [layers]);
-  const boxShadowValue = useMemo(() => (layers.length ? layers.map(buildLayerCss).join(', ') : 'none'), [layers]);
+  const snippets = useMemo(() => {
+    const lines = layers.map(buildLayerCss);
+    const joinedInline = lines.length ? lines.join(', ') : 'none';
+    const joinedBlock = lines.length ? lines.join(',\n        ') : 'none';
+
+    return {
+      boxShadowValue: joinedInline,
+      css: lines.length ? `.box-shadow-card {\n  box-shadow: ${joinedBlock};\n}` : 'box-shadow: none;',
+      tailwind: lines.length ? `shadow-[${lines.map((l) => l.replace(/\s+/g, '_')).join(',')}]` : 'shadow-none',
+      theme: `// tailwind.config.js\nextend: {\n  boxShadow: {\n    'layered-card': \`${joinedBlock}\`,\n  },\n},\n`,
+    };
+  }, [layers]);
 
   function updateLayer(id: string, patch: Partial<ShadowLayer>) {
     setConfig((prev) => ({
@@ -75,22 +66,21 @@ function BoxShadowPage() {
   }
 
   function removeLayer(id: string) {
-    setConfig((prev) => {
-      const nextLayers = prev.layers.filter((layer) => layer.id !== id);
-      const nextConfig = { ...prev, layers: nextLayers };
-      if (!nextLayers.length) {
-        setActiveLayerId(null);
-      } else if (id === activeLayerId) {
-        setActiveLayerId(nextLayers[0]?.id ?? null);
-      }
-      return nextConfig;
-    });
+    setConfig((prev) => ({
+      ...prev,
+      layers: prev.layers.filter((layer) => layer.id !== id),
+    }));
+    // 无需处理 activeLayerId：activeLayer 是派生值，被删除时会自动 fallback 到第一层
   }
 
   function resetConfig() {
     setConfig(() => initialBoxShadowConfig);
     setActiveLayerId(initialBoxShadowConfig.layers[0]?.id ?? null);
   }
+
+  // 派生当前激活层：raw id 仍在 layers 中就用它，否则兜底到第一层
+  const activeLayer = layers.find((l) => l.id === activeLayerIdRaw) ?? layers[0] ?? null;
+  const activeLayerId = activeLayer?.id ?? null;
 
   function renderLayerRow(layer: ShadowLayer, index: number) {
     const isActive = layer.id === activeLayerId;
@@ -133,8 +123,6 @@ function BoxShadowPage() {
       </button>
     );
   }
-
-  const activeLayer = layers.find((layer) => layer.id === activeLayerId) ?? layers[0] ?? null;
 
   return (
     <div className="max-w-5xl w-full mx-auto px-4 pb-5 lg:py-8 grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
@@ -262,7 +250,7 @@ function BoxShadowPage() {
         <div className="rounded-lg border bg-background p-12 flex items-center justify-center">
           <div
             className="w-40 h-24 rounded-xl border bg-card text-card-foreground flex items-center justify-center text-xs"
-            style={{ boxShadow: boxShadowValue }}
+            style={{ boxShadow: snippets.boxShadowValue }}
           >
             阴影预览
           </div>
@@ -282,15 +270,15 @@ function BoxShadowPage() {
           </TabsList>
 
           <TabsContent value="css" className="flex-1">
-            <CodeArea code={cssSnippet} language="css" className="border-none bg-transparent" />
+            <CodeArea code={snippets.css} language="css" className="border-none bg-transparent" />
           </TabsContent>
 
           <TabsContent value="tailwind" className="flex-1">
-            <CodeArea code={tailwindSnippet} language="js" className="border-none bg-transparent" />
+            <CodeArea code={snippets.tailwind} language="js" className="border-none bg-transparent" />
           </TabsContent>
 
           <TabsContent value="theme" className="flex-1">
-            <CodeArea code={themeSnippet} language="js" className="border-none bg-transparent" />
+            <CodeArea code={snippets.theme} language="js" className="border-none bg-transparent" />
           </TabsContent>
         </Tabs>
 

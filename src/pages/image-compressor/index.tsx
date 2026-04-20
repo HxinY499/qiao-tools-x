@@ -292,9 +292,9 @@ function ImageCompressorPage() {
     update(changes);
   }
 
-  // 切换宽高比锁定 —— 使用函数式更新防止 stale closure
+  // 切换宽高比锁定 —— 通过 dispatch 直接取反，避免闭包读到旧值
   function toggleAspectRatio() {
-    update({ keepAspectRatio: !keepAspectRatio });
+    dispatch({ type: 'UPDATE', payload: { keepAspectRatio: !stateRef.current.keepAspectRatio } });
   }
 
   // 应用预设
@@ -749,18 +749,6 @@ function ImageCompressorPage() {
               ) : null}
             </h3>
             <ImageComponent src={compressedUrl} alt="压缩后图片预览" placeholder={compressedPlaceholder} canPreview />
-
-            {/* 文件大小警告提示 */}
-            {/* {compressedSize && originalSize && compressedSize > originalSize && (
-              <div className="mt-2 rounded-md bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 px-3 py-2">
-                <p className="text-[11px] leading-relaxed text-amber-900 dark:text-amber-200 font-medium">
-                  ⚠️ 处理后文件反而增大了 {formatBytes(compressedSize - originalSize)}
-                </p>
-                <p className="mt-1 text-[10px] leading-relaxed text-amber-700 dark:text-amber-300">
-                  建议调整压缩参数、输出格式或图片尺寸
-                </p>
-              </div>
-            )} */}
 
             <ul className="mt-2 text-[11px] text-muted-foreground space-y-1">
               <li className="flex justify-between gap-2">

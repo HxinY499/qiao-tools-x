@@ -41,36 +41,27 @@ export const initConfig: ConfigType = {
   corner: { 'background-color': 'transparent' },
 };
 
-function loadInitialConfig(): ConfigType {
-  if (typeof window === 'undefined') return initConfig;
-  try {
-    const raw = window.localStorage.getItem('qiao-tools-x-scroll-bar');
-    if (!raw) return initConfig;
-    const parsed = JSON.parse(raw) as Partial<ConfigType>;
-    return {
-      scrollbar: { ...initConfig.scrollbar, ...(parsed.scrollbar || {}) },
-      track: { ...initConfig.track, ...(parsed.track || {}) },
-      thumb: { ...initConfig.thumb, ...(parsed.thumb || {}) },
-      corner: { ...initConfig.corner, ...(parsed.corner || {}) },
-    };
-  } catch {
-    return initConfig;
-  }
-}
-
 type ScrollbarStore = {
   config: ConfigType;
+  hasHorizontal: boolean;
+  showWhenHover: boolean;
   setConfig: (updater: (prev: ConfigType) => ConfigType) => void;
+  setHasHorizontal: (v: boolean) => void;
+  setShowWhenHover: (v: boolean) => void;
 };
 
 export const useScrollbarStore = create<ScrollbarStore>()(
   persist(
     (set) => ({
-      config: loadInitialConfig(),
+      config: initConfig,
+      hasHorizontal: false,
+      showWhenHover: false,
       setConfig: (updater) =>
         set((state) => ({
           config: updater(state.config),
         })),
+      setHasHorizontal: (hasHorizontal) => set({ hasHorizontal }),
+      setShowWhenHover: (showWhenHover) => set({ showWhenHover }),
     }),
     {
       name: 'qiao-tools-x-persist-scroll-bar',

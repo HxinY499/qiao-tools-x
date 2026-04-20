@@ -246,6 +246,9 @@ function ScrollToTop() {
 
 const AUTO_COLLAPSE_THRESHOLD = 20;
 
+// isMac() 在运行期间不会变化，缓存为模块级常量避免每次渲染重算
+const PASTE_SHORTCUT = isMac() ? '⌘V' : 'Ctrl+V';
+
 // ─── 主页面 ─────────────────────────────────────────────────
 
 export default function LjsonToJsonPage() {
@@ -319,8 +322,6 @@ export default function LjsonToJsonPage() {
     );
   }, [blocks]);
 
-  const pasteShortcut = useMemo(() => (isMac() ? '⌘V' : 'Ctrl+V'), []);
-
   // 全局粘贴事件
   useEffect(() => {
     const handlePasteEvent = (e: ClipboardEvent) => {
@@ -352,7 +353,7 @@ export default function LjsonToJsonPage() {
         </div>
         <div className="text-center space-y-1.5">
           <p className="text-sm text-muted-foreground">
-            直接按 <kbd className="px-1.5 py-0.5 rounded border bg-muted text-[11px] font-mono">{pasteShortcut}</kbd>{' '}
+            直接按 <kbd className="px-1.5 py-0.5 rounded border bg-muted text-[11px] font-mono">{PASTE_SHORTCUT}</kbd>{' '}
             粘贴 ljson 数据即可自动解析
           </p>
           <p className="text-xs text-muted-foreground/60">或点击下方按钮手动输入</p>

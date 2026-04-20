@@ -48,7 +48,7 @@ export const useGradientStore = create<GradientStore>()(
 );
 
 export function createNewStop(index: number): ColorStop {
-  const id = `stop-${index}-${Date.now()}`;
+  const id = `stop-${crypto.randomUUID()}`;
   const basePosition = Math.min(100, Math.max(0, index * (100 / 3)));
   return createStop(id, '#22c55e', Math.round(basePosition));
 }

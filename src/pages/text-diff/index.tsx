@@ -16,6 +16,13 @@ import { buildDiffLines, buildDiffSummaryText, calculateStats } from './utils';
 
 type InputMode = 'paste' | 'upload';
 
+// 上传文件的通用配置（模块级常量，避免每次渲染重建）
+const UPLOAD_VALIDATION = {
+  maxSize: 2 * 1024 * 1024,
+  extensions: ['txt', 'log', 'json', 'yaml', 'yml', 'md', 'js', 'jsx', 'ts', 'tsx', 'css', 'scss', 'toml', 'ini', 'conf'],
+};
+const ACCEPT_EXTENSIONS = '.txt,.log,.json,.yaml,.yml,.md,.js,.jsx,.ts,.tsx,.css,.scss,.toml,.ini,.conf';
+
 export default function TextDiffPage() {
   const { leftText, rightText, setLeftText, setRightText, swapTexts, reset } = useTextDiffStore();
 
@@ -86,29 +93,6 @@ export default function TextDiffPage() {
   const hasResult = hasCompared && diffLines.length > 0;
   const summaryText = hasResult ? buildDiffSummaryText(filteredLines) : '';
 
-  const commonUploadValidation = {
-    maxSize: 2 * 1024 * 1024,
-    extensions: [
-      'txt',
-      'log',
-      'json',
-      'yaml',
-      'yml',
-      'md',
-      'js',
-      'jsx',
-      'ts',
-      'tsx',
-      'css',
-      'scss',
-      'toml',
-      'ini',
-      'conf',
-    ],
-  };
-
-  const acceptExtensions = '.txt,.log,.json,.yaml,.yml,.md,.js,.jsx,.ts,.tsx,.css,.scss,.toml,.ini,.conf';
-
   return (
     <div className="max-w-6xl w-full mx-auto px-4 pb-5 lg:py-8 space-y-4">
       <Card className="shadow-sm border">
@@ -177,8 +161,8 @@ export default function TextDiffPage() {
                         setLeftFileName(file.name);
                       }}
                       onError={(error) => toast.error(error)}
-                      validation={commonUploadValidation}
-                      accept={acceptExtensions}
+                      validation={UPLOAD_VALIDATION}
+                      accept={ACCEPT_EXTENSIONS}
                       readAs="text"
                       onFileRead={(result) => {
                         if (typeof result === 'string') {
@@ -245,8 +229,8 @@ export default function TextDiffPage() {
                         setRightFileName(file.name);
                       }}
                       onError={(error) => toast.error(error)}
-                      validation={commonUploadValidation}
-                      accept={acceptExtensions}
+                      validation={UPLOAD_VALIDATION}
+                      accept={ACCEPT_EXTENSIONS}
                       readAs="text"
                       onFileRead={(result) => {
                         if (typeof result === 'string') {

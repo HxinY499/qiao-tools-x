@@ -1,6 +1,6 @@
 import { useDebounceFn } from 'ahooks';
 import { Download, FileImage, RefreshCw, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
 import { ColorPicker } from '@/components/color-picker';
@@ -13,7 +13,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
-import { useSvgConverterStore } from './store';
+import { selectDisplayParams, useSvgConverterStore } from './store';
 import { ConversionParams, OutputFormat, PresetType, SvgItem } from './types';
 import { formatBytes, PRESETS } from './utils';
 
@@ -32,27 +32,42 @@ function SvgConverterPage() {
     toggleMode,
     applyPreset,
     convertAll,
-    getDisplayParams,
   } = useSvgConverterStore();
 
+  // 派生 selector：store 变化时自动更新，避免与 useState 同步
+  const displayParams = useSvgConverterStore(selectDisplayParams);
+
   const selectedItem = items.find((i) => i.id === selectedId) || null;
-  const displayParams = getDisplayParams();
 
-  // 本地状态：用于 Input 立即响应用户输入
-  const [localWidth, setLocalWidth] = useState(displayParams.width);
-  const [localHeight, setLocalHeight] = useState(displayParams.height);
+  // 本地覆盖值：用户正在输入时使用，否则回落到 store 的派生值
+  // 这样无需 useEffect 同步，避免"镜像 state"反模式
+  const [localWidth, setLocalWidth] = useState<number | null>(null);
+  const [localHeight, setLocalHeight] = useState<number | null>(null);
 
-  // 当 displayParams 变化时（切换文件、模式、预设），同步到本地状态
-  useEffect(() => {
-    setLocalWidth(displayParams.width);
-    setLocalHeight(displayParams.height);
-  }, [displayParams.width, displayParams.height, selectedId, isIndividualMode, currentPreset]);
+  const displayWidth = localWidth ?? displayParams.width;
+  const displayHeight = localHeight ?? displayParams.height;
 
-  const totalOriginalSize = items.reduce((sum, item) => sum + item.file.size, 0);
-  const totalConvertedSize = items.reduce((sum, item) => sum + (item.result?.blob?.size || 0), 0);
-  const hasConvertedFiles = items.some((item) => item.result?.status === 'success');
+  // 聚合 stats 统计（items 变化时一次遍历搞定）
+  const stats = useMemo(() => {
+    let totalOriginalSize = 0;
+    let totalConvertedSize = 0;
+    let successCount = 0;
+    for (const item of items) {
+      totalOriginalSize += item.file.size;
+      if (item.result?.status === 'success') {
+        successCount += 1;
+        totalConvertedSize += item.result.blob?.size ?? 0;
+      }
+    }
+    return {
+      totalOriginalSize,
+      totalConvertedSize,
+      successCount,
+      hasConvertedFiles: successCount > 0,
+    };
+  }, [items]);
 
-  // 防抖更新参数到 store（触发转换）
+  // 防抖更新参数到 store（触发转换），提交后清空本地覆盖让 Input 回归 store 派生值
   const { run: debouncedUpdateParams } = useDebounceFn(
     (updates: Partial<ConversionParams>) => {
       if (isIndividualMode && selectedId) {
@@ -60,6 +75,8 @@ function SvgConverterPage() {
       } else {
         setGlobalParams(updates);
       }
+      setLocalWidth(null);
+      setLocalHeight(null);
     },
     { wait: 500 },
   );
@@ -286,7 +303,7 @@ function SvgConverterPage() {
                     type="number"
                     min="1"
                     max="10000"
-                    value={localWidth}
+                    value={displayWidth}
                     onChange={(e) => {
                       const newWidth = Number(e.target.value);
                       setLocalWidth(newWidth);
@@ -305,7 +322,7 @@ function SvgConverterPage() {
                     type="number"
                     min="1"
                     max="10000"
-                    value={localHeight}
+                    value={displayHeight}
                     onChange={(e) => {
                       const newHeight = Number(e.target.value);
                       setLocalHeight(newHeight);
@@ -489,8 +506,8 @@ function SvgConverterPage() {
         <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">操作 & 使用说明</h2>
         <div className="mt-3 flex flex-col gap-3">
           <div className="flex flex-wrap gap-2">
-            <Button type="button" disabled={!hasConvertedFiles} onClick={downloadAllFiles} variant="default">
-              批量下载（{items.filter((i) => i.result?.status === 'success').length} 个文件）
+            <Button type="button" disabled={!stats.hasConvertedFiles} onClick={downloadAllFiles} variant="default">
+              批量下载（{stats.successCount} 个文件）
             </Button>
             <Button type="button" disabled={items.length === 0} onClick={() => convertAll()} variant="outline">
               <RefreshCw className="w-3 h-3 mr-1" />
@@ -511,15 +528,15 @@ function SvgConverterPage() {
                 </div>
                 <div>
                   <span className="text-muted-foreground">原始总大小：</span>
-                  <span className="font-medium">{formatBytes(totalOriginalSize)}</span>
+                  <span className="font-medium">{formatBytes(stats.totalOriginalSize)}</span>
                 </div>
                 <div>
                   <span className="text-muted-foreground">已转换：</span>
-                  <span className="font-medium">{items.filter((i) => i.result?.status === 'success').length} 个</span>
+                  <span className="font-medium">{stats.successCount} 个</span>
                 </div>
                 <div>
                   <span className="text-muted-foreground">转换后总大小：</span>
-                  <span className="font-medium">{formatBytes(totalConvertedSize)}</span>
+                  <span className="font-medium">{formatBytes(stats.totalConvertedSize)}</span>
                 </div>
               </div>
             </div>

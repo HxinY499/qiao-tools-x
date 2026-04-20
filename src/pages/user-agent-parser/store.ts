@@ -2,7 +2,6 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
 import { UserAgentData } from './types';
-import { parseUserAgent } from './utils';
 
 interface UserAgentParserState {
   data: UserAgentData;
@@ -12,17 +11,13 @@ interface UserAgentParserState {
 
 const DEFAULT_DATA: UserAgentData = {
   userAgent: '',
-  parsedResult: null,
 };
 
 export const useUserAgentParserStore = create<UserAgentParserState>()(
   persist(
     (set) => ({
       data: DEFAULT_DATA,
-      setUserAgent: (ua) => {
-        const parsedResult = ua ? parseUserAgent(ua) : null;
-        set({ data: { userAgent: ua, parsedResult } });
-      },
+      setUserAgent: (ua) => set({ data: { userAgent: ua } }),
       reset: () => set({ data: DEFAULT_DATA }),
     }),
     {

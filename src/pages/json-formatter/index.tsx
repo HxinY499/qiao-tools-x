@@ -27,8 +27,8 @@ export default function JsonFormatterPage() {
   // 使用 useLatest 保存当前 input 值，用于防抖函数内部访问
   const inputRef = useLatest(input);
 
-  // 派生状态：是否有输入内容
-  const hasInput = useMemo(() => input.trim().length > 0, [input]);
+  // 直接计算，开销极低无需 memo
+  const hasInput = input.trim().length > 0;
 
   // 解析 JSON 核心函数
   const parseJson = (jsonStr: string) => {
@@ -73,20 +73,19 @@ export default function JsonFormatterPage() {
   // 监听输入变化，自动触发格式化
   useEffect(() => {
     autoFormat();
-  }, [input]);
+  }, [input, autoFormat]);
 
   const handleTreeUpdate = (newData: any) => {
     setJsonData(newData);
   };
 
-  // 简易模式下，使用当前 jsonData 重新格式化为字符串，如果没有 jsonData 则尝试使用 input
-  // 为了保证显示的一致性，优先使用 jsonData 序列化
-  const getDisplayCode = () => {
+  // 简易模式下使用的格式化代码
+  const displayCode = useMemo(() => {
     if (jsonData !== null) {
       return JSON.stringify(jsonData, null, settings.indent);
     }
     return input;
-  };
+  }, [jsonData, settings.indent, input]);
 
   // 加载历史记录
   const handleLoadHistory = (content: string) => {
@@ -231,7 +230,7 @@ export default function JsonFormatterPage() {
         {jsonData !== null ? (
           settings.simpleMode ? (
             <CodeArea
-              code={getDisplayCode()}
+              code={displayCode}
               showCopyButton={false}
               language="json"
               className="h-full bg-transparent"
