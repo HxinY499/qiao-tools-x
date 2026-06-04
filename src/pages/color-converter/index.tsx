@@ -89,11 +89,10 @@ function ColorConverterPage() {
   // 处理 HSL 输入变化
   const handleHSLChange = (key: 'h' | 's' | 'l', value: string) => {
     const num = parseInt(value, 10);
-    const hsl = getHSL();
     const maxValues = { h: 360, s: 100, l: 100 };
 
     if (!isNaN(num) && num >= 0 && num <= maxValues[key]) {
-      setFromHSL({ ...hsl, [key]: num });
+      setFromHSL({ ...hslValue, [key]: num });
     }
   };
 
