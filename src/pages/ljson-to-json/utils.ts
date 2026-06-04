@@ -22,14 +22,6 @@ export interface ParseResult {
 }
 
 /**
- * 判断当前平台是否为 macOS
- */
-export function isMac(): boolean {
-  if (typeof navigator === 'undefined') return false;
-  return /mac|iphone|ipad|ipod/i.test(navigator.userAgent);
-}
-
-/**
  * 粗略判断文本是否像 ljson（JSON Lines / NDJSON）。
  * 规则：
  *   - 至少有 2 个非空行

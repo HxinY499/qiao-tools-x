@@ -58,14 +58,6 @@ export function looksLikeSse(text: string): boolean {
 }
 
 /**
- * 判断当前平台是否为 macOS
- */
-export function isMac(): boolean {
-  if (typeof navigator === 'undefined') return false;
-  return /mac|iphone|ipad|ipod/i.test(navigator.userAgent);
-}
-
-/**
  * 按 SSE 规范从文本中提取事件块，支持多行 data 拼接
  */
 export function parseSseToJson(sseText: string): ParseResult {
