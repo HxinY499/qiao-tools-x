@@ -28,6 +28,7 @@ export enum ToolKey {
   MarkdownEditor = 'markdown-editor',
   SseToJson = 'sse-to-json',
   LjsonToJson = 'ljson-to-json',
+  AsciiArt = 'ascii-art',
 }
 
 export type ToolRoute = {

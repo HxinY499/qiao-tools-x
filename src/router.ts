@@ -20,6 +20,7 @@ import {
   Regex,
   ScrollText,
   Search,
+  Sparkles,
   Square,
 } from 'lucide-react';
 import { lazy } from 'react';
@@ -381,6 +382,20 @@ export const toolRoutes: ToolRoute[] = [
       description:
         '免费在线 ljson (JSON Lines / NDJSON) 解析工具，按行解析每一条 JSON，支持语法高亮、逐条查看、错误定位与一键合并复制。',
       keywords: 'ljson解析,JSON Lines,NDJSON,jsonl解析,换行分隔JSON,日志JSON解析,JSON批量格式化',
+    },
+  },
+  {
+    key: ToolKey.AsciiArt,
+    path: '/ascii-art',
+    title: 'ASCII Art',
+    subtitle: '把文字渲染成 ASCII 大字，可换字体、复制、下载，给 README / 代码注释加点小情趣',
+    icon: Sparkles,
+    component: lazy(() => import('@/pages/ascii-art')),
+    category: 'dev',
+    seo: {
+      description:
+        '免费在线 ASCII Art 生成器，输入文字选择字体即可渲染出 ASCII 大字，支持多种 figlet 字体、一键复制与下载，适合给 README、Banner、代码注释加趣味装饰。',
+      keywords: 'ASCII Art,ASCII 字符画,ASCII 大字,figlet,文字 banner,代码注释装饰,README banner',
     },
   },
 ];

@@ -18,7 +18,7 @@ const config = {
   // dev / build 启动后，终端会打印 DevTools 访问地址，提供 Rolldown 构建分析、
   // 模块图、chunks、依赖等调试能力。
   devtools: {
-    enabled: true,
+    // enabled: true,
   },
   plugins: [
     react(),
