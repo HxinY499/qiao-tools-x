@@ -17,9 +17,9 @@ const config = {
   // 启用 Vite 8 官方内置 DevTools（依赖 @vitejs/devtools）。
   // dev / build 启动后，终端会打印 DevTools 访问地址，提供 Rolldown 构建分析、
   // 模块图、chunks、依赖等调试能力。
-  devtools: {
-    // enabled: true,
-  },
+  // devtools: {
+  //   enabled: true,
+  // },
   plugins: [
     react(),
     // Vite 8 的 plugin-react 默认使用 Oxc，不再支持内置 babel 选项，
