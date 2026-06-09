@@ -1,40 +1,58 @@
-import { Download, RefreshCw, Shuffle, Type } from 'lucide-react';
+import { ChevronDown, Code2, Download, RefreshCw, Shuffle, Type } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
 import { CopyButton } from '@/components/copy-button';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/utils';
 
 import { useAsciiArtStore } from './store';
-import { FONT_LIST, type FontName, SAMPLE_TEXTS } from './types';
-import { downloadAsTxt, pickRandomDifferent, renderAsciiArt } from './utils';
+import {
+  BORDER_STYLES,
+  type BorderValue,
+  COMMENT_FORMATS,
+  type CommentFormat,
+  FONT_LIST,
+  type FontName,
+  KERNING_OPTIONS,
+  type KerningValue,
+  SAMPLE_TEXTS,
+} from './types';
+import { applyBorder, downloadAsTxt, pickRandomDifferent, renderAsciiArt, wrapAsComment } from './utils';
 
 const MAX_TEXT_LEN = 32;
 
 function AsciiArtPage() {
-  const { text, font, setText, setFont } = useAsciiArtStore();
-  const [output, setOutput] = useState<string>('');
+  const { text, font, kerning, border, setText, setFont, setKerning, setBorder } = useAsciiArtStore();
+  const [rawOutput, setRawOutput] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // text/font 任一变化时重新渲染（loadFont 内部有缓存，重复切换字体很快）
+  // text/font/kerning 任一变化时重新渲染（loadFont 内部有缓存，重复切换字体很快）
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
     setError(null);
 
-    renderAsciiArt(text, font)
+    renderAsciiArt(text, font, kerning)
       .then((result) => {
         if (cancelled) return;
         if (result === null) {
           setError('字体加载失败，请换一个字体试试');
-          setOutput('');
+          setRawOutput('');
         } else {
-          setOutput(result);
+          setRawOutput(result);
         }
       })
       .finally(() => {
@@ -44,7 +62,15 @@ function AsciiArtPage() {
     return () => {
       cancelled = true;
     };
-  }, [text, font]);
+  }, [text, font, kerning]);
+
+  // 应用边框得到最终展示/复制的内容
+  const output = useMemo(() => applyBorder(rawOutput, border), [rawOutput, border]);
+
+  const previewWidth = useMemo(() => {
+    if (!output) return 0;
+    return output.split('\n').reduce((max, line) => Math.max(max, line.length), 0);
+  }, [output]);
 
   const handleRandomText = () => {
     setText(pickRandomDifferent(SAMPLE_TEXTS, text));
@@ -61,11 +87,15 @@ function AsciiArtPage() {
     toast.success('已下载 .txt 文件');
   };
 
-  // 预览框的字符数（最长行）用于估算需不需要横向滚动
-  const previewWidth = useMemo(() => {
-    if (!output) return 0;
-    return output.split('\n').reduce((max, line) => Math.max(max, line.length), 0);
-  }, [output]);
+  const handleCopyAsComment = async (format: CommentFormat) => {
+    if (!output) return;
+    try {
+      await navigator.clipboard.writeText(wrapAsComment(output, format));
+      toast.success(`已复制为 ${format.label.split(' ')[0]} 注释`);
+    } catch {
+      toast.error('复制失败');
+    }
+  };
 
   return (
     <div className="max-w-5xl w-full mx-auto px-4 pb-5 lg:py-8 space-y-6">
@@ -78,6 +108,7 @@ function AsciiArtPage() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-5">
+          {/* 文字内容 */}
           <div className="space-y-2">
             <Label htmlFor="ascii-text">文字内容</Label>
             <div className="flex gap-2">
@@ -96,6 +127,7 @@ function AsciiArtPage() {
             <p className="text-xs text-muted-foreground">提示：figlet 字体只支持 ASCII 字符，中文不会渲染。</p>
           </div>
 
+          {/* 字体网格 */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label>字体</Label>
@@ -126,6 +158,57 @@ function AsciiArtPage() {
               })}
             </div>
           </div>
+
+          {/* 字符间距 + 边框 同一行展示，桌面双列 */}
+          <div className="grid gap-5 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label>字符间距</Label>
+              <div className="grid grid-cols-3 gap-2">
+                {KERNING_OPTIONS.map((k) => {
+                  const active = k.value === kerning;
+                  return (
+                    <button
+                      key={k.value}
+                      type="button"
+                      onClick={() => setKerning(k.value as KerningValue)}
+                      className={cn(
+                        'h-9 px-3 text-xs rounded-md border transition-colors',
+                        active
+                          ? 'border-primary bg-primary text-primary-foreground'
+                          : 'border-input bg-background hover:bg-accent hover:text-accent-foreground',
+                      )}
+                    >
+                      {k.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>边框装饰</Label>
+              <div className="grid grid-cols-4 gap-2">
+                {BORDER_STYLES.map((b) => {
+                  const active = b.value === border;
+                  return (
+                    <button
+                      key={b.value}
+                      type="button"
+                      onClick={() => setBorder(b.value as BorderValue)}
+                      className={cn(
+                        'h-9 px-3 text-xs rounded-md border transition-colors',
+                        active
+                          ? 'border-primary bg-primary text-primary-foreground'
+                          : 'border-input bg-background hover:bg-accent hover:text-accent-foreground',
+                      )}
+                    >
+                      {b.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
         </CardContent>
       </Card>
 
@@ -150,6 +233,25 @@ function AsciiArtPage() {
                 className="h-8 px-2 lg:px-3"
                 onCopy={() => toast.success('已复制到剪贴板')}
               />
+              {/* 复制为注释下拉 */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" disabled={!output} className="h-8 px-2 lg:px-3">
+                    <Code2 className="w-4 h-4 mr-1" />
+                    注释格式
+                    <ChevronDown className="w-3 h-3 ml-1 opacity-50" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-64">
+                  <DropdownMenuLabel>复制为代码注释</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {COMMENT_FORMATS.map((f) => (
+                    <DropdownMenuItem key={f.key} onClick={() => handleCopyAsComment(f)}>
+                      {f.label}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
               <Button variant="ghost" size="sm" disabled={!output} onClick={handleDownload} className="h-8 px-2 lg:px-3">
                 <Download className="w-4 h-4 mr-1" />
                 下载
