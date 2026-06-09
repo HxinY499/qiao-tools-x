@@ -10,7 +10,7 @@ interface SEOProps {
 }
 
 export function SEO({ title, description, keywords, path, image, category }: SEOProps) {
-  const fullTitle = `${title} - Qiao Tools 免费在线工具`;
+  const fullTitle = `${title} - Qiao Tools`;
   const url = `https://qiaotools.com${path}`;
   const ogImage = image ? `https://qiaotools.com${image}` : 'https://qiaotools.com/qiao-tools.svg';
 
