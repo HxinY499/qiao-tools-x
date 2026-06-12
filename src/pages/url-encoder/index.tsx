@@ -1,5 +1,6 @@
 import { Link } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { CopyButton } from '@/components/copy-button';
 import { Button } from '@/components/ui/button';
@@ -20,6 +21,7 @@ const EXAMPLE_ENCODE_COMPONENT = '你好 世界 & test=value';
 const EXAMPLE_ENCODE_URI = 'https://example.com/搜索?q=你好 世界&name=张三';
 
 function UrlEncoderPage() {
+  const { t } = useTranslation('tools');
   const [input, setInput] = useState('');
   const [mode, setMode] = useState<Mode>('decode');
   const [encodeMethod, setEncodeMethod] = useState<EncodeMethod>('component');
@@ -75,7 +77,7 @@ function UrlEncoderPage() {
       <Card className="shadow-sm p-4 lg:p-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">URL 编解码</h2>
+            <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">{t('urlEncoder.title')}</h2>
           </div>
           <div className="flex items-center gap-3">
             {mode === 'encode' && (
@@ -96,10 +98,10 @@ function UrlEncoderPage() {
             <Tabs value={mode} onValueChange={(v) => setMode(v as Mode)}>
               <TabsList>
                 <TabsTrigger value="decode" className="text-xs">
-                  Decode (解码)
+                  {`Decode (${t('urlEncoder.decode')})`}
                 </TabsTrigger>
                 <TabsTrigger value="encode" className="text-xs">
-                  Encode (编码)
+                  {`Encode (${t('urlEncoder.encode')})`}
                 </TabsTrigger>
               </TabsList>
             </Tabs>
@@ -109,27 +111,27 @@ function UrlEncoderPage() {
         <div className="mt-4 grid gap-4 lg:grid-cols-2">
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between">
-              <Label className="text-xs font-medium">输入</Label>
+              <Label className="text-xs font-medium">{t('urlEncoder.input')}</Label>
               <div className="flex items-center gap-2">
                 <Button variant="secondary" size="sm" className="h-6 px-2 text-[11px]" onClick={fillSample}>
-                  示例
+                  {t('urlEncoder.sample')}
                 </Button>
                 <Button variant="secondary" size="sm" className="h-6 px-2 text-[11px]" onClick={() => setInput('')}>
-                  清空
+                  {t('urlEncoder.clear')}
                 </Button>
               </div>
             </div>
             <Textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder={mode === 'encode' ? '输入要编码的文本...' : '输入要解码的 URL 或文本...'}
+              placeholder={mode === 'encode' ? t('urlEncoder.encodePlaceholder') : t('urlEncoder.decodePlaceholder')}
               className="min-h-[200px] text-xs font-mono"
             />
           </div>
 
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between">
-              <Label className="text-xs font-medium">结果</Label>
+              <Label className="text-xs font-medium">{t('urlEncoder.result')}</Label>
               <CopyButton
                 text={output}
                 mode="icon-text"
@@ -149,7 +151,7 @@ function UrlEncoderPage() {
           <div>
             <h3 className="text-sm font-medium mb-4 flex items-center gap-2">
               <Link className="w-4 h-4" />
-              URL 解析
+              {t('urlEncoder.urlAnalysis')}
             </h3>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <div className="space-y-1">
@@ -218,20 +220,23 @@ function UrlEncoderPage() {
 
       {/* 使用说明 */}
       <Card className="shadow-sm p-4 lg:p-5">
-        <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase mb-3">使用说明</h2>
+        <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase mb-3">{t('urlEncoder.usageGuide')}</h2>
         <ul className="list-disc pl-4 text-xs text-muted-foreground space-y-1.5 leading-relaxed">
           <li>
             <span className="font-medium text-foreground">encodeURIComponent</span>
-            ：编码所有特殊字符，包括 <code className="bg-muted px-1 rounded">/ ? & =</code> 等。适合编码 URL 参数值。
+            {t('urlEncoder.guideComponent')}
+            <code className="bg-muted px-1 rounded">/ ? & =</code>
+            {t('urlEncoder.guideComponentSuffix')}
           </li>
           <li>
             <span className="font-medium text-foreground">encodeURI</span>
-            ：保留 URL 结构字符（<code className="bg-muted px-1 rounded">/ ? & = : #</code>
-            ），只编码非 ASCII 字符和空格。适合编码完整 URL。
+            {t('urlEncoder.guideUri')}
+            <code className="bg-muted px-1 rounded">/ ? & = : #</code>
+            {t('urlEncoder.guideUriSuffix')}
           </li>
           <li>
-            <span className="font-medium text-foreground">解码模式</span>
-            ：自动解析 URL 结构，提取协议、主机、路径、查询参数等信息。
+            <span className="font-medium text-foreground">{t('urlEncoder.guideDecodeTerm')}</span>
+            {t('urlEncoder.guideDecode')}
           </li>
         </ul>
       </Card>

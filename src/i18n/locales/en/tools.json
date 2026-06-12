@@ -1,0 +1,1469 @@
+{
+  "imageCompressor": {
+    "presets": {
+      "custom": "Custom",
+      "manual": "Manually adjust all parameters",
+      "social": "Social Media",
+      "socialDesc": "Suitable for WeChat, Moments sharing (Quality 75%, Width 1280px)",
+      "web": "Web Optimization",
+      "webDesc": "Responsive-friendly, balancing mobile and PC (Quality 75%, Width 1080px)",
+      "extreme": "Extreme Compression",
+      "extremeDesc": "Minimum size, suitable for batch uploads (Quality 65%, Width 800px)"
+    },
+    "preview": {
+      "originalPlaceholder": "Original image preview will appear here after upload",
+      "resultPlaceholder": "Adjust parameters and compress to see the result",
+      "originalFailed": "Original image failed to load, please retry or change the file",
+      "imageFailed": "Image failed to load, please try a different file.",
+      "uploadSuccess": "Image uploaded successfully",
+      "readFailed": "File read failed, please retry.",
+      "invalidSize": "Invalid image dimensions",
+      "compressing": "Compressing, please wait...",
+      "failed": "Compression preview failed, please adjust parameters and retry",
+      "error": "An error occurred during compression, please try reducing the size or changing the image."
+    },
+    "upload": {
+      "upload": "Upload Image",
+      "drag": "Drag image here, or",
+      "select": "Select image file"
+    },
+    "settings": {
+      "title": "Compression Settings",
+      "preset": "Preset",
+      "manual": "Manual Adjustment",
+      "quality": "Compression Quality",
+      "noCompress": "No Compression",
+      "noCompressTip": "If you only want to change the format or resize, you can enable no-compression mode",
+      "qualityTip": "Lower values mean smaller file size but reduced quality",
+      "noCompressOn": "\"No Compression\" mode enabled, original image will be used directly (only effective when size is not adjusted)",
+      "format": "Output Format",
+      "keepFormat": "Keep Original Format",
+      "formatJpg": "JPEG (Best for photos, smaller size)",
+      "formatPng": "PNG (Supports transparency and color quantization)",
+      "formatWebp": "WebP (Supports transparency)",
+      "transparentPng": "Transparent background detected, recommend keeping PNG or switching to WebP",
+      "noTransparent": "No transparent background detected, recommend switching to JPEG or WebP for smaller size",
+      "resize": "Image Resize",
+      "width": "Width (px)",
+      "height": "Height (px)",
+      "percent": "Scale by percentage",
+      "originalSize": "Original size: ",
+      "reduce": "Reduce",
+      "increase": "Increase",
+      "originalVolume": "Original size"
+    },
+    "compare": {
+      "title": "Preview Comparison",
+      "original": "Original",
+      "compressed": "Compressed",
+      "fileSize": "File size: ",
+      "imageSize": "Image size: ",
+      "formatType": "Format: ",
+      "compressing": "Compressing...",
+      "compressedSize": "Compressed size: ",
+      "compressionRatio": "Compression ratio: "
+    },
+    "actions": {
+      "download": "Download Compressed Image",
+      "reupload": "Re-upload",
+      "helpTitle": "Usage Guide",
+      "help1": "Supports PNG color quantization compression to effectively reduce PNG file size.",
+      "help2": "Quality too low will cause obvious distortion. Adjust gradually and compare via the right-side preview.",
+      "help3": "JPEG is best for photos, WebP balances small size and transparency, PNG is best for graphics requiring transparency.",
+      "help4": "Compression runs in a separate thread and won't freeze the page (even with large images)."
+    }
+  },
+  "imageWatermark": {
+    "watermarkText": "© qiao-tools",
+    "noImage": "No image selected",
+    "selected": "Selected: ",
+    "upload": {
+      "title": "Upload Image",
+      "drag": "Drag image here, or",
+      "select": "Select image file",
+      "watermarkDrag": "Drag watermark image here, or",
+      "watermarkSelect": "Select watermark image",
+      "watermarkTip": "Recommend using a PNG icon or logo with transparent background, not too large."
+    },
+    "config": {
+      "title": "Watermark Settings",
+      "text": "Text Watermark",
+      "image": "Image Watermark",
+      "textContent": "Watermark Text",
+      "textPlaceholder": "e.g.: © 2025 Your Name / your-website.com",
+      "fontSize": "Font Size",
+      "fontFamily": "Font Style",
+      "fontSystem": "System Font",
+      "fontSerif": "Serif Font",
+      "fontMono": "Monospace Font",
+      "fontRounded": "Rounded Title",
+      "fontDisplay": "Display Title",
+      "fontHand": "Handwriting Style",
+      "fontComic": "Comic Style",
+      "fontNarrow": "Narrow Font",
+      "fontCondensed": "Condensed Font",
+      "fontWeight": "Weight: ",
+      "normal": "Normal",
+      "bold": "Bold",
+      "color": "Text Color",
+      "sizeRatio": "Watermark width ratio",
+      "sizeRatioDesc1": "Currently about",
+      "sizeRatioDesc2": " of image width, scales proportionally.",
+      "layout": "Watermark Layout",
+      "single": "Single Watermark",
+      "tile": "Tiled",
+      "position": "Position",
+      "tileGap": "Tile Gap",
+      "tileGapDesc": "Controls horizontal and vertical spacing between watermarks. Larger values mean wider spacing.",
+      "opacity": "Watermark Opacity",
+      "margin": "Margin (distance from edge)",
+      "rotation": "Rotation Angle",
+      "resetRotation": "Reset"
+    },
+    "preview": {
+      "title": "Watermark Preview",
+      "real": "Preview shows actual export result",
+      "watermarkPreview": "Current Watermark Preview"
+    },
+    "basePreviewTitle": "Image & Preview",
+    "exportFormat": "Export Format",
+    "exportOriginal": "Keep Original Format",
+    "exportPng": "PNG (Lossless)",
+    "exportJpeg": "JPEG (Smaller Size)",
+    "download": "Download Watermarked Image"
+  },
+  "uuidGenerator": {
+    "config": {
+      "title": "Configuration",
+      "quantity": "Quantity: {{count}}",
+      "uppercase": "Uppercase",
+      "uppercaseDesc": "Use A-F instead of a-f",
+      "hyphens": "Include hyphens",
+      "hyphensDesc": "Include \"-\" separators",
+      "generate": "Generate UUID"
+    },
+    "result": {
+      "title": "Result",
+      "placeholder": "Click the button to generate..."
+    },
+    "history": {
+      "title": "History",
+      "empty": "No history yet",
+      "clear": "Clear history",
+      "countSuffix": "UUIDs"
+    },
+    "toast": {
+      "generated": "Generated {{count}} UUID(s)",
+      "copied": "Copied to clipboard"
+    }
+  },
+  "urlEncoder": {
+    "title": "URL Encode / Decode",
+    "decode": "Decode",
+    "encode": "Encode",
+    "input": "Input",
+    "sample": "Sample",
+    "clear": "Clear",
+    "encodePlaceholder": "Enter text or URL to encode...",
+    "decodePlaceholder": "Enter URL-encoded string to decode...",
+    "result": "Result",
+    "urlAnalysis": "URL Parameter Analysis",
+    "usageGuide": "Usage Guide",
+    "guideComponent": " encodes all characters except letters, numbers, and ",
+    "guideComponentSuffix": ". Use it to encode URL parameter values.",
+    "guideUri": " preserves URL structure characters ",
+    "guideUriSuffix": " unencoded. Use it to encode a complete URL.",
+    "guideDecodeTerm": "Decode",
+    "guideDecode": " automatically decodes URL-encoded strings to restore the original text."
+  },
+  "textEscaper": {
+    "htmlEntities": "HTML Entities",
+    "unicode": "Unicode",
+    "jsString": "JS String",
+    "encode": "Escape",
+    "decode": "Unescape",
+    "exampleHtmlEncode": "Text → HTML entities",
+    "exampleHtmlDecode": "HTML entities → Text",
+    "exampleUnicodeEncode": "Text → Unicode codes",
+    "exampleUnicodeDecode": "Unicode codes → Text",
+    "exampleJsEncode": "Text → JS escaped string",
+    "exampleJsDecode": "JS escaped string → Text",
+    "sample": "Fill Sample",
+    "clear": "Clear",
+    "inputLabel": "Input",
+    "inputPlaceholderEncode": "Enter text to escape...",
+    "inputPlaceholderDecode": "Enter text to unescape...",
+    "outputLabel": "Output",
+    "waitingInput": "Waiting for input...",
+    "usageGuide": "Usage Guide",
+    "guideHtmlTerm": "HTML Entities",
+    "guideHtml": " escaping is for HTML content to prevent XSS attacks, e.g. `<` → `&lt;`, `>` → `&gt;`.",
+    "guideUnicodeTerm": "Unicode",
+    "guideUnicode": " encoding converts characters to \\uXXXX format, commonly used for non-ASCII characters.",
+    "guideJsTerm": "JS String",
+    "guideJs": " escaping handles special characters in JavaScript strings, e.g. `\"` → `\\\"`, newline → `\\n`."
+  },
+  "colorConverter": {
+    "inputRequired": "Please enter a color value",
+    "mustStartWithHash": "Hex color must start with #",
+    "invalidLength": "Invalid Hex color length, should be 3, 4, 6 or 8 digits",
+    "invalidHexFormat": "Contains invalid hexadecimal characters",
+    "invalidColorFormat": "Invalid color format",
+    "hexFormatHint": "Supports #RGB, #RGBA, #RRGGBB, #RRGGBBAA formats"
+  },
+  "borderRadius": {
+    "title": "Corner Controls",
+    "reset": "Reset",
+    "topLeft": "Top Left",
+    "topRight": "Top Right",
+    "bottomRight": "Bottom Right",
+    "bottomLeft": "Bottom Left",
+    "lockXY": "Lock X/Y axes (click to unlock)",
+    "unlockXY": "Unlock X/Y axes (click to lock)",
+    "horizontalRadius": "Horizontal Radius (X)",
+    "verticalRadius": "Vertical Radius (Y)",
+    "tip": "Unlock X/Y axes to independently adjust horizontal and vertical radii for elliptical corners.",
+    "previewAndCode": "Preview & Code"
+  },
+  "ljsonToJson": {
+    "parseFailed": "Parse Failed",
+    "pasteTitle": "Paste ljson Data",
+    "pasteDesc": "Paste JSON Lines / NDJSON data, one JSON object per line",
+    "rawTitle": "Raw Text",
+    "rawDesc": "View the original ljson input text",
+    "viewRaw": "View Raw Text",
+    "parsedSuccess": "Parsed {{count}} records",
+    "total": "Total: {{count}}",
+    "success": "{{count}} succeeded",
+    "fail": "{{count}} failed"
+  },
+  "sseToJson": {
+    "parseFailed": "Parse Failed",
+    "pasteTitle": "Paste SSE Data",
+    "pasteDesc": "Paste raw Server-Sent Events data. The data fields will be extracted and parsed as JSON.",
+    "rawTitle": "Raw Text",
+    "rawDesc": "View the original SSE input text",
+    "viewRaw": "View Raw Text",
+    "parsedSuccess": "Parsed {{count}} SSE records",
+    "signal": "Signal: {{raw}}",
+    "total": "Total: {{count}}",
+    "success": "{{count}} JSON",
+    "signalCount": "{{count}} signals",
+    "fail": "{{count}} failed"
+  },
+  "cronTranslator": {
+    "title": "Cron Expression Translator",
+    "formatLabel": "Format",
+    "formats": {
+      "standard": {
+        "label": "Standard (5 fields)",
+        "desc": "min hour day month weekday"
+      },
+      "with-seconds": {
+        "label": "With Seconds (6 fields)",
+        "desc": "sec min hour day month weekday"
+      }
+    },
+    "exprLabel": "Cron Expression",
+    "placeholder": "e.g.: 0 9 * * 1-5",
+    "placeholderWithSeconds": "e.g.: 0 0 9 * * 1-5",
+    "clear": "Clear",
+    "hintPrefix": "Hint: ",
+    "detectHint": "Current input has {{fields}} fields, possibly {{label}} format",
+    "templatesLabel": "Common Templates",
+    "templates": {
+      "everyMinute": "Every minute",
+      "every5Minutes": "Every 5 minutes",
+      "hourly": "Every hour",
+      "daily": "Every day at midnight",
+      "workdays9am": "Weekdays at 9am",
+      "monday9am": "Every Monday at 9am",
+      "monthly1st": "1st of each month at midnight",
+      "yearlyJan1": "Jan 1st at midnight"
+    },
+    "translation": "Translation",
+    "copied": "Copied",
+    "fieldsBreakdown": "Fields Breakdown",
+    "colField": "Field",
+    "colValue": "Value",
+    "colRange": "Description",
+    "nextRunsTitle": "Next {{count}} Runs",
+    "nextRunsEmpty": "Cannot calculate next run time",
+    "localTimeNote": "All times are in local timezone"
+  },
+  "userAgentParser": {
+    "uaString": "User-Agent String",
+    "useMyUA": "Use My UA",
+    "clear": "Clear",
+    "placeholder": "Paste a User-Agent string, or click \"Use My UA\" to auto-fill...",
+    "commonExamples": "Common examples:",
+    "browser": "Browser",
+    "engine": "Engine",
+    "os": "Operating System",
+    "device": "Device",
+    "name": "Name",
+    "version": "Version",
+    "major": "Major",
+    "type": "Type",
+    "vendor": "Vendor",
+    "model": "Model",
+    "architecture": "Architecture",
+    "jsonResult": "Full Parse Result (JSON)"
+  },
+  "boxShadow": {
+    "sections": {
+      "config": "Configure Layers",
+      "preview": "Preview & Code"
+    },
+    "actions": {
+      "reset": "Reset",
+      "addLayer": "Add Layer",
+      "delete": "Delete"
+    },
+    "layers": {
+      "listLabel": "Shadow Layers",
+      "layerLabel": "Layer {{index}}",
+      "inset": "Inset",
+      "outer": "Outer",
+      "empty": "No layers yet. Click \"Add Layer\" in the top right to get started."
+    },
+    "editor": {
+      "title": "Editing: Layer {{index}}",
+      "subtitle": "Fine-tune the position, size, and color of this layer.",
+      "insetLabel": "Inset shadow",
+      "offsetX": "Offset X",
+      "offsetY": "Offset Y",
+      "blurRadius": "Blur radius",
+      "spreadRadius": "Spread radius",
+      "shadowColor": "Shadow color"
+    },
+    "preview": {
+      "label": "Shadow Preview"
+    },
+    "tabs": {
+      "css": "CSS",
+      "tailwind": "Tailwind Utility",
+      "theme": "Theme boxShadow"
+    },
+    "tips": {
+      "title": "Tips",
+      "tip1": "Use multiple layers to simulate real lighting: one soft large shadow + one small sharp shadow.",
+      "tip2": "A negative spread radius tightens the shadow edges, preventing them from bleeding over adjacent content.",
+      "tip3": "In Tailwind, consider extracting the generated shadow-[...] into a component class for consistency."
+    }
+  },
+  "gradientGenerator": {
+    "sections": {
+      "config": "Configure Gradient",
+      "preview": "Preview & Code"
+    },
+    "actions": {
+      "reset": "Reset",
+      "addStop": "Add Stop",
+      "delete": "Delete"
+    },
+    "type": {
+      "label": "Gradient Type",
+      "linear": "Linear gradient",
+      "radial": "Radial gradient"
+    },
+    "angle": {
+      "label": "Angle",
+      "hint": "0° points upward, rotates clockwise."
+    },
+    "stops": {
+      "label": "Color Stops",
+      "hint": "Supports multi-color gradients, sorted by position from left to right.",
+      "position": "Position"
+    },
+    "tabs": {
+      "css": "CSS",
+      "tailwind": "Tailwind Utility",
+      "tailwindTitle": "Tailwind Gradient Class"
+    },
+    "tips": {
+      "title": "Tips",
+      "tip1": "For linear gradients, angles between 120° and 160° tend to look softer and more natural.",
+      "tip2": "Keep at least two color stops; more stops create richer gradient layers.",
+      "tip3": "Tailwind arbitrary value syntax is great for quick experiments; extract frequently used gradients into custom class names for reuse."
+    }
+  },
+  "scrollBar": {
+    "configTitle": "Configure Scrollbar Style",
+    "reset": "Reset",
+    "scrollbarSection": "Scrollbar",
+    "trackSection": "Track",
+    "thumbSection": "Thumb",
+    "cornerSection": "Corner",
+    "previewTitle": "Preview & CSS Code",
+    "previewAreaLabel": "Scrollbar Preview",
+    "showOnHover": "Show on hover only",
+    "includeHorizontal": "Include horizontal scroll",
+    "previewText": "This is the scrollbar preview area. Scroll up and down (or left and right if horizontal is enabled) to see the style effect.",
+    "previewRow": "Row {{count}}: Scrollbar visual config demo — adjust the parameters on the left to observe changes in width, color, border-radius, and border.",
+    "tipsTitle": "Tips",
+    "tip1": "The generated CSS uses the selector .scrollbar-code-area by default. You can change it to your own class name.",
+    "tip2": "If you only want the scrollbar to appear on hover, check \"Show on hover only\".",
+    "tip3": "The horizontal scroll toggle only affects the preview content width, so you can preview horizontal scrollbar styles at the same time."
+  },
+  "jsonFormatter": {
+    "inputLabel": "Input JSON",
+    "outputLabel": "Formatted Result",
+    "inputPlaceholder": "Paste JSON here...",
+    "removeEscapes": "Remove Escapes",
+    "clear": "Clear",
+    "minify": "Minify",
+    "format": "Format",
+    "parseError": "Parse Error",
+    "waitingInput": "Waiting for input...",
+    "fullscreen": "Fullscreen",
+    "exitFullscreen": "Exit Fullscreen",
+    "noEscapesFound": "No escape sequences found to remove",
+    "escapesRemoved": "Escape sequences removed",
+    "repository": "Repository",
+    "repositoryTitle": "JSON Repository",
+    "repositoryDesc": "Manage JSON data saved in local IndexedDB",
+    "loading": "Loading...",
+    "noRecords": "No saved records",
+    "deleteRecord": "Delete this record",
+    "loadHistoryFailed": "Failed to load history",
+    "deleteSuccess": "Deleted successfully",
+    "deleteFailed": "Delete failed",
+    "jsonLoaded": "JSON content loaded",
+    "save": "Save",
+    "saveTooltip": "Data will be stored in your browser's local IndexedDB",
+    "saveDialogTitle": "Save JSON",
+    "saveDialogDesc": "Will be saved in your browser's local database (IndexedDB)",
+    "saveName": "Name",
+    "saveNamePlaceholder": "Enter a name...",
+    "saveNameRequired": "Please enter a save name",
+    "saveEmptyContent": "Cannot save empty content",
+    "saveSuccess": "Saved successfully",
+    "saveFailed": "Save failed",
+    "saving": "Saving...",
+    "cancel": "Cancel",
+    "settingsTitle": "Editor Settings",
+    "resetAllSettings": "Reset all settings",
+    "simpleMode": "Simple Mode",
+    "simpleModeDesc": "Use static syntax highlighting",
+    "basicAppearance": "Basic Appearance",
+    "fontSize": "Font Size ({{size}}px)",
+    "indentWidth": "Indent Width ({{count}} spaces)",
+    "displayControl": "Display Control",
+    "collapseAll": "Collapse all nodes by default",
+    "showArrayIndices": "Show array indices",
+    "showStringQuotes": "Show string quotes",
+    "showCollectionCount": "Show collection count",
+    "arrayIndexFromOne": "Array index from 1",
+    "showIconTooltips": "Show icon tooltips",
+    "advancedFeatures": "Advanced Features",
+    "viewOnly": "View Only",
+    "enableClipboard": "Enable Clipboard",
+    "sortKeys": "Sort keys",
+    "stringTruncate": "String truncate ({{length}})",
+    "animationSpeed": "Animation speed ({{time}}ms)"
+  },
+  "base64": {
+    "sectionTitle": "Base64 Encode / Decode",
+    "tabImage": "Image to Data URL",
+    "tabText": "Text ⇄ Base64",
+    "labelInput": "Input",
+    "modeTextToBase64": "Text → Base64",
+    "modeBase64ToText": "Base64 → Text",
+    "placeholderEncodeInput": "Enter text to encode here. Supports multi-line and Unicode.",
+    "placeholderDecodeInput": "Paste the Base64 string to decode here. Line breaks are allowed.",
+    "hintEncode": "Type any text and the Base64 result will be generated in real time.",
+    "hintDecode": "Paste a Base64 string and the original text will be restored on the right.",
+    "btnClear": "Clear",
+    "tipBase64Chars": "Tip: Base64 should only contain letters, digits, +, / and up to two = padding characters.",
+    "errorLengthMultiple": "Base64 string length must be a multiple of 4",
+    "errorInvalidBase64": "The content does not appear to be a valid Base64 string",
+    "errorDecodeFailed": "Base64 decoding failed. Please check that the content is complete.",
+    "labelOutput": "Output",
+    "btnCopyResult": "Copy result",
+    "btnCopied": "Copied",
+    "placeholderEncodeOutput": "The encoded Base64 string will appear here in real time.",
+    "placeholderDecodeOutput": "The decoded text will appear here.",
+    "labelSelectImage": "Select or drop an image file",
+    "btnClearImage": "Clear image",
+    "uploaderTitle": "Drop an image here, or click to select a file",
+    "uploaderHint": "Supports common image formats (PNG / JPG / JPEG / GIF, etc.). Max 8 MB per image.",
+    "noFileSelected": "No image file selected",
+    "toastFileTooLarge": "Image is too large. Please select a file under 8 MB.",
+    "toastReadFailed": "Failed to read image. Please try again or choose a different file.",
+    "labelPreview": "Preview & Data URL",
+    "imageAlt": "Image preview",
+    "imagePlaceholder": "Preview",
+    "labelDataUrl": "Base64 Data URL",
+    "btnCopy": "Copy",
+    "checkboxStripPrefix": "Remove",
+    "checkboxStripSuffix": "prefix",
+    "checkboxWrap": "Wrap at fixed length",
+    "charsPerLine": "chars/line",
+    "usageTitle": "Usage & Tips",
+    "usageTip1": "All encoding and decoding is done locally in your browser and nothing is uploaded to a server, making it safe for sensitive text or images.",
+    "usageTip2": "Text mode is useful for generating Authorization headers, config snippets, etc. Note that Base64 output is roughly 33% larger than the original.",
+    "usageTip3": "Image mode is commonly used to inline small icons or placeholders in CSS, HTML, or JSON. For large images, a URL reference is still recommended.",
+    "usageTip4": "If decoding fails, check whether the Base64 string contains unexpected line breaks or extra characters, and try removing whitespace before pasting.",
+    "usageTip5Pre": "A Data URL typically looks like: ",
+    "usageTip5Post": " — you can paste the entire string directly into your stylesheet or tag attribute.",
+    "btnPasteFromBase64": "Paste from Base64",
+    "dialogTitle": "Paste Image Base64 / Data URL",
+    "dialogPlaceholder": "Paste a data:image/... or raw Base64 string here, e.g. copied from a network request or config file.",
+    "dialogHint": "Supports a full Data URL (with data:image/...;base64, prefix) or a raw Base64 string. Line breaks and whitespace are ignored automatically.",
+    "dialogLocalOnly": "All parsing is done locally and nothing is uploaded to a server.",
+    "dialogErrorEmpty": "Please enter an image Base64 or Data URL to parse",
+    "dialogErrorInvalid": "The content does not appear to be a valid image Base64",
+    "pastedImageDescription": "Image pasted from Base64",
+    "btnCancel": "Cancel",
+    "btnParseAndPreview": "Parse & Preview"
+  },
+  "asciiArt": {
+    "sectionConfig": "Configuration",
+    "labelText": "Text",
+    "placeholderText": "Enter text (ASCII/numbers recommended, max 32 characters)",
+    "btnRandomTextTitle": "Random sample text",
+    "hintAsciiOnly": "Note: figlet fonts only support ASCII characters. Chinese characters will not render.",
+    "labelFont": "Font",
+    "btnRandomFont": "Random font",
+    "labelKerning": "Kerning",
+    "kerningFitted": "Fitted",
+    "kerningOverlap": "Smushed",
+    "kerningLoose": "Full",
+    "labelBorder": "Border",
+    "borderNone": "None",
+    "borderSingle": "Single",
+    "borderDouble": "Double",
+    "borderStar": "Star",
+    "sectionPreview": "Preview",
+    "colWidth": "{{count}} cols wide",
+    "toastCopied": "Copied to clipboard",
+    "btnCommentFormat": "Comment format",
+    "dropdownCopyAsComment": "Copy as code comment",
+    "btnDownload": "Download",
+    "toastDownloaded": "Downloaded .txt file",
+    "toastCopiedAsComment": "Copied as {{format}} comment",
+    "toastCopyFailed": "Copy failed",
+    "errorFontLoad": "Font failed to load. Please try a different font.",
+    "rendering": "Rendering…",
+    "emptyHint": "Enter text above to start generating"
+  },
+  "textDiff": {
+    "btn": {
+      "compareNow": "Compare Now",
+      "comparing": "Comparing…",
+      "swap": "Swap",
+      "clear": "Clear",
+      "fillExample": "Fill Example",
+      "copyLeft": "Copy Left",
+      "copyRight": "Copy Right",
+      "copied": "Copied"
+    },
+    "label": {
+      "leftText": "Left Text",
+      "rightText": "Right Text"
+    },
+    "inputMode": {
+      "paste": "Paste",
+      "upload": "Upload"
+    },
+    "upload": {
+      "hint": "Drag and drop a file here, or click to select",
+      "sizeLimit": "Supports common text/code files. Max 2MB per file.",
+      "currentFile": "Current file"
+    },
+    "placeholder": {
+      "left": "Paste original text here, e.g. old version code or config",
+      "right": "Paste target text here, e.g. new version code or config"
+    },
+    "clearDialog": {
+      "title": "Clear all text?",
+      "description": "This will clear all text on both sides along with the diff result. This action cannot be undone.",
+      "cancel": "Cancel",
+      "confirm": "Confirm Clear"
+    },
+    "toast": {
+      "inputRequired": "Please enter text or upload a file on either side first"
+    },
+    "result": {
+      "title": "Diff Result",
+      "showDiffOnly": "Show diff only",
+      "syncScroll": "Sync scroll",
+      "copyResult": "Copy result",
+      "badge": {
+        "added": "Added",
+        "removed": "Removed",
+        "modified": "Modified"
+      },
+      "stats": {
+        "left": "Left: {{lineCount}} lines / {{charCount}} chars",
+        "right": "Right: {{lineCount}} lines / {{charCount}} chars"
+      },
+      "lineNo": "Line",
+      "leftSide": "Left",
+      "rightSide": "Right",
+      "computing": "Computing diff, please wait for large texts…",
+      "empty": {
+        "hint": "Waiting for diff result. Enter text above and click \"Compare Now\".",
+        "privacy": "All computation is done locally in your browser. No text is uploaded. Great for diffing configs, API responses, or code snippets."
+      }
+    }
+  },
+  "timestampConverter": {
+    "converterTitle": "Timestamp ⇄ Datetime",
+    "label": {
+      "unixTimestamp": "Unix Timestamp",
+      "datetime": "Datetime ({{tz}})"
+    },
+    "datetimeHint": "Supports ISO 8601, yyyy-MM-dd HH:mm:ss, yyyy/MM/dd and other common formats. Output is normalized.",
+    "error": {
+      "timestampRequired": "Please enter a timestamp",
+      "timestampInvalidChars": "Timestamp must contain digits only",
+      "timestampParseFailed": "Failed to parse the timestamp",
+      "datetimeRequired": "Please enter a datetime",
+      "datetimeParseFailed": "Failed to parse the datetime format"
+    },
+    "currentTime": {
+      "label": "Current Time",
+      "autoRefreshing": "· Auto-refreshing",
+      "autoRefreshPaused": "· Auto-refresh paused",
+      "resumeRefresh": "Resume Auto-refresh"
+    },
+    "datePicker": {
+      "timeLabel": "Time (HH:mm:ss)"
+    },
+    "formatLabel": {
+      "unix-seconds": "Unix seconds (10-digit)",
+      "unix-milliseconds": "Unix milliseconds (13-digit)",
+      "standard": "yyyy-MM-dd HH:mm:ss",
+      "slash": "yyyy/MM/dd HH:mm:ss",
+      "us": "MM-dd-yyyy HH:mm:ss",
+      "date-only": "yyyy-MM-dd",
+      "iso": "ISO 8601",
+      "utc": "UTC string",
+      "locale": "Locale string"
+    }
+  },
+  "markdownEditor": {
+    "placeholder": {
+      "editor": "Type Markdown here...",
+      "preview": "Start typing to see preview..."
+    },
+    "menu": {
+      "import": "Import",
+      "importSupport": "Supports .md .html .txt",
+      "export": "Export",
+      "exportMd": "Export Markdown",
+      "exportHtml": "Export HTML",
+      "exportPdf": "Export PDF",
+      "exportDocx": "Export Word",
+      "exportImage": "Export Image",
+      "previewTheme": "Preview Theme",
+      "showProgressBar": "Show Reading Progress Bar"
+    },
+    "preview": {
+      "hideToolbar": "Hide Toolbar",
+      "showToolbar": "Show Toolbar",
+      "settingsAndExport": "Settings & Export",
+      "zoomOut": "Zoom Out",
+      "zoomIn": "Zoom In",
+      "zoom": "Zoom",
+      "zoomReset": "Reset",
+      "toc": "Table of Contents",
+      "fullscreen": "Fullscreen Preview",
+      "exitFullscreen": "Exit Fullscreen (ESC)"
+    },
+    "theme": {
+      "light": "Light Themes",
+      "dark": "Dark Themes"
+    },
+    "toast": {
+      "importSuccess": "Imported {{name}}",
+      "importFailed": "Failed to read file",
+      "noContent": "No content to export",
+      "exportMd": "Exported Markdown file",
+      "exportHtml": "Exported HTML file",
+      "generatingPdf": "Generating PDF...",
+      "exportPdf": "Exported PDF file",
+      "exportPdfFailed": "PDF export failed",
+      "generatingDocx": "Generating Word document...",
+      "exportDocx": "Exported Word file",
+      "exportDocxFailed": "Word export failed",
+      "generatingImage": "Generating image...",
+      "exportImage": "Exported image",
+      "exportImageFailed": "Image export failed"
+    },
+    "toc": {
+      "title": "Contents",
+      "empty": "No headings found"
+    },
+    "table": {
+      "dialogTitle": "Insert Table",
+      "rows": "Rows",
+      "cols": "Cols",
+      "importExcel": "Import Excel",
+      "deleteCol": "Delete column",
+      "deleteRow": "Delete row",
+      "headerPrefix": "Header",
+      "headerPlaceholder": "Header {{n}}",
+      "cellPlaceholder": "Cell content",
+      "preview": "Markdown Preview",
+      "cancel": "Cancel",
+      "insert": "Insert Table",
+      "excelParseFailed": "Failed to parse Excel file, please check the file format"
+    },
+    "toolbar": {
+      "heading": "Heading",
+      "headingDesc": "Insert heading",
+      "bold": "Bold",
+      "boldDesc": "Bold text",
+      "italic": "Italic",
+      "italicDesc": "Italic text",
+      "strikethrough": "Strikethrough",
+      "strikethroughDesc": "Strikethrough text",
+      "inlineCode": "Inline Code",
+      "inlineCodeDesc": "Inline code",
+      "codeBlock": "Code Block",
+      "codeBlockDesc": "Multi-line code",
+      "link": "Link",
+      "linkDesc": "Insert link",
+      "image": "Image",
+      "imageDesc": "Insert image",
+      "ul": "Unordered List",
+      "ulDesc": "Bullet list",
+      "ol": "Ordered List",
+      "olDesc": "Numbered list",
+      "quote": "Blockquote",
+      "quoteDesc": "Blockquote",
+      "taskUnchecked": "Task List",
+      "taskUncheckedDesc": "Unchecked task",
+      "taskChecked": "Completed Task",
+      "taskCheckedDesc": "Completed task",
+      "inlineMath": "Inline Math",
+      "inlineMathDesc": "Inline math formula",
+      "blockMath": "Math Block",
+      "blockMathDesc": "Block math formula",
+      "table": "Table",
+      "tableDesc": "Insert table",
+      "hr": "Horizontal Rule",
+      "hrDesc": "Horizontal divider",
+      "toc": "Table of Contents",
+      "tocDesc": "Generate document outline",
+      "chart": "Chart",
+      "chartDesc": "Insert Mermaid chart",
+      "h1": "Heading 1",
+      "h2": "Heading 2",
+      "h3": "Heading 3",
+      "h4": "Heading 4",
+      "h5": "Heading 5",
+      "h6": "Heading 6"
+    },
+    "chart": {
+      "flowchart": "Flowchart",
+      "sequence": "Sequence Diagram",
+      "state": "State Diagram",
+      "gantt": "Gantt Chart",
+      "class": "Class Diagram",
+      "pie": "Pie Chart",
+      "mindmap": "Mind Map"
+    }
+  },
+  "jsonSchemaConverter": {
+    "placeholder": {
+      "schemaInput": "Paste JSON Schema here...",
+      "tsInput": "Paste TypeScript interface or type here..."
+    },
+    "options": {
+      "outputType": "Output Type",
+      "addExport": "Add export",
+      "optionalByDefault": "Optional by default",
+      "schemaVersion": "Schema Version",
+      "includeRequired": "Include required"
+    },
+    "button": {
+      "convert": "Convert",
+      "swap": "Swap",
+      "example": "Example",
+      "clear": "Clear"
+    },
+    "error": {
+      "invalidSchema": "Invalid JSON Schema",
+      "invalidTs": "Invalid TypeScript code"
+    },
+    "toast": {
+      "convertSuccess": "Converted successfully",
+      "exampleLoaded": "Example loaded"
+    },
+    "output": {
+      "waiting": "Waiting for conversion..."
+    },
+    "usage": {
+      "title": "Usage",
+      "schemaToTs": ": Converts JSON Schema to TypeScript interface or type, supporting nested objects, arrays, enums, union types, and more.",
+      "tsToSchema": ": Converts TypeScript interface/type to JSON Schema, supporting Draft-04 and Draft-07.",
+      "swapButton": "Swap button",
+      "swapDesc": ": Uses the output as new input for bidirectional validation.",
+      "supportedTypes": "Supported types: primitives, arrays, nested objects, union types (|), intersection types (&), enums, $ref references, and more."
+    }
+  },
+  "regexVisualizer": {
+    "label": {
+      "pattern": "Regular Expression",
+      "testText": "Test Text"
+    },
+    "placeholder": {
+      "pattern": "Enter a regex, e.g. \\d+, [a-z]+, (\\w+)@(\\w+)\\.(\\w+)",
+      "testText": "Enter text to test..."
+    },
+    "button": {
+      "clear": "Clear"
+    },
+    "confirmClear": "Clear all content?",
+    "section": {
+      "railroad": "Railroad Diagram"
+    },
+    "tab": {
+      "match": "Matches",
+      "explain": "Explanation",
+      "replace": "Replace Preview"
+    },
+    "legend": {
+      "title": "Legend",
+      "literal": "Literal",
+      "meta": "Meta",
+      "class": "Class",
+      "group": "Group",
+      "anchor": "Anchor",
+      "quantifier": "Quantifier"
+    },
+    "explanation": {
+      "empty": "Enter a regex to see its explanation"
+    },
+    "typeLabel": {
+      "literal": "Literal",
+      "meta": "Meta",
+      "escape": "Escape",
+      "class": "Class",
+      "group": "Group",
+      "quantifier": "Quantifier"
+    },
+    "match": {
+      "empty": "Enter test text to see match results",
+      "count": "{{count}} match(es)",
+      "totalChars": "{{count}} character(s) matched in total",
+      "matchTitle": "Match #{{index}}",
+      "detailTitle": "Match Details",
+      "emptyMatch": "(empty match)",
+      "position": "Position: {{start}} - {{end}}",
+      "captures": "Capture groups:",
+      "namedGroups": "Named groups:",
+      "noMatch": "(no match)"
+    },
+    "replace": {
+      "label": "Replace Pattern",
+      "placeholder": "Enter replacement text, supports $1, $2, $& etc.",
+      "hint": "Hint",
+      "hintMatch": "matched text",
+      "hintGroup1": "first capture group",
+      "hintBefore": "text before match",
+      "hintAfter": "text after match",
+      "previewTitle": "Replace Preview",
+      "copyResult": "Copy Result",
+      "copied": "Copied",
+      "empty": "(empty)",
+      "cannotReplace": "(cannot replace)"
+    },
+    "template": {
+      "button": "Templates"
+    },
+    "templates": {
+      "email": {
+        "name": "Email Address",
+        "description": "Matches common email address formats"
+      },
+      "phone-cn": {
+        "name": "Phone Number (CN)",
+        "description": "Matches 11-digit Chinese mainland phone numbers"
+      },
+      "url": {
+        "name": "URL",
+        "description": "Matches HTTP/HTTPS links"
+      },
+      "ipv4": {
+        "name": "IPv4 Address",
+        "description": "Matches IPv4 address format"
+      },
+      "date": {
+        "name": "Date (YYYY-MM-DD)",
+        "description": "Matches YYYY-MM-DD date format"
+      },
+      "time": {
+        "name": "Time (HH:MM:SS)",
+        "description": "Matches 24-hour time format"
+      },
+      "hex-color": {
+        "name": "Hex Color",
+        "description": "Matches CSS hexadecimal color values"
+      },
+      "id-cn": {
+        "name": "ID Card (CN)",
+        "description": "Matches 18-digit Chinese ID card numbers"
+      },
+      "html-tag": {
+        "name": "HTML Tag",
+        "description": "Matches HTML tags (simple version)"
+      },
+      "chinese": {
+        "name": "Chinese Characters",
+        "description": "Matches consecutive Chinese characters"
+      },
+      "number": {
+        "name": "Number (int or decimal)",
+        "description": "Matches integers or decimals"
+      },
+      "username": {
+        "name": "Username",
+        "description": "Starts with letter, 3-16 alphanumeric or underscore chars"
+      }
+    },
+    "flag": {
+      "g": {
+        "label": "Global",
+        "description": "Find all matches, not just the first one"
+      },
+      "i": {
+        "label": "Ignore Case",
+        "description": "Case-insensitive matching"
+      },
+      "m": {
+        "label": "Multiline",
+        "description": "^ and $ match start/end of each line"
+      },
+      "s": {
+        "label": "Dot All",
+        "description": ". matches newline characters"
+      },
+      "u": {
+        "label": "Unicode",
+        "description": "Enable Unicode mode"
+      },
+      "y": {
+        "label": "Sticky",
+        "description": "Match starting from lastIndex position"
+      }
+    },
+    "diagram": {
+      "empty": "Enter a regex to see its visualization",
+      "digit": "digit",
+      "nonDigit": "non-digit",
+      "word": "word",
+      "nonWord": "non-word",
+      "space": "space",
+      "nonSpace": "non-space",
+      "any": "any",
+      "anchorStart": "start ^",
+      "anchorEnd": "end $",
+      "anchorBoundary": "boundary \\b",
+      "anchorNonBoundary": "non-boundary \\B"
+    },
+    "meta": {
+      "anyChar": "Matches any single character (except newline)",
+      "zeroOrMore": "Matches the preceding element zero or more times",
+      "oneOrMore": "Matches the preceding element one or more times",
+      "zeroOrOne": "Matches the preceding element zero or one time",
+      "start": "Matches start of string",
+      "end": "Matches end of string",
+      "or": "OR operator, matches left or right",
+      "digit": "Matches a digit [0-9]",
+      "nonDigit": "Matches a non-digit [^0-9]",
+      "wordChar": "Matches a word character [a-zA-Z0-9_]",
+      "nonWordChar": "Matches a non-word character",
+      "whitespace": "Matches whitespace (space, tab, etc.)",
+      "nonWhitespace": "Matches non-whitespace",
+      "wordBoundary": "Matches a word boundary",
+      "nonWordBoundary": "Matches a non-word boundary",
+      "newline": "Matches a newline",
+      "carriageReturn": "Matches a carriage return",
+      "tab": "Matches a tab",
+      "null": "Matches a NULL character"
+    },
+    "explain": {
+      "escape": "Escaped character \"{{char}}\"",
+      "positiveClass": "Matches character class {{class}}",
+      "negativeClass": "Does not match character class {{class}}",
+      "captureGroup": "Capture group",
+      "nonCaptureGroup": "Non-capturing group",
+      "lookahead": "Positive lookahead",
+      "negativeLookahead": "Negative lookahead",
+      "lookbehind": "Positive lookbehind",
+      "negativeLookbehind": "Negative lookbehind",
+      "namedCaptureGroup": "Named capture group \"{{name}}\"",
+      "exactTimes": "Match exactly {{count}} time(s)",
+      "atLeastTimes": "Match at least {{count}} time(s)",
+      "betweenTimes": "Match {{min}} to {{max}} time(s)",
+      "literal": "Match character \"{{char}}\""
+    }
+  },
+  "qrcodeTool": {
+    "tabGenerate": "Generate QR Code",
+    "tabParse": "Parse QR Code",
+    "modeText": "Free Text",
+    "modeWifi": "WiFi",
+    "modeContact": "Contact",
+    "modeSms": "SMS",
+    "modeLocation": "Location",
+    "btnSample": "Sample",
+    "btnClear": "Clear",
+    "btnDownload": "Download QR Code",
+    "previewPlaceholder": "Enter content to generate QR code",
+    "styleSettings": "Style Settings",
+    "labelForeground": "Foreground (dots)",
+    "labelBackground": "Background",
+    "labelErrorLevel": "Error Correction Level",
+    "errorTolerance": "tolerance",
+    "errorLevelAutoH": "Auto H level when Logo is set",
+    "labelSize": "Size: {{value}}px",
+    "labelMargin": "Margin: {{value}}",
+    "labelLogo": "Brand Logo",
+    "labelLogoSize": "Logo Size: {{value}}%",
+    "btnUploadLogo": "Upload Logo Image",
+    "logoHint": "Logo will be placed at the center of the QR code. A square image with transparent background is recommended.",
+    "btnResetStyle": "Reset Style",
+    "labelTextContent": "Text Content",
+    "placeholderText": "Enter text, URL or any content...",
+    "labelSsid": "Network Name (SSID)",
+    "placeholderSsid": "Enter WiFi name",
+    "labelEncryption": "Encryption",
+    "encryptionNone": "No Password",
+    "labelPassword": "Password",
+    "placeholderPassword": "Enter WiFi password",
+    "labelHiddenNetwork": "Hidden Network",
+    "labelName": "Name",
+    "placeholderName": "Enter name",
+    "labelPhone": "Phone",
+    "placeholderPhone": "Enter phone number",
+    "labelEmail": "Email",
+    "placeholderEmail": "Enter email address",
+    "labelCompany": "Company",
+    "placeholderCompany": "Enter company name",
+    "labelTitle": "Title",
+    "placeholderTitle": "Enter job title",
+    "labelSmsRecipient": "Recipient Number",
+    "placeholderSmsPhone": "Enter phone number",
+    "labelSmsContent": "Message Content",
+    "placeholderSmsMessage": "Enter message content (optional)",
+    "labelLatitude": "Latitude",
+    "placeholderLatitude": "e.g. 39.9042",
+    "labelLongitude": "Longitude",
+    "placeholderLongitude": "e.g. 116.4074",
+    "labelLocationLabel": "Location Label (optional)",
+    "placeholderLocationLabel": "e.g. Tiananmen Square",
+    "locationHint": "Tip: You can get coordinates from a map application.",
+    "parseUploadHint": "Click or drag image here to upload",
+    "parseUploadFormats": "Supports JPG, PNG, GIF and other common image formats",
+    "parseFailedLabel": "Parse Failed",
+    "parseResultLabel": "Parse Result",
+    "btnClearResult": "Clear Result",
+    "parseErrorNotRecognized": "Unable to recognize QR code. Please ensure the image is clear and contains a valid QR code.",
+    "parseErrorModuleLoad": "QR code parsing module failed to load",
+    "parseErrorImgLoad": "Image failed to load",
+    "parseErrorFileRead": "File read failed",
+    "usageTitle": "Usage Guide",
+    "usageText": "Enter any text or URL to generate a corresponding QR code.",
+    "usageWifi": "Fill in the network name, password, and encryption type. Scan to connect to WiFi instantly.",
+    "usageContact": "Generates a vCard-format QR code. Scan to add contact directly.",
+    "usageSms": "Fill in the recipient and message. Scan to send SMS quickly.",
+    "usageLocation": "Enter latitude and longitude. Scan to open the location in a map app.",
+    "usageStyleTitle": "Style Settings",
+    "usageStyle": "Customize QR code color, size, and margin. You can also upload a brand logo to place at the center.",
+    "sampleContactName": "John Doe",
+    "sampleContactCompany": "Sample Corp",
+    "sampleContactTitle": "Product Manager",
+    "sampleSmsMessage": "Check balance",
+    "sampleLocationLabel": "Tiananmen Square, Beijing"
+  },
+  "wordCount": {
+    "statsTitle": "Statistics",
+    "toggleStats": "Toggle stats panel",
+    "statWords": "Words",
+    "statChars": "Characters",
+    "statCharsNoSpaces": "No spaces",
+    "statReadingTime": "Reading Time",
+    "statParagraphs": "Paragraphs",
+    "statSentences": "Sentences",
+    "readingTimeZero": "0 min",
+    "readingTimeLessThanOne": "< 1 min",
+    "readingTimeMinutes": "{{count}} min",
+    "targetWordCount": "Target Word Count",
+    "targetWordCountPlaceholder": "Set target word count (optional)",
+    "progress": "Progress",
+    "textContentTitle": "Text Content",
+    "btnFindReplace": "Find & Replace",
+    "findReplaceTitle": "Find & Replace",
+    "findReplaceTooltip": "This is a lightweight text processing tool that does not support find highlighting. If needed, use the browser built-in find function (Ctrl/Cmd + F).",
+    "labelFind": "Find",
+    "placeholderFind": "Enter search text...",
+    "labelReplaceWith": "Replace With",
+    "placeholderReplace": "Enter replacement text...",
+    "useRegex": "Use Regular Expression",
+    "commonRegex": "Common Regex",
+    "selectCommonRegex": "Select Common Regex",
+    "regexNumbers": "Match numbers",
+    "regexLetters": "Match letters",
+    "regexChinese": "Match Chinese",
+    "regexWhitespace": "Match whitespace",
+    "regexNewline": "Match newline",
+    "regexEmail": "Match email",
+    "quickReplaceNewline": "Replace \\n with real newline",
+    "quickRemoveEscape": "Remove escape chars",
+    "btnCancel": "Cancel",
+    "btnReplaceAll": "Replace All",
+    "btnCleanFormat": "Clean Format",
+    "selectCleanMethod": "Select clean method",
+    "cleanSpaces": "Remove extra spaces",
+    "cleanLines": "Remove blank lines",
+    "cleanTabs": "Remove tabs",
+    "cleanFullwidth": "Full-width to half-width",
+    "cleanAll": "Clean All",
+    "btnCopy": "Copy",
+    "btnCopied": "Copied",
+    "btnClearText": "Clear",
+    "placeholderTextarea": "Type or paste text here...",
+    "confirmClear": "Are you sure you want to clear the content?",
+    "toastSpacesRemoved": "Extra spaces removed",
+    "toastLinesRemoved": "Blank lines removed",
+    "toastTabsRemoved": "Tabs removed",
+    "toastFullwidthConverted": "Full-width characters converted to half-width",
+    "toastAllCleaned": "All cleaning operations applied",
+    "toastFindEmpty": "Please enter search text",
+    "toastNoMatch": "No match found or content unchanged",
+    "toastReplaced": "Replaced {{count}} occurrence(s)",
+    "toastRegexError": "Invalid regular expression",
+    "toastNoNewline": "No \\n text found",
+    "toastNewlineReplaced": "All \\n replaced with real newlines",
+    "toastNoEscape": "No removable escape characters found",
+    "toastEscapeRemoved": "All escape characters removed"
+  },
+  "seoAnalyzer": {
+    "inputTabs": {
+      "url": "URL",
+      "code": "Code",
+      "file": "File"
+    },
+    "urlInput": {
+      "placeholderFull": "Enter full URL",
+      "history": "History",
+      "hint": "Enter a URL to analyze SEO. Some sites may block crawling due to anti-bot measures."
+    },
+    "codeInput": {
+      "placeholder": "Paste HTML code...",
+      "hint": "Paste the full HTML code to analyze (Cmd/Ctrl + Enter to submit)"
+    },
+    "fileInput": {
+      "title": "Click or drag an HTML file here",
+      "hint": "Supports .html and .htm files, max 2MB",
+      "button": "Choose File"
+    },
+    "actions": {
+      "analyze": "Analyze",
+      "reanalyze": "Re-analyze",
+      "copyReport": "Copy Report",
+      "copied": "Copied"
+    },
+    "errors": {
+      "emptyUrl": "Please enter a URL",
+      "fetchFailed": "Fetch failed",
+      "noHtml": "No HTML content received",
+      "requestFailed": "Request failed",
+      "emptyCode": "Please enter HTML code",
+      "emptyFile": "File is empty or failed to read"
+    },
+    "scoreLabels": {
+      "excellent": "Excellent",
+      "good": "Good",
+      "average": "Average",
+      "poor": "Poor"
+    },
+    "scoreUnit": "pts",
+    "stats": {
+      "errors": "Errors",
+      "warnings": "Warnings",
+      "passed": "Passed"
+    },
+    "sections": {
+      "checkResults": "Check Results",
+      "structuredData": "Structured Data",
+      "pageStats": "Page Stats"
+    },
+    "tabs": {
+      "headings": "Headings",
+      "images": "Images",
+      "links": "Links"
+    },
+    "categories": {
+      "meta": "Basic Meta",
+      "social": "Social Tags",
+      "headings": "Heading Structure",
+      "images": "Image Optimization",
+      "links": "Link Analysis",
+      "structured": "Structured Data",
+      "html": "HTML Structure"
+    },
+    "checks": {
+      "title": {
+        "name": "Page Title",
+        "desc": "Title length is appropriate",
+        "sugg": ""
+      },
+      "description": {
+        "name": "Meta Description",
+        "desc": "Description length is appropriate",
+        "sugg": ""
+      },
+      "viewport": {
+        "name": "Viewport",
+        "desc": "Mobile viewport configured correctly",
+        "sugg": ""
+      },
+      "canonical": {
+        "name": "Canonical URL",
+        "desc": "Canonical link is set",
+        "sugg": "Strongly recommended to add a self-referential canonical tag to prevent duplicate content issues"
+      },
+      "robots": {
+        "name": "Robots Directive",
+        "desc": "No robots tag set (indexing allowed by default)",
+        "sugg": "Confirm this is intentional; otherwise search engines will ignore this page"
+      },
+      "keywords": {
+        "name": "Meta Keywords",
+        "desc": "Keywords set (ignored by major search engines)",
+        "sugg": ""
+      },
+      "og": {
+        "name": "Open Graph",
+        "desc": "Open Graph tags are complete",
+        "sugg": "Add og:title, og:description, og:image to improve social sharing"
+      },
+      "twitter": {
+        "name": "Twitter Card",
+        "desc": "Twitter Card tags are complete",
+        "sugg": "Add twitter:card and related tags to improve Twitter sharing"
+      },
+      "h1": {
+        "name": "H1 Tag",
+        "desc": "H1 tag is correctly configured",
+        "sugg": "Add one H1 tag describing the main content of the page"
+      },
+      "heading-hierarchy": {
+        "name": "Heading Hierarchy",
+        "desc": "Heading hierarchy is correct",
+        "sugg": "Keep heading levels sequential, avoid skipping levels"
+      },
+      "images": {
+        "name": "Image Count",
+        "desc": "No images on this page",
+        "sugg": ""
+      },
+      "img-alt": {
+        "name": "Image Alt Attribute",
+        "desc": "All images have alt attributes",
+        "sugg": "Alt attributes are critical for accessibility and image SEO"
+      },
+      "img-dimensions": {
+        "name": "Image Dimensions",
+        "desc": "Image dimensions not specified",
+        "sugg": "Specifying width and height reduces CLS (Cumulative Layout Shift)"
+      },
+      "link-count": {
+        "name": "Link Count",
+        "desc": "Link statistics",
+        "sugg": ""
+      },
+      "link-security": {
+        "name": "External Link Security",
+        "desc": "External links are properly secured",
+        "sugg": "Add rel=noopener noreferrer to external links for security"
+      },
+      "structured-data": {
+        "name": "Structured Data",
+        "desc": "No structured data detected",
+        "sugg": "Adding JSON-LD structured data helps achieve rich search results"
+      },
+      "structured-data-error": {
+        "name": "JSON-LD Syntax Error",
+        "desc": "JSON-LD parsing failed",
+        "sugg": "Check your JSON syntax"
+      },
+      "doctype": {
+        "name": "DOCTYPE",
+        "desc": "DOCTYPE declaration is correct",
+        "sugg": "Add DOCTYPE html as the first line of your HTML"
+      },
+      "html-lang": {
+        "name": "HTML Lang",
+        "desc": "Language attribute is set",
+        "sugg": "Add a lang attribute to the html tag to declare the page language"
+      },
+      "semantic": {
+        "name": "Semantic Tags",
+        "desc": "Semantic tags are used",
+        "sugg": "Use header, nav, main, footer etc. appropriately to improve SEO"
+      },
+      "content-length": {
+        "name": "Word Count",
+        "desc": "Content is sufficient",
+        "sugg": "The page may rely on JS rendering; search engines may not crawl the body text"
+      }
+    },
+    "preview": {
+      "searchTitle": "Search Result Preview",
+      "socialTitle": "Social Media Preview",
+      "noTitle": "(No title)",
+      "noDescription": "(No description)"
+    },
+    "panels": {
+      "noBaseUrl": "Local HTML / code mode has no source URL; relative path images/links cannot be previewed or followed.",
+      "headings": {
+        "empty": "No heading tags on this page",
+        "emptyText": "(empty)"
+      },
+      "images": {
+        "empty": "No images on this page",
+        "total": "Total: {{count}}",
+        "missingAlt": "Missing Alt: {{count}}",
+        "noPreview": "No preview",
+        "previewAlt": "Image preview",
+        "noSrc": "(no src)",
+        "missingAltAttr": "Missing alt attribute"
+      },
+      "links": {
+        "internal": "Internal",
+        "external": "External",
+        "internalTab": "Internal Links",
+        "externalTab": "External Links",
+        "noInternal": "No internal links",
+        "noExternal": "No external links",
+        "noText": "(no text)",
+        "noHref": "(no href)"
+      },
+      "structuredData": {
+        "empty": "No structured data detected"
+      }
+    },
+    "pageStats": {
+      "words": "Words",
+      "images": "Images",
+      "links": "Links",
+      "headings": "Headings",
+      "charset": "Charset",
+      "author": "Author",
+      "generator": "Generator"
+    }
+  },
+  "svgConverter": {
+    "sections": {
+      "upload": "Upload SVG",
+      "params": "Conversion Params",
+      "preview": "Preview",
+      "actions": "Actions & Guide"
+    },
+    "uploader": {
+      "title": "Drag SVG files here, or",
+      "button": "Choose SVG Files",
+      "hint": "Supports batch uploading multiple SVG files"
+    },
+    "fileList": {
+      "addedCount": "{{count}} file(s) added",
+      "current": "(current: {{name}})",
+      "clearAll": "Clear All",
+      "converting": "Converting...",
+      "failed": "Failed",
+      "download": "Download",
+      "remove": "Remove",
+      "empty": "No files"
+    },
+    "params": {
+      "presetSize": "Preset Size",
+      "customSize": "Custom Size",
+      "width": "Width (px)",
+      "height": "Height (px)",
+      "outputFormat": "Output Format",
+      "bgSettings": "Background",
+      "transparent": "Transparent",
+      "transparentActive": "Transparent enabled",
+      "bgColorJpeg": "Background Color (JPEG does not support transparency)",
+      "unifiedMode": "Unified Params",
+      "individualModeActive": "Individual Params",
+      "individualModeHint": "Individual mode: click a file in the list to edit its params separately",
+      "originalSize": "Original size: {{w}} x {{h}}",
+      "uploadFirst": "Upload a file first"
+    },
+    "presets": {
+      "original": {
+        "label": "Original",
+        "description": "Keep SVG original dimensions"
+      },
+      "icon": {
+        "label": "Icon",
+        "description": "64x64px, suitable for app icons"
+      },
+      "web": {
+        "label": "Web",
+        "description": "512x512px, suitable for web display"
+      },
+      "social": {
+        "label": "Social",
+        "description": "1024x1024px, suitable for avatars/covers"
+      },
+      "keepOriginal": "Keep original"
+    },
+    "formats": {
+      "png": "PNG (supports transparency)",
+      "jpeg": "JPEG (smaller size, no transparency)",
+      "webp": "WebP (smallest size, supports transparency)"
+    },
+    "preview": {
+      "original": "Original SVG",
+      "converted": "Converted Image",
+      "converting": "Converting...",
+      "convertFailed": "Conversion Failed",
+      "waiting": "Waiting to convert...",
+      "convertedAlt": "Converted preview",
+      "fileSize": "File Size:",
+      "originalSize": "Original Size:",
+      "exportSize": "Export Size:",
+      "outputFormat": "Output Format:"
+    },
+    "actions": {
+      "downloadAll": "Download All ({{count}} files)",
+      "reconvert": "Re-convert",
+      "clearAndReupload": "Clear & Re-upload"
+    },
+    "stats": {
+      "totalFiles": "Total files:",
+      "fileCount": "{{count}}",
+      "originalSize": "Original size:",
+      "converted": "Converted:",
+      "convertedSize": "Converted size:"
+    },
+    "guide": {
+      "title": "Usage Notes",
+      "tip1": "Supports batch uploading multiple SVG files; unified params apply to all files by default.",
+      "tip2": "Click Individual Params to set conversion params for each file separately.",
+      "tip3": "Click a file in the list to switch the preview target.",
+      "tip4": "PNG supports transparent backgrounds, ideal for icons and graphics with transparency.",
+      "tip5": "JPEG has the smallest file size but does not support transparency; best for photos.",
+      "tip6": "WebP balances small size and transparency support with good browser compatibility.",
+      "tip7": "Complex SVGs (external fonts, filters, animations) may not export well; simplify before converting."
+    },
+    "toast": {
+      "noValidSvg": "No valid SVG files found",
+      "filteredNonSvg": "Filtered {{count}} non-SVG file(s)",
+      "parseFailed": "Parse failed: {{name}}",
+      "added": "Added {{count}} file(s)",
+      "noFilesToDownload": "No files available for download",
+      "startDownload": "Downloading {{count}} file(s)"
+    }
+  }
+}

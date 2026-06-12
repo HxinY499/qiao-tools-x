@@ -2,7 +2,13 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
 import enCommon from './locales/en/common.json';
+import enRoutes from './locales/en/routes.json';
+import enTools from './locales/en/tools.json';
+import enToolPage from './locales/en/toolPage.json';
 import zhCommon from './locales/zh-CN/common.json';
+import zhRoutes from './locales/zh-CN/routes.json';
+import zhTools from './locales/zh-CN/tools.json';
+import zhToolPage from './locales/zh-CN/toolPage.json';
 
 export const SUPPORTED_LANGUAGES = ['zh-CN', 'en'] as const;
 export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
@@ -24,9 +30,20 @@ function resolveInitialLanguage(): SupportedLanguage {
 
 i18n.use(initReactI18next).init({
   resources: {
-    'zh-CN': { common: zhCommon },
-    en: { common: enCommon },
+    'zh-CN': {
+      common: zhCommon,
+      routes: zhRoutes,
+      toolPage: zhToolPage,
+      tools: zhTools,
+    },
+    en: {
+      common: enCommon,
+      routes: enRoutes,
+      toolPage: enToolPage,
+      tools: enTools,
+    },
   },
+  ns: ['common', 'routes', 'toolPage', 'tools'],
   lng: resolveInitialLanguage(),
   fallbackLng: DEFAULT_LANGUAGE,
   defaultNS: 'common',

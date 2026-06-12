@@ -11,6 +11,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FixedSizeList as List } from 'react-window';
 
 import { CopyButton } from '@/components/copy-button';
@@ -42,6 +43,8 @@ const severityConfig: Record<IssueSeverity, { icon: typeof CheckCircle2; color: 
 
 // 评分环
 function ScoreRing({ score, size = 'lg' }: { score: number; size?: 'sm' | 'lg' }) {
+  const { t } = useTranslation('tools');
+
   const getScoreColor = (s: number) => {
     if (s >= 80) return 'text-green-500';
     if (s >= 60) return 'text-yellow-500';
@@ -49,10 +52,10 @@ function ScoreRing({ score, size = 'lg' }: { score: number; size?: 'sm' | 'lg' }
   };
 
   const getScoreLabel = (s: number) => {
-    if (s >= 80) return '优秀';
-    if (s >= 60) return '良好';
-    if (s >= 40) return '一般';
-    return '较差';
+    if (s >= 80) return t('seoAnalyzer.scoreLabels.excellent');
+    if (s >= 60) return t('seoAnalyzer.scoreLabels.good');
+    if (s >= 40) return t('seoAnalyzer.scoreLabels.average');
+    return t('seoAnalyzer.scoreLabels.poor');
   };
 
   const dimensions = size === 'lg' ? 'h-24 w-24' : 'h-16 w-16';
@@ -94,15 +97,20 @@ function StatCard({ label, value, color }: { label: string; value: number; color
 
 // 检查项行
 function CheckItemRow({ item }: { item: SeoCheckItem }) {
+  const { t } = useTranslation('tools');
   const config = severityConfig[item.severity];
   const Icon = config.icon;
+
+  const nameKey = `seoAnalyzer.checks.${item.id}.name`;
+  const descKey = `seoAnalyzer.checks.${item.id}.desc`;
+  const suggKey = `seoAnalyzer.checks.${item.id}.sugg`;
 
   return (
     <div className={cn('flex items-start gap-2.5 rounded-md p-2.5', config.bgColor)}>
       <Icon className={cn('mt-0.5 h-4 w-4 shrink-0', config.color)} />
       <div className="min-w-0 flex-1 space-y-0.5">
         <div className="flex flex-wrap items-center gap-1.5">
-          <span className="text-sm font-medium">{item.name}</span>
+          <span className="text-sm font-medium">{t(nameKey, { defaultValue: item.name })}</span>
           {item.value && (
             <Badge variant="secondary" className="h-5 px-1.5 text-[10px]">
               {item.value}
@@ -113,15 +121,15 @@ function CheckItemRow({ item }: { item: SeoCheckItem }) {
               variant="outline"
               className="h-5 border-red-500/50 px-1.5 text-[10px] text-red-600 dark:text-red-400"
             >
-              {item.scoreModifier} 分
+              {item.scoreModifier} {t('seoAnalyzer.scoreUnit')}
             </Badge>
           )}
         </div>
-        <p className="text-xs text-muted-foreground">{item.description}</p>
+        <p className="text-xs text-muted-foreground">{t(descKey, { defaultValue: item.description })}</p>
         {item.suggestion && (
           <p className="text-xs text-blue-600 dark:text-blue-400">
             <span className="mr-1">💡</span>
-            {item.suggestion}
+            {t(suggKey, { defaultValue: item.suggestion })}
           </p>
         )}
       </div>
@@ -131,6 +139,7 @@ function CheckItemRow({ item }: { item: SeoCheckItem }) {
 
 // 分类卡片
 function CategorySection({ category }: { category: SeoCategory }) {
+  const { t } = useTranslation('tools');
   const [isOpen, setIsOpen] = useState(true);
 
   const counts = {
@@ -145,7 +154,9 @@ function CategorySection({ category }: { category: SeoCategory }) {
         <button className="flex w-full items-center justify-between rounded-lg p-3 text-left transition-colors hover:bg-muted/50">
           <div className="flex items-center gap-2.5">
             <span className="text-lg">{category.icon}</span>
-            <span className="text-sm font-medium">{category.name}</span>
+            <span className="text-sm font-medium">
+              {t(`seoAnalyzer.categories.${category.id}`, { defaultValue: category.name })}
+            </span>
           </div>
           <div className="flex items-center gap-2">
             {counts.error > 0 && (
@@ -180,17 +191,22 @@ function CategorySection({ category }: { category: SeoCategory }) {
 
 // 搜索预览
 function SearchPreview({ result }: { result: SeoAnalysisResult }) {
+  const { t } = useTranslation('tools');
   const displayUrl = result.finalUrl || result.url || 'example.com';
 
   return (
     <div className="space-y-3">
-      <Label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">搜索结果预览</Label>
+      <Label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+        {t('seoAnalyzer.preview.searchTitle')}
+      </Label>
       <div className="rounded-lg border bg-card p-3 space-y-1">
         <p className="text-base font-medium text-blue-600 dark:text-blue-400 line-clamp-1">
-          {result.meta.title || '(无标题)'}
+          {result.meta.title || t('seoAnalyzer.preview.noTitle')}
         </p>
         <p className="text-xs text-green-700 dark:text-green-500 line-clamp-1">{displayUrl}</p>
-        <p className="text-xs text-muted-foreground line-clamp-2">{result.meta.description || '(无描述)'}</p>
+        <p className="text-xs text-muted-foreground line-clamp-2">
+          {result.meta.description || t('seoAnalyzer.preview.noDescription')}
+        </p>
       </div>
     </div>
   );
@@ -198,11 +214,15 @@ function SearchPreview({ result }: { result: SeoAnalysisResult }) {
 
 // 社交预览
 function SocialPreview({ result }: { result: SeoAnalysisResult }) {
+  const { t } = useTranslation('tools');
+
   if (!result.openGraph.title && !result.openGraph.image) return null;
 
   return (
     <div className="space-y-3">
-      <Label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">社交媒体预览</Label>
+      <Label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+        {t('seoAnalyzer.preview.socialTitle')}
+      </Label>
       <div className="overflow-hidden rounded-lg border bg-card">
         {result.openGraph.image && (
           <div className="aspect-[1.91/1] bg-muted">
@@ -230,8 +250,10 @@ function SocialPreview({ result }: { result: SeoAnalysisResult }) {
 
 // 标题结构
 function HeadingsPanel({ headings }: { headings: SeoAnalysisResult['headings'] }) {
+  const { t } = useTranslation('tools');
+
   if (headings.length === 0) {
-    return <p className="py-8 text-center text-xs text-muted-foreground">页面没有标题标签</p>;
+    return <p className="py-8 text-center text-xs text-muted-foreground">{t('seoAnalyzer.panels.headings.empty')}</p>;
   }
 
   const HeadingRow = ({ index, style }: { index: number; style: React.CSSProperties }) => {
@@ -242,7 +264,7 @@ function HeadingsPanel({ headings }: { headings: SeoAnalysisResult['headings'] }
           <Badge variant="outline" className="h-5 w-7 shrink-0 justify-center px-0 text-[10px] font-mono">
             H{h.level}
           </Badge>
-          <span className="truncate text-xs">{h.text || '(空)'}</span>
+          <span className="truncate text-xs">{h.text || t('seoAnalyzer.panels.headings.emptyText')}</span>
         </div>
       </div>
     );
@@ -257,11 +279,12 @@ function HeadingsPanel({ headings }: { headings: SeoAnalysisResult['headings'] }
 
 // 图片列表
 function ImagesPanel({ images, baseUrl }: { images: SeoAnalysisResult['images']; baseUrl?: string }) {
+  const { t } = useTranslation('tools');
   const [previewSrc, setPreviewSrc] = useState<string | null>(null);
   const [previewAlt, setPreviewAlt] = useState<string | null>();
 
   if (images.length === 0) {
-    return <p className="py-8 text-center text-xs text-muted-foreground">页面没有图片</p>;
+    return <p className="py-8 text-center text-xs text-muted-foreground">{t('seoAnalyzer.panels.images.empty')}</p>;
   }
 
   const withoutAlt = images.filter((img) => !img.hasAlt).length;
@@ -314,16 +337,18 @@ function ImagesPanel({ images, baseUrl }: { images: SeoAnalysisResult['images'];
           {hasPreview ? (
             <img
               src={resolveSrc(img.src as string | undefined) ?? ''}
-              alt={img.alt || img.src || '图片预览'}
+              alt={img.alt || img.src || t('seoAnalyzer.panels.images.previewAlt')}
               className="h-full w-full object-cover"
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center text-[10px] text-muted-foreground">
-              无预览
+              {t('seoAnalyzer.panels.images.noPreview')}
             </div>
           )}
         </div>
-        <span className="min-w-0 flex-1 truncate text-muted-foreground">{img.src || '(无 src)'}</span>
+        <span className="min-w-0 flex-1 truncate text-muted-foreground">
+          {img.src || t('seoAnalyzer.panels.images.noSrc')}
+        </span>
       </div>
     );
   };
@@ -332,15 +357,15 @@ function ImagesPanel({ images, baseUrl }: { images: SeoAnalysisResult['images'];
     <div className="space-y-2">
       <div className="flex gap-3 text-xs">
         <span className="text-muted-foreground">
-          总计 <span className="font-medium text-foreground">{images.length}</span> 张
+          {t('seoAnalyzer.panels.images.total', { count: images.length })}
         </span>
         <span className={withoutAlt > 0 ? 'text-yellow-600' : 'text-green-600'}>
-          缺少 Alt: <span className="font-medium">{withoutAlt}</span>
+          {t('seoAnalyzer.panels.images.missingAlt', { count: withoutAlt })}
         </span>
       </div>
       {!baseUrl && (
         <p className="text-[11px] text-yellow-600 dark:text-yellow-500">
-          本地 HTML / 代码模式无来源地址，相对路径图片无法预览。
+          {t('seoAnalyzer.panels.noBaseUrl')}
         </p>
       )}
 
@@ -361,7 +386,7 @@ function ImagesPanel({ images, baseUrl }: { images: SeoAnalysisResult['images'];
                   {previewAlt ? (
                     <span className="text-foreground">{previewAlt}</span>
                   ) : (
-                    <span className="text-yellow-600 dark:text-yellow-500">缺少 alt 属性</span>
+                    <span className="text-yellow-600 dark:text-yellow-500">{t('seoAnalyzer.panels.images.missingAltAttr')}</span>
                   )}
                 </p>
               </div>
@@ -375,6 +400,7 @@ function ImagesPanel({ images, baseUrl }: { images: SeoAnalysisResult['images'];
 
 // 链接列表
 function LinksPanel({ links, baseUrl }: { links: SeoAnalysisResult['links']; baseUrl?: string }) {
+  const { t } = useTranslation('tools');
   const internal = links.filter((l) => !l.isExternal);
   const external = links.filter((l) => l.isExternal);
 
@@ -412,9 +438,9 @@ function LinksPanel({ links, baseUrl }: { links: SeoAnalysisResult['links']; bas
         onClick={() => handleRowClick(link.href)}
         title={link.href}
       >
-        <span className="shrink-0 text-muted-foreground">{link.text || '(无文字)'}</span>
+        <span className="shrink-0 text-muted-foreground">{link.text || t('seoAnalyzer.panels.links.noText')}</span>
         <span className="text-muted-foreground/50">→</span>
-        <span className="min-w-0 flex-1 truncate">{link.href || '(无 href)'}</span>
+        <span className="min-w-0 flex-1 truncate">{link.href || t('seoAnalyzer.panels.links.noHref')}</span>
       </div>
     );
   };
@@ -429,9 +455,9 @@ function LinksPanel({ links, baseUrl }: { links: SeoAnalysisResult['links']; bas
         onClick={() => handleRowClick(link.href)}
         title={link.href}
       >
-        <span className="shrink-0 text-muted-foreground">{link.text || '(无文字)'}</span>
+        <span className="shrink-0 text-muted-foreground">{link.text || t('seoAnalyzer.panels.links.noText')}</span>
         <span className="text-muted-foreground/50">→</span>
-        <span className="min-w-0 flex-1 truncate">{link.href || '(无 href)'}</span>
+        <span className="min-w-0 flex-1 truncate">{link.href || t('seoAnalyzer.panels.links.noHref')}</span>
         {link.hasNofollow && (
           <Badge variant="outline" className="h-4 shrink-0 px-1 text-[9px]">
             nofollow
@@ -445,29 +471,29 @@ function LinksPanel({ links, baseUrl }: { links: SeoAnalysisResult['links']; bas
     <div className="space-y-2">
       <div className="flex gap-3 text-xs text-muted-foreground">
         <span>
-          内链 <span className="font-medium text-foreground">{internal.length}</span>
+          {t('seoAnalyzer.panels.links.internal')} <span className="font-medium text-foreground">{internal.length}</span>
         </span>
         <span>
-          外链 <span className="font-medium text-foreground">{external.length}</span>
+          {t('seoAnalyzer.panels.links.external')} <span className="font-medium text-foreground">{external.length}</span>
         </span>
       </div>
       {!baseUrl && (
         <p className="text-[11px] text-yellow-600 dark:text-yellow-500">
-          本地 HTML / 代码模式无来源地址，相对路径链接无法跳转。
+          {t('seoAnalyzer.panels.noBaseUrl')}
         </p>
       )}
       <Tabs defaultValue="internal" className="w-full">
         <TabsList className="h-8 w-full">
           <TabsTrigger value="internal" className="flex-1 text-xs">
-            内部链接
+            {t('seoAnalyzer.panels.links.internalTab')}
           </TabsTrigger>
           <TabsTrigger value="external" className="flex-1 text-xs">
-            外部链接
+            {t('seoAnalyzer.panels.links.externalTab')}
           </TabsTrigger>
         </TabsList>
         <TabsContent value="internal" className="mt-2">
           {internal.length === 0 ? (
-            <p className="py-8 text-center text-xs text-muted-foreground">无内部链接</p>
+            <p className="py-8 text-center text-xs text-muted-foreground">{t('seoAnalyzer.panels.links.noInternal')}</p>
           ) : (
             <List height={280} itemCount={internal.length} itemSize={32} width="100%" className="custom-scrollbar">
               {InternalLinkRow}
@@ -476,7 +502,7 @@ function LinksPanel({ links, baseUrl }: { links: SeoAnalysisResult['links']; bas
         </TabsContent>
         <TabsContent value="external" className="mt-2">
           {external.length === 0 ? (
-            <p className="py-8 text-center text-xs text-muted-foreground">无外部链接</p>
+            <p className="py-8 text-center text-xs text-muted-foreground">{t('seoAnalyzer.panels.links.noExternal')}</p>
           ) : (
             <List height={280} itemCount={external.length} itemSize={32} width="100%" className="custom-scrollbar">
               {ExternalLinkRow}
@@ -490,10 +516,12 @@ function LinksPanel({ links, baseUrl }: { links: SeoAnalysisResult['links']; bas
 
 // 结构化数据
 function StructuredDataPanel({ data }: { data: SeoAnalysisResult['structuredData'] }) {
+  const { t } = useTranslation('tools');
+
   if (data.length === 0) {
     return (
       <div className="flex h-[280px] items-center justify-center">
-        <p className="text-center text-xs text-muted-foreground">未检测到结构化数据</p>
+        <p className="text-center text-xs text-muted-foreground">{t('seoAnalyzer.panels.structuredData.empty')}</p>
       </div>
     );
   }
@@ -522,6 +550,7 @@ function StructuredDataPanel({ data }: { data: SeoAnalysisResult['structuredData
 }
 
 export function SeoResultView({ result, onReset }: SeoResultViewProps) {
+  const { t } = useTranslation('tools');
   const counts = {
     error: result.categories.reduce((acc, cat) => acc + cat.items.filter((i) => i.severity === 'error').length, 0),
     warning: result.categories.reduce((acc, cat) => acc + cat.items.filter((i) => i.severity === 'warning').length, 0),
@@ -534,7 +563,7 @@ export function SeoResultView({ result, onReset }: SeoResultViewProps) {
       <div className="flex items-center justify-between gap-2">
         <Button variant="ghost" size="sm" onClick={onReset} className="h-8 gap-1.5 px-2">
           <ArrowLeft className="h-4 w-4" />
-          <span className="hidden sm:inline">重新分析</span>
+          <span className="hidden sm:inline">{t('seoAnalyzer.actions.reanalyze')}</span>
         </Button>
         <div className="flex min-w-0 items-center gap-2">
           {result.url && (
@@ -553,8 +582,8 @@ export function SeoResultView({ result, onReset }: SeoResultViewProps) {
             mode="icon-text"
             variant="outline"
             size="sm"
-            copyText="复制报告"
-            successText="已复制"
+            copyText={t('seoAnalyzer.actions.copyReport')}
+            successText={t('seoAnalyzer.actions.copied')}
           />
         </div>
       </div>
@@ -565,9 +594,9 @@ export function SeoResultView({ result, onReset }: SeoResultViewProps) {
           <ScoreRing score={result.score} />
           <Separator orientation="vertical" className="h-16" />
           <div className="flex flex-1 items-center justify-around">
-            <StatCard label="错误" value={counts.error} color="text-red-500" />
-            <StatCard label="警告" value={counts.warning} color="text-yellow-500" />
-            <StatCard label="通过" value={counts.success} color="text-green-500" />
+            <StatCard label={t('seoAnalyzer.stats.errors')} value={counts.error} color="text-red-500" />
+            <StatCard label={t('seoAnalyzer.stats.warnings')} value={counts.warning} color="text-yellow-500" />
+            <StatCard label={t('seoAnalyzer.stats.passed')} value={counts.success} color="text-green-500" />
           </div>
         </div>
         <Progress value={result.score} className="mt-4 h-1.5" />
@@ -578,7 +607,7 @@ export function SeoResultView({ result, onReset }: SeoResultViewProps) {
         {/* Left: Check Results */}
         <Card className="p-3 lg:col-span-3">
           <Label className="mb-3 block text-xs font-medium uppercase tracking-wider text-muted-foreground">
-            检测结果
+            {t('seoAnalyzer.sections.checkResults')}
           </Label>
           <div className="divide-y">
             {result.categories.map((category) => (
@@ -601,15 +630,15 @@ export function SeoResultView({ result, onReset }: SeoResultViewProps) {
               <TabsList className="mb-3 h-8 w-full">
                 <TabsTrigger value="headings" className="flex-1 gap-1 text-xs">
                   <ListTree className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">标题</span>
+                  <span className="hidden sm:inline">{t('seoAnalyzer.tabs.headings')}</span>
                 </TabsTrigger>
                 <TabsTrigger value="images" className="flex-1 gap-1 text-xs">
                   <ImageIcon className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">图片</span>
+                  <span className="hidden sm:inline">{t('seoAnalyzer.tabs.images')}</span>
                 </TabsTrigger>
                 <TabsTrigger value="links" className="flex-1 gap-1 text-xs">
                   <Link2 className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">链接</span>
+                  <span className="hidden sm:inline">{t('seoAnalyzer.tabs.links')}</span>
                 </TabsTrigger>
               </TabsList>
               <TabsContent value="headings">
@@ -627,7 +656,7 @@ export function SeoResultView({ result, onReset }: SeoResultViewProps) {
           {/* Structured Data */}
           <Card className="p-3">
             <Label className="mb-3 block text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              结构化数据
+              {t('seoAnalyzer.sections.structuredData')}
             </Label>
             <StructuredDataPanel data={result.structuredData} />
           </Card>
@@ -635,24 +664,24 @@ export function SeoResultView({ result, onReset }: SeoResultViewProps) {
           {/* Stats */}
           <Card className="p-3 min-w-0">
             <Label className="mb-3 block text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              页面统计
+              {t('seoAnalyzer.sections.pageStats')}
             </Label>
             <div className="grid grid-cols-4 gap-2 text-center">
               <div className="rounded-md bg-muted/50 p-2">
                 <p className="text-lg font-semibold">{result.wordCount.toLocaleString()}</p>
-                <p className="text-[10px] text-muted-foreground">文字</p>
+                <p className="text-[10px] text-muted-foreground">{t('seoAnalyzer.pageStats.words')}</p>
               </div>
               <div className="rounded-md bg-muted/50 p-2">
                 <p className="text-lg font-semibold">{result.images.length}</p>
-                <p className="text-[10px] text-muted-foreground">图片</p>
+                <p className="text-[10px] text-muted-foreground">{t('seoAnalyzer.pageStats.images')}</p>
               </div>
               <div className="rounded-md bg-muted/50 p-2">
                 <p className="text-lg font-semibold">{result.links.length}</p>
-                <p className="text-[10px] text-muted-foreground">链接</p>
+                <p className="text-[10px] text-muted-foreground">{t('seoAnalyzer.pageStats.links')}</p>
               </div>
               <div className="rounded-md bg-muted/50 p-2">
                 <p className="text-lg font-semibold">{result.headings.length}</p>
-                <p className="text-[10px] text-muted-foreground">标题</p>
+                <p className="text-[10px] text-muted-foreground">{t('seoAnalyzer.pageStats.headings')}</p>
               </div>
             </div>
 
@@ -660,19 +689,19 @@ export function SeoResultView({ result, onReset }: SeoResultViewProps) {
               <div className="mt-3 space-y-1 border-t pt-3 text-[11px] text-muted-foreground">
                 {result.meta.charset && (
                   <p className="flex gap-1.5">
-                    <span className="shrink-0 font-medium">字符编码</span>
+                    <span className="shrink-0 font-medium">{t('seoAnalyzer.pageStats.charset')}</span>
                     <span className="min-w-0 truncate text-foreground">{result.meta.charset}</span>
                   </p>
                 )}
                 {result.meta.author && (
                   <p className="flex gap-1.5">
-                    <span className="shrink-0 font-medium">作者</span>
+                    <span className="shrink-0 font-medium">{t('seoAnalyzer.pageStats.author')}</span>
                     <span className="min-w-0 truncate text-foreground">{result.meta.author}</span>
                   </p>
                 )}
                 {result.meta.generator && (
                   <p className="flex gap-1.5">
-                    <span className="shrink-0 font-medium">生成器</span>
+                    <span className="shrink-0 font-medium">{t('seoAnalyzer.pageStats.generator')}</span>
                     <span className="min-w-0 truncate text-foreground">{result.meta.generator}</span>
                   </p>
                 )}

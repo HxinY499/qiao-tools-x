@@ -1,5 +1,6 @@
 import { ChevronDown } from 'lucide-react';
 import { RefObject, useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -30,6 +31,7 @@ interface ToolbarProps {
 }
 
 export function Toolbar({ textareaRef, content, onSelectionChange }: ToolbarProps) {
+  const { t } = useTranslation('tools');
   const containerRef = useRef<HTMLDivElement>(null);
   const measureRef = useRef<HTMLDivElement>(null);
   const moreButtonRef = useRef<HTMLDivElement>(null);
@@ -130,7 +132,7 @@ export function Toolbar({ textareaRef, content, onSelectionChange }: ToolbarProp
               trigger={
                 <div className="flex items-center w-full">
                   <item.icon className="h-4 w-4 mr-2" />
-                  {item.label}
+                  {t(item.label)}
                 </div>
               }
               onInsert={handleInsertTable}
@@ -150,7 +152,7 @@ export function Toolbar({ textareaRef, content, onSelectionChange }: ToolbarProp
             }
             onInsert={handleInsertTable}
           />
-          <TooltipContent>{item.label}</TooltipContent>
+          <TooltipContent>{t(item.label)}</TooltipContent>
         </Tooltip>
       );
     }
@@ -166,7 +168,7 @@ export function Toolbar({ textareaRef, content, onSelectionChange }: ToolbarProp
             }}
           >
             <chart.icon className="h-4 w-4 mr-2" />
-            {chart.label}
+            {t(chart.label)}
           </DropdownMenuItem>
         ));
       }
@@ -181,7 +183,7 @@ export function Toolbar({ textareaRef, content, onSelectionChange }: ToolbarProp
                 </Button>
               </DropdownMenuTrigger>
             </TooltipTrigger>
-            <TooltipContent>{item.label}</TooltipContent>
+            <TooltipContent>{t(item.label)}</TooltipContent>
           </Tooltip>
           <DropdownMenuContent
             align="start"
@@ -198,7 +200,7 @@ export function Toolbar({ textareaRef, content, onSelectionChange }: ToolbarProp
                 }}
               >
                 <chart.icon className="h-4 w-4 mr-2" />
-                {chart.label}
+                {t(chart.label)}
               </DropdownMenuItem>
             ))}
           </DropdownMenuContent>
@@ -216,7 +218,7 @@ export function Toolbar({ textareaRef, content, onSelectionChange }: ToolbarProp
             }}
           >
             <heading.icon className="h-4 w-4 mr-2" />
-            <span className="flex-1">{heading.label}</span>
+            <span className="flex-1">{t(heading.label)}</span>
             {heading.shortcut && (
               <span className="ml-auto text-xs text-muted-foreground">{formatShortcut(heading.shortcut)}</span>
             )}
@@ -233,7 +235,7 @@ export function Toolbar({ textareaRef, content, onSelectionChange }: ToolbarProp
                 </Button>
               </DropdownMenuTrigger>
             </TooltipTrigger>
-            <TooltipContent>{item.label}</TooltipContent>
+            <TooltipContent>{t(item.label)}</TooltipContent>
           </Tooltip>
           <DropdownMenuContent
             align="start"
@@ -250,7 +252,7 @@ export function Toolbar({ textareaRef, content, onSelectionChange }: ToolbarProp
                 }}
               >
                 <heading.icon className="h-4 w-4 mr-2" />
-                <span className="flex-1">{heading.label}</span>
+                <span className="flex-1">{t(heading.label)}</span>
                 {heading.shortcut && (
                   <span className="ml-auto text-xs text-muted-foreground">{formatShortcut(heading.shortcut)}</span>
                 )}
@@ -265,7 +267,7 @@ export function Toolbar({ textareaRef, content, onSelectionChange }: ToolbarProp
       return (
         <DropdownMenuItem key={item.id} onClick={() => executeCommand(item.id)}>
           <item.icon className="h-4 w-4 mr-2" />
-          <span className="flex-1">{item.label}</span>
+          <span className="flex-1">{t(item.label)}</span>
           {shortcutText && <span className="ml-auto text-xs text-muted-foreground">{shortcutText}</span>}
         </DropdownMenuItem>
       );
@@ -286,7 +288,7 @@ export function Toolbar({ textareaRef, content, onSelectionChange }: ToolbarProp
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            {item.label}
+            {t(item.label)}
             {shortcutText && <span className="ml-2 text-muted-foreground">{shortcutText}</span>}
           </TooltipContent>
         </Tooltip>
@@ -301,7 +303,7 @@ export function Toolbar({ textareaRef, content, onSelectionChange }: ToolbarProp
           </Button>
         </TooltipTrigger>
         <TooltipContent>
-          {item.label}
+          {t(item.label)}
           {shortcutText && <span className="ml-2 text-muted-foreground">{shortcutText}</span>}
         </TooltipContent>
       </Tooltip>

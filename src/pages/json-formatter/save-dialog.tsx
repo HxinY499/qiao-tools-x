@@ -1,5 +1,6 @@
 import { Save } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
@@ -25,6 +26,7 @@ interface SaveJsonDialogProps {
 }
 
 export function SaveJsonDialog({ content, onSaved, disabled }: SaveJsonDialogProps) {
+  const { t } = useTranslation('tools');
   const [open, setOpen] = useState(false);
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
@@ -40,24 +42,24 @@ export function SaveJsonDialog({ content, onSaved, disabled }: SaveJsonDialogPro
 
   const handleSave = async () => {
     if (!name.trim()) {
-      toast.error('请输入保存名称');
+      toast.error(t('jsonFormatter.saveNameRequired'));
       return;
     }
 
     if (!content.trim()) {
-      toast.error('无法保存空内容');
+      toast.error(t('jsonFormatter.saveEmptyContent'));
       return;
     }
 
     try {
       setLoading(true);
       await db.add(name, content);
-      toast.success('保存成功');
+      toast.success(t('jsonFormatter.saveSuccess'));
       setOpen(false);
       onSaved?.();
     } catch (error) {
       console.error('Save failed:', error);
-      toast.error('保存失败');
+      toast.error(t('jsonFormatter.saveFailed'));
     } finally {
       setLoading(false);
     }
@@ -74,34 +76,34 @@ export function SaveJsonDialog({ content, onSaved, disabled }: SaveJsonDialogPro
                 variant="outline"
                 className="h-7 w-7 p-0 xl:w-auto xl:px-2"
                 disabled={disabled}
-                title="保存"
+                title={t('jsonFormatter.save')}
               >
                 <Save className="h-3.5 w-3.5" />
-                <span className="hidden xl:inline ml-2">保存</span>
+                <span className="hidden xl:inline ml-2">{t('jsonFormatter.save')}</span>
               </Button>
             </DialogTrigger>
           </TooltipTrigger>
           <TooltipContent>
-            <p>数据将存储在本地 IndexedDB 中</p>
+            <p>{t('jsonFormatter.saveTooltip')}</p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
 
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>保存 JSON</DialogTitle>
-          <DialogDescription>将保存在您的浏览器本地数据库（IndexedDB）中</DialogDescription>
+          <DialogTitle>{t('jsonFormatter.saveDialogTitle')}</DialogTitle>
+          <DialogDescription>{t('jsonFormatter.saveDialogDesc')}</DialogDescription>
         </DialogHeader>
         <div className="flex items-center gap-2">
           <Label htmlFor="name" className="text-right shrink-0">
-            名称
+            {t('jsonFormatter.saveName')}
           </Label>
           <Input
             id="name"
             value={name}
             onChange={(e) => setName(e.target.value)}
             className="col-span-3"
-            placeholder="输入名称..."
+            placeholder={t('jsonFormatter.saveNamePlaceholder')}
             autoFocus
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
@@ -112,10 +114,10 @@ export function SaveJsonDialog({ content, onSaved, disabled }: SaveJsonDialogPro
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)}>
-            取消
+            {t('jsonFormatter.cancel')}
           </Button>
           <Button onClick={handleSave} disabled={loading}>
-            {loading ? '保存中...' : '保存'}
+            {loading ? t('jsonFormatter.saving') : t('jsonFormatter.save')}
           </Button>
         </DialogFooter>
       </DialogContent>

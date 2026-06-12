@@ -3,6 +3,7 @@
  */
 
 import { BookOpen, ChevronDown } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -20,12 +21,14 @@ interface TemplateSelectorProps {
 }
 
 export function TemplateSelector({ onSelect }: TemplateSelectorProps) {
+  const { t } = useTranslation('tools');
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="sm" className="gap-1.5">
           <BookOpen className="h-4 w-4" />
-          常用模板
+          {t('regexVisualizer.template.button')}
           <ChevronDown className="h-3 w-3 opacity-50" />
         </Button>
       </DropdownMenuTrigger>
@@ -36,8 +39,8 @@ export function TemplateSelector({ onSelect }: TemplateSelectorProps) {
             onClick={() => onSelect(template)}
             className="flex flex-col items-start gap-1 py-2 cursor-pointer"
           >
-            <span className="font-medium">{template.name}</span>
-            <span className="text-xs text-muted-foreground line-clamp-1">{template.description}</span>
+            <span className="font-medium">{t(`regexVisualizer.templates.${template.id}.name`, { defaultValue: template.name })}</span>
+            <span className="text-xs text-muted-foreground line-clamp-1">{t(`regexVisualizer.templates.${template.id}.description`, { defaultValue: template.description })}</span>
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

@@ -104,10 +104,41 @@ export function executeReplace(
 }
 
 /**
- * 生成正则解释
+ * i18n key for meta char explanations (maps raw char to translation key suffix)
  */
-export function generateExplanation(pattern: string): ExplanationItem[] {
+export const META_CHAR_I18N_KEYS: Record<string, string> = {
+  '.': 'anyChar',
+  '*': 'zeroOrMore',
+  '+': 'oneOrMore',
+  '?': 'zeroOrOne',
+  '^': 'start',
+  '$': 'end',
+  '|': 'or',
+  '\\d': 'digit',
+  '\\D': 'nonDigit',
+  '\\w': 'wordChar',
+  '\\W': 'nonWordChar',
+  '\\s': 'whitespace',
+  '\\S': 'nonWhitespace',
+  '\\b': 'wordBoundary',
+  '\\B': 'nonWordBoundary',
+  '\\n': 'newline',
+  '\\r': 'carriageReturn',
+  '\\t': 'tab',
+  '\\0': 'null',
+};
+
+/**
+ * 生成正则解释（接受 t 翻译函数）
+ */
+export function generateExplanation(pattern: string, t?: (key: string, opts?: Record<string, unknown>) => string): ExplanationItem[] {
   if (!pattern) return [];
+
+  const tr = (key: string, opts?: Record<string, unknown>): string => {
+    if (t) return t(key, opts);
+    // fallback to META_CHAR_EXPLANATIONS for untranslated context
+    return key;
+  };
 
   const items: ExplanationItem[] = [];
   let i = 0;
@@ -118,14 +149,17 @@ export function generateExplanation(pattern: string): ExplanationItem[] {
     // 转义序列
     if (char === '\\' && i + 1 < pattern.length) {
       const escaped = pattern.slice(i, i + 2);
-      const explanation = META_CHAR_EXPLANATIONS[escaped];
+      const i18nKey = META_CHAR_I18N_KEYS[escaped];
 
-      if (explanation) {
-        items.push({ raw: escaped, description: explanation, type: 'meta' });
+      if (i18nKey) {
+        const description = t
+          ? t(`regexVisualizer.meta.${i18nKey}`)
+          : (META_CHAR_EXPLANATIONS[escaped] || escaped);
+        items.push({ raw: escaped, description, type: 'meta' });
       } else {
         items.push({
           raw: escaped,
-          description: `转义字符 "${pattern[i + 1]}"`,
+          description: tr('regexVisualizer.explain.escape', { char: pattern[i + 1] }),
           type: 'escape',
         });
       }
@@ -147,7 +181,9 @@ export function generateExplanation(pattern: string): ExplanationItem[] {
       const negative = charClass[1] === '^';
       items.push({
         raw: charClass,
-        description: negative ? `不匹配字符集 ${charClass}` : `匹配字符集 ${charClass}`,
+        description: negative
+          ? tr('regexVisualizer.explain.negativeClass', { class: charClass })
+          : tr('regexVisualizer.explain.positiveClass', { class: charClass }),
         type: 'class',
       });
       continue;
@@ -165,25 +201,27 @@ export function generateExplanation(pattern: string): ExplanationItem[] {
       }
       const group = pattern.slice(start, i);
 
-      let description = '捕获组';
+      let descKey = 'regexVisualizer.explain.captureGroup';
+      let descOpts: Record<string, unknown> | undefined;
       if (group.startsWith('(?:')) {
-        description = '非捕获组';
+        descKey = 'regexVisualizer.explain.nonCaptureGroup';
       } else if (group.startsWith('(?=')) {
-        description = '正向前瞻断言';
+        descKey = 'regexVisualizer.explain.lookahead';
       } else if (group.startsWith('(?!')) {
-        description = '负向前瞻断言';
+        descKey = 'regexVisualizer.explain.negativeLookahead';
       } else if (group.startsWith('(?<=')) {
-        description = '正向后瞻断言';
+        descKey = 'regexVisualizer.explain.lookbehind';
       } else if (group.startsWith('(?<!')) {
-        description = '负向后瞻断言';
+        descKey = 'regexVisualizer.explain.negativeLookbehind';
       } else if (group.startsWith('(?<')) {
         const nameMatch = group.match(/\(\?<(\w+)>/);
         if (nameMatch) {
-          description = `命名捕获组 "${nameMatch[1]}"`;
+          descKey = 'regexVisualizer.explain.namedCaptureGroup';
+          descOpts = { name: nameMatch[1] };
         }
       }
 
-      items.push({ raw: group, description, type: 'group' });
+      items.push({ raw: group, description: tr(descKey, descOpts), type: 'group' });
       continue;
     }
 
@@ -203,11 +241,11 @@ export function generateExplanation(pattern: string): ExplanationItem[] {
         let description = '';
 
         if (max === undefined) {
-          description = `精确匹配 ${min} 次`;
+          description = tr('regexVisualizer.explain.exactTimes', { count: min });
         } else if (max === '') {
-          description = `匹配至少 ${min} 次`;
+          description = tr('regexVisualizer.explain.atLeastTimes', { count: min });
         } else {
-          description = `匹配 ${min} 到 ${max} 次`;
+          description = tr('regexVisualizer.explain.betweenTimes', { min, max });
         }
 
         items.push({ raw: quantifier, description, type: 'quantifier' });
@@ -216,9 +254,12 @@ export function generateExplanation(pattern: string): ExplanationItem[] {
     }
 
     // 单字符元字符
-    const singleMeta = META_CHAR_EXPLANATIONS[char];
-    if (singleMeta) {
-      items.push({ raw: char, description: singleMeta, type: 'meta' });
+    const i18nKey = META_CHAR_I18N_KEYS[char];
+    if (i18nKey) {
+      const description = t
+        ? t(`regexVisualizer.meta.${i18nKey}`)
+        : (META_CHAR_EXPLANATIONS[char] || char);
+      items.push({ raw: char, description, type: 'meta' });
       i++;
       continue;
     }
@@ -226,7 +267,7 @@ export function generateExplanation(pattern: string): ExplanationItem[] {
     // 普通字符
     items.push({
       raw: char,
-      description: `匹配字符 "${char}"`,
+      description: tr('regexVisualizer.explain.literal', { char }),
       type: 'literal',
     });
     i++;

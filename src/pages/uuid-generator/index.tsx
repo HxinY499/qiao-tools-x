@@ -1,5 +1,6 @@
 import { Check, History, RefreshCw, Trash2 } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
 import { CopyButton } from '@/components/copy-button';
@@ -15,6 +16,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useUUIDStore } from './store';
 
 function UUIDGeneratorPage() {
+  const { t } = useTranslation('tools');
   const [quantity, setQuantity] = useState(1);
   const [uppercase, setUppercase] = useState(false);
   const [hyphens, setHyphens] = useState(true);
@@ -42,7 +44,7 @@ function UUIDGeneratorPage() {
     setGeneratedContent(content);
     addHistory(uuids);
 
-    toast.success(`已生成 ${quantity} 个 UUID`);
+    toast.success(t('uuidGenerator.toast.generated', { count: quantity }));
   };
 
   return (
@@ -53,13 +55,13 @@ function UUIDGeneratorPage() {
           <CardHeader>
             <CardTitle className="text-base font-medium flex items-center gap-2">
               <RefreshCw className="w-4 h-4" />
-              生成配置
+              {t('uuidGenerator.config.title')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <Label>生成数量: {quantity}</Label>
+                <Label>{t('uuidGenerator.config.quantity', { count: quantity })}</Label>
               </div>
               <div className="flex items-center gap-4">
                 <Slider
@@ -88,22 +90,26 @@ function UUIDGeneratorPage() {
 
             <div className="flex items-center justify-between space-x-2">
               <Label htmlFor="uppercase" className="flex flex-col space-y-1">
-                <span>大写字母</span>
-                <span className="font-normal text-xs text-muted-foreground">使用 A-F 代替 a-f</span>
+                <span>{t('uuidGenerator.config.uppercase')}</span>
+                <span className="font-normal text-xs text-muted-foreground">
+                  {t('uuidGenerator.config.uppercaseDesc')}
+                </span>
               </Label>
               <Switch id="uppercase" checked={uppercase} onCheckedChange={setUppercase} />
             </div>
 
             <div className="flex items-center justify-between space-x-2">
               <Label htmlFor="hyphens" className="flex flex-col space-y-1">
-                <span>包含连字符</span>
-                <span className="font-normal text-xs text-muted-foreground">包含 "-" 分隔符</span>
+                <span>{t('uuidGenerator.config.hyphens')}</span>
+                <span className="font-normal text-xs text-muted-foreground">
+                  {t('uuidGenerator.config.hyphensDesc')}
+                </span>
               </Label>
               <Switch id="hyphens" checked={hyphens} onCheckedChange={setHyphens} />
             </div>
 
             <Button className="w-full" onClick={generateUUIDs}>
-              生成 UUID
+              {t('uuidGenerator.config.generate')}
             </Button>
           </CardContent>
         </Card>
@@ -114,7 +120,7 @@ function UUIDGeneratorPage() {
             <CardTitle className="text-base font-medium flex items-center justify-between">
               <span className="flex items-center gap-2">
                 <Check className="w-4 h-4" />
-                生成结果
+                {t('uuidGenerator.result.title')}
               </span>
               <CopyButton
                 text={generatedContent}
@@ -123,7 +129,7 @@ function UUIDGeneratorPage() {
                 size="sm"
                 disabled={!generatedContent}
                 className="h-8 px-2 lg:px-3"
-                onCopy={() => toast.success('已复制到剪贴板')}
+                onCopy={() => toast.success(t('uuidGenerator.toast.copied'))}
               />
             </CardTitle>
           </CardHeader>
@@ -131,7 +137,7 @@ function UUIDGeneratorPage() {
             <Textarea
               value={generatedContent}
               readOnly
-              placeholder="点击生成按钮开始..."
+              placeholder={t('uuidGenerator.result.placeholder')}
               className="h-full min-h-[200px] font-mono text-sm resize-none bg-muted/30"
             />
           </CardContent>
@@ -144,7 +150,7 @@ function UUIDGeneratorPage() {
           <CardTitle className="text-base font-medium flex items-center justify-between">
             <span className="flex items-center gap-2">
               <History className="w-4 h-4" />
-              生成历史
+              {t('uuidGenerator.history.title')}
             </span>
             {history.length > 0 && (
               <Button
@@ -154,14 +160,14 @@ function UUIDGeneratorPage() {
                 className="text-destructive hover:text-destructive"
               >
                 <Trash2 className="w-4 h-4 mr-2" />
-                清空历史
+                {t('uuidGenerator.history.clear')}
               </Button>
             )}
           </CardTitle>
         </CardHeader>
         <CardContent>
           {history.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground text-sm">暂无生成记录</div>
+            <div className="text-center py-8 text-muted-foreground text-sm">{t('uuidGenerator.history.empty')}</div>
           ) : (
             <ScrollArea className="h-[300px] pr-4">
               <div className="space-y-4">
@@ -169,7 +175,7 @@ function UUIDGeneratorPage() {
                   <div key={batch.id} className="flex flex-col space-y-2 p-3 rounded-lg border bg-muted/20">
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-muted-foreground">
-                        {new Date(batch.timestamp).toLocaleString()} • {batch.uuids.length} 个 UUID
+                        {new Date(batch.timestamp).toLocaleString()} • {batch.uuids.length} {t('uuidGenerator.history.countSuffix')}
                       </span>
                       <div className="flex items-center gap-1">
                         <CopyButton
@@ -179,7 +185,7 @@ function UUIDGeneratorPage() {
                           size="icon"
                           className="h-7 w-7"
                           iconClassName="w-3.5 h-3.5"
-                          onCopy={() => toast.success('已复制到剪贴板')}
+                          onCopy={() => toast.success(t('uuidGenerator.toast.copied'))}
                         />
                         <Button
                           variant="ghost"

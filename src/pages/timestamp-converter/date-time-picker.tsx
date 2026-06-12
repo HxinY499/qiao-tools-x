@@ -34,7 +34,7 @@ export function DateTimePicker({
   onChange,
   align = 'end',
   buttonClassName,
-  timeLabel = '时间（精确到秒）',
+  timeLabel = 'Time (HH:mm:ss)',
 }: DateTimePickerProps) {
   const [open, setOpen] = useState(false);
   // 本地编辑态：仅在用户打字时使用；关闭后由 value 派生，不需 useEffect 同步

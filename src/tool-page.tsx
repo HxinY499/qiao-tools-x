@@ -1,5 +1,6 @@
 import { Info, Laptop, Moon, Sun } from 'lucide-react';
 import { Suspense, useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { SEO } from '@/components/seo';
 import { Button } from '@/components/ui/button';
@@ -14,7 +15,6 @@ import {
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 import { useSidebar } from './components/ui/sidebar';
-import { LOADING_MESSAGES } from './constant';
 import { useIsMobile } from './hooks/use-mobile';
 import { useThemeStore, type ThemeSetting } from './store/theme';
 import { ToolRoute } from './type';
@@ -22,11 +22,9 @@ import { cn } from './utils';
 
 // ─── 路由加载 fallback ────────────────────────────────────────
 function RouteLoadingFallback() {
+  const { t } = useTranslation('toolPage');
   const [visible, setVisible] = useState(false);
-  const [message] = useState(() => {
-    const index = Math.floor(Math.random() * LOADING_MESSAGES.length);
-    return LOADING_MESSAGES[index];
-  });
+  const [index] = useState(() => Math.floor(Math.random() * 5));
 
   useEffect(() => {
     const timer = setTimeout(() => setVisible(true), 100);
@@ -38,29 +36,33 @@ function RouteLoadingFallback() {
   return (
     <div className="min-h-[60vh] flex flex-col items-center justify-center gap-3 text-muted-foreground">
       <div className="h-8 w-8 rounded-full border-2 border-muted-foreground/30 border-t-primary animate-spin" />
-      <div className="text-xs text-center px-4 max-w-sm leading-relaxed">{message}</div>
+      <div className="text-xs text-center px-4 max-w-sm leading-relaxed">
+        {(t('loading', { returnObjects: true }) as string[])[index]}
+      </div>
     </div>
   );
 }
 
 // ─── 主题 cycle 按钮（light → dark → system → light） ──────────
 const THEME_CYCLE: ThemeSetting[] = ['light', 'dark', 'system'];
-const THEME_META: Record<ThemeSetting, { icon: typeof Sun; label: string }> = {
-  light: { icon: Sun, label: '浅色模式' },
-  dark: { icon: Moon, label: '深色模式' },
-  system: { icon: Laptop, label: '跟随系统' },
+const THEME_ICONS: Record<ThemeSetting, typeof Sun> = {
+  light: Sun,
+  dark: Moon,
+  system: Laptop,
 };
 
 function ThemeToggleButton() {
+  const { t } = useTranslation('toolPage');
   const { themeSetting, setThemeSetting } = useThemeStore();
-  const meta = THEME_META[themeSetting];
-  const Icon = meta.icon;
+  const Icon = THEME_ICONS[themeSetting];
 
   const handleClick = useCallback(() => {
     const idx = THEME_CYCLE.indexOf(themeSetting);
     const next = THEME_CYCLE[(idx + 1) % THEME_CYCLE.length];
     setThemeSetting(next);
   }, [themeSetting, setThemeSetting]);
+
+  const label = t(`themes.${themeSetting}`);
 
   return (
     <Tooltip>
@@ -70,13 +72,13 @@ function ThemeToggleButton() {
           size="icon"
           className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/60"
           onClick={handleClick}
-          aria-label={`切换主题（当前：${meta.label}）`}
+          aria-label={t('themeAria', { label })}
         >
           <Icon className="h-3.5 w-3.5" />
         </Button>
       </TooltipTrigger>
       <TooltipContent side="bottom" className="text-xs">
-        主题：{meta.label}（点击切换）
+        {t('themeTip', { label })}
       </TooltipContent>
     </Tooltip>
   );
@@ -84,14 +86,20 @@ function ThemeToggleButton() {
 
 // ─── 工具页 ───────────────────────────────────────────────────
 export function ToolPage({ route }: { route: ToolRoute }) {
+  const { t } = useTranslation('routes');
+  const { t: tTool } = useTranslation('toolPage');
   const { open } = useSidebar();
   const isMobile = useIsMobile();
+
+  // i18n 标题/副标题：优先取翻译，兜底 router.ts 里的原值
+  const title = t(`${route.key}.title`, route.title);
+  const subtitle = route.subtitle ? t(`${route.key}.subtitle`, route.subtitle) : undefined;
 
   return (
     <>
       {route.seo && (
         <SEO
-          title={route.title}
+          title={title}
           description={route.seo.description}
           keywords={route.seo.keywords}
           path={route.path}
@@ -121,9 +129,9 @@ export function ToolPage({ route }: { route: ToolRoute }) {
 
               {/* 标题 + 副标题 */}
               <div className="flex flex-col min-w-0 flex-1">
-                <h1 className="text-[15px] font-semibold tracking-tight truncate leading-tight">{route.title}</h1>
-                {route.subtitle && (
-                  <p className="text-[11px] text-muted-foreground/80 mt-0.5 truncate leading-snug">{route.subtitle}</p>
+                <h1 className="text-[15px] font-semibold tracking-tight truncate leading-tight">{title}</h1>
+                {subtitle && (
+                  <p className="text-[11px] text-muted-foreground/80 mt-0.5 truncate leading-snug">{subtitle}</p>
                 )}
               </div>
 
@@ -137,25 +145,22 @@ export function ToolPage({ route }: { route: ToolRoute }) {
                           variant="ghost"
                           size="icon"
                           className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/60"
-                          aria-label="数据安全说明"
+                          aria-label={tTool('dataSafety.trigger')}
                         >
                           <Info className="h-3.5 w-3.5" />
                         </Button>
                       </DialogTrigger>
                     </TooltipTrigger>
                     <TooltipContent side="bottom" className="text-xs">
-                      数据安全说明
+                      {tTool('dataSafety.trigger')}
                     </TooltipContent>
                   </Tooltip>
                   <DialogContent>
                     <DialogHeader>
-                      <DialogTitle>数据安全说明</DialogTitle>
+                      <DialogTitle>{tTool('dataSafety.title')}</DialogTitle>
                       <DialogDescription className="pt-2 space-y-2">
-                        <p>
-                          这个工具站不会往后端存储任何数据，所有数据均存储在客户端本地（如 LocalStorage、IndexedDB
-                          等），不用担心数据泄露风险。
-                        </p>
-                        <p>菜单置顶数据也保存在本地了，所以当切换浏览器或者清理缓存后指定数据会消失。</p>
+                        <p>{tTool('dataSafety.para1')}</p>
+                        <p>{tTool('dataSafety.para2')}</p>
                       </DialogDescription>
                     </DialogHeader>
                   </DialogContent>

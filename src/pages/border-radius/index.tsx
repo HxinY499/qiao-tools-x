@@ -1,6 +1,7 @@
 import { useLocalStorageState } from 'ahooks';
 import { RefreshCw } from 'lucide-react';
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { CodeArea } from '@/components/code-area';
 import { Button } from '@/components/ui/button';
@@ -26,6 +27,7 @@ const initialState: BorderRadiusState = {
 };
 
 export default function BorderRadiusPage() {
+  const { t } = useTranslation('tools');
   const [state, setState] = useLocalStorageState<BorderRadiusState>('qiao-tools-x-persist-border-radius', {
     defaultValue: initialState,
   });
@@ -82,45 +84,45 @@ export default function BorderRadiusPage() {
       {/* Left Column: Controls */}
       <Card className="shadow-sm flex flex-col gap-4 p-4 lg:p-5">
         <header className="flex items-center justify-between">
-          <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">圆角设置</h2>
+          <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">{t('borderRadius.title')}</h2>
           <Button variant="ghost" size="sm" onClick={reset} className="h-7 px-2 text-[11px]">
             <RefreshCw className="h-3 w-3 mr-1.5" />
-            重置
+            {t('borderRadius.reset')}
           </Button>
         </header>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <CornerControl
-            label="左上角 (Top Left)"
+            label={t('borderRadius.topLeft')}
             value={state.topLeft}
             onUpdate={(updates) => updateCorner('topLeft', updates)}
           />
           <CornerControl
-            label="右上角 (Top Right)"
+            label={t('borderRadius.topRight')}
             value={state.topRight}
             onUpdate={(updates) => updateCorner('topRight', updates)}
           />
           <CornerControl
-            label="右下角 (Bottom Right)"
+            label={t('borderRadius.bottomRight')}
             value={state.bottomRight}
             onUpdate={(updates) => updateCorner('bottomRight', updates)}
           />
           <CornerControl
-            label="左下角 (Bottom Left)"
+            label={t('borderRadius.bottomLeft')}
             value={state.bottomLeft}
             onUpdate={(updates) => updateCorner('bottomLeft', updates)}
           />
         </div>
 
         <div className="text-[11px] text-muted-foreground mt-2">
-          <p>提示：点击小锁图标可以独立调整水平和垂直半径，制作椭圆圆角。</p>
+          <p>{t('borderRadius.tip')}</p>
         </div>
       </Card>
 
       {/* Right Column: Preview & Code */}
       <Card className="shadow-sm flex flex-col gap-4 p-4 lg:p-5">
         <header>
-          <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">预览 & 代码</h2>
+          <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">{t('borderRadius.previewAndCode')}</h2>
         </header>
 
         <div className="rounded-lg border bg-background/50 p-8 sm:p-16 flex items-center justify-center min-h-[300px]">

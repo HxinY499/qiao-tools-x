@@ -1,6 +1,7 @@
 import { useDebounceEffect } from 'ahooks';
 import { Image as ImageIcon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
 import ColorPicker from '@/components/color-picker';
@@ -71,17 +72,18 @@ function downloadDataUrl(dataUrl: string, filename: string) {
 }
 
 function ImageWatermarkPage() {
+  const { t } = useTranslation('tools');
   const baseCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const [baseImageFile, setBaseImageFile] = useState<File | null>(null);
   const [baseImageUrl, setBaseImageUrl] = useState<string | null>(null);
   const [baseImageWidth, setBaseImageWidth] = useState<number | null>(null);
   const [baseImageHeight, setBaseImageHeight] = useState<number | null>(null);
-  const [baseUploadStatus, setBaseUploadStatus] = useState('尚未选择图片');
+  const [baseUploadStatus, setBaseUploadStatus] = useState<string | null>(null);
 
   const [mode, setMode] = useState<WatermarkMode>('text');
 
-  const [textWatermark, setTextWatermark] = useState('© qiao-tools');
+  const [textWatermark, setTextWatermark] = useState(t('imageWatermark.watermarkText'));
   const [fontSize, setFontSize] = useState(32);
   const [fontFamily, setFontFamily] = useState<FontFamilyOption>('system');
   const [fontWeight, setFontWeight] = useState<'normal' | 'bold'>('bold');
@@ -123,7 +125,7 @@ function ImageWatermarkPage() {
       setBaseImageUrl(url);
       setBaseImageWidth(image.width);
       setBaseImageHeight(image.height);
-      setBaseUploadStatus(`已选择：${file.name}`);
+      setBaseUploadStatus(`${t('imageWatermark.selected')}${file.name}`);
     };
     image.onerror = () => {
       URL.revokeObjectURL(url);
@@ -451,62 +453,62 @@ function ImageWatermarkPage() {
         <Card className="shadow-sm p-4 lg:p-5">
           <CardHeader className="space-y-2 p-0">
             <CardTitle className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">
-              底图与预览
+              {t('imageWatermark.basePreviewTitle')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 pt-3 p-0">
             <div className="space-y-2">
-              <Label className="text-xs">上传图片</Label>
+              <Label className="text-xs">{t('imageWatermark.upload.title')}</Label>
               <FileDragUploader
                 onFileSelect={handleBaseImageFile}
                 onError={(error) => toast.error(error)}
                 className="mt-3 bg-muted/60 overflow-hidden h-4/5"
                 icon={<ImageIcon />}
-                title="拖拽图片到此处，或"
-                buttonText="选择图片文件"
+                title={t('imageWatermark.upload.drag')}
+                buttonText={t('imageWatermark.upload.select')}
                 hint=""
                 accept="image/*"
               />
               <p className={`mt-2 text-xs ${baseImageFile ? 'text-emerald-600 font-medium' : 'text-muted-foreground'}`}>
-                {baseUploadStatus}
+                {baseUploadStatus ?? t('imageWatermark.noImage')}
               </p>
             </div>
 
             <div className="space-y-2">
-              <Label className="text-xs">水印效果预览</Label>
+              <Label className="text-xs">{t('imageWatermark.preview.title')}</Label>
               <canvas ref={baseCanvasRef} className="hidden" />
               <ImageComponent
                 src={hasBaseImage && resultDataUrl ? resultDataUrl : null}
-                alt="水印效果预览"
-                placeholder="水印效果预览"
+                alt={t('imageWatermark.preview.title')}
+                placeholder={t('imageWatermark.preview.title')}
                 canPreview
                 imgClassName="max-h-[420px] max-w-full w-full object-contain"
               />
-              <p className="mt-1 text-[11px] text-muted-foreground">预览为真实导出效果</p>
+              <p className="mt-1 text-[11px] text-muted-foreground">{t('imageWatermark.preview.real')}</p>
             </div>
 
             <div className="flex flex-wrap items-center gap-3 pt-1">
               <div className="flex items-center gap-2">
-                <Label className="text-[11px] text-muted-foreground">导出格式</Label>
+                <Label className="text-[11px] text-muted-foreground">{t('imageWatermark.exportFormat')}</Label>
                 <Select value={exportFormat} onValueChange={(value) => setExportFormat(value as ExportFormat)}>
                   <SelectTrigger className="h-8 w-[140px] text-xs">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="original" className="text-xs">
-                      保持原格式
+                      {t('imageWatermark.exportOriginal')}
                     </SelectItem>
                     <SelectItem value="png" className="text-xs">
-                      PNG（无损）
+                      {t('imageWatermark.exportPng')}
                     </SelectItem>
                     <SelectItem value="jpeg" className="text-xs">
-                      JPEG（体积更小）
+                      {t('imageWatermark.exportJpeg')}
                     </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <Button type="button" size="sm" disabled={!canDownload} onClick={handleDownload}>
-                下载带水印图片
+                {t('imageWatermark.download')}
               </Button>
             </div>
           </CardContent>
@@ -515,30 +517,30 @@ function ImageWatermarkPage() {
         <Card className="shadow-sm p-4 lg:p-5">
           <CardHeader className="p-0">
             <CardTitle className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">
-              水印配置
+              {t('imageWatermark.config.title')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-5 pt-3 p-0">
             <Tabs value={mode} onValueChange={(value) => setMode(value as WatermarkMode)}>
               <TabsList className="grid grid-cols-2 text-xs">
-                <TabsTrigger value="text">文字水印</TabsTrigger>
-                <TabsTrigger value="image">图片水印</TabsTrigger>
+                <TabsTrigger value="text">{t('imageWatermark.config.text')}</TabsTrigger>
+                <TabsTrigger value="image">{t('imageWatermark.config.image')}</TabsTrigger>
               </TabsList>
 
               <TabsContent value="text" className="space-y-4 pt-3">
                 <div className="space-y-2">
-                  <Label className="text-xs">水印文字内容</Label>
+                  <Label className="text-xs">{t('imageWatermark.config.textContent')}</Label>
                   <Textarea
                     value={textWatermark}
                     onChange={(event) => setTextWatermark(event.target.value)}
                     className="min-h-[70px] text-xs"
-                    placeholder="例如：© 2025 Your Name / your-website.com"
+                    placeholder={t('imageWatermark.config.textPlaceholder')}
                   />
                 </div>
 
                 <div className="grid gap-3 sm:grid-cols-2">
                   <div className="space-y-2">
-                    <Label className="text-xs">字体大小</Label>
+                    <Label className="text-xs">{t('imageWatermark.config.fontSize')}</Label>
                     <Slider
                       value={[fontSize]}
                       min={12}
@@ -548,38 +550,38 @@ function ImageWatermarkPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs">字体样式</Label>
+                    <Label className="text-xs">{t('imageWatermark.config.fontFamily')}</Label>
                     <Select value={fontFamily} onValueChange={(value) => setFontFamily(value as FontFamilyOption)}>
                       <SelectTrigger className="h-8 text-xs">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="system" className="text-xs">
-                          系统字体
+                          {t('imageWatermark.config.fontSystem')}
                         </SelectItem>
                         <SelectItem value="serif" className="text-xs">
-                          衬线字体（Serif）
+                          {t('imageWatermark.config.fontSerif')}
                         </SelectItem>
                         <SelectItem value="mono" className="text-xs">
-                          等宽字体（Monospace）
+                          {t('imageWatermark.config.fontMono')}
                         </SelectItem>
                         <SelectItem value="rounded" className="text-xs">
-                          圆角标题（Rounded）
+                          {t('imageWatermark.config.fontRounded')}
                         </SelectItem>
                         <SelectItem value="display" className="text-xs">
-                          展示标题（Display）
+                          {t('imageWatermark.config.fontDisplay')}
                         </SelectItem>
                         <SelectItem value="handwriting" className="text-xs">
-                          手写风格（Handwriting）
+                          {t('imageWatermark.config.fontHand')}
                         </SelectItem>
                         <SelectItem value="comic" className="text-xs">
-                          漫画风格（Comic）
+                          {t('imageWatermark.config.fontComic')}
                         </SelectItem>
                         <SelectItem value="narrow" className="text-xs">
-                          窄体字体（Narrow）
+                          {t('imageWatermark.config.fontNarrow')}
                         </SelectItem>
                         <SelectItem value="condensed" className="text-xs">
-                          紧凑字体（Condensed）
+                          {t('imageWatermark.config.fontCondensed')}
                         </SelectItem>
                       </SelectContent>
                     </Select>
@@ -588,17 +590,17 @@ function ImageWatermarkPage() {
                       onValueChange={(value) => setFontWeight(value as 'normal' | 'bold')}
                       className="flex items-center gap-3 pt-1"
                     >
-                      <Label className="text-[11px] text-muted-foreground">字重：</Label>
+                      <Label className="text-[11px] text-muted-foreground">{t('imageWatermark.config.fontWeight')}</Label>
                       <div className="flex items-center gap-2">
                         <RadioGroupItem id="font-weight-normal" value="normal" />
                         <Label htmlFor="font-weight-normal" className="text-[11px]">
-                          常规
+                          {t('imageWatermark.config.normal')}
                         </Label>
                       </div>
                       <div className="flex items-center gap-2">
                         <RadioGroupItem id="font-weight-bold" value="bold" />
                         <Label htmlFor="font-weight-bold" className="text-[11px]">
-                          加粗
+                          {t('imageWatermark.config.bold')}
                         </Label>
                       </div>
                     </RadioGroup>
@@ -606,14 +608,14 @@ function ImageWatermarkPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-xs">文字颜色</Label>
+                  <Label className="text-xs">{t('imageWatermark.config.color')}</Label>
                   <ColorPicker value={textColor} onChange={(value) => setTextColor(value)} className="w-full" />
                 </div>
               </TabsContent>
 
               <TabsContent value="image" className="space-y-4 pt-3">
                 <div className="space-y-2">
-                  <Label className="text-xs">上传水印图片</Label>
+                  <Label className="text-xs">{t('imageWatermark.upload.watermarkSelect')}</Label>
                   <FileDragUploader
                     onFileSelect={handleWatermarkImageFile}
                     onError={(error) => toast.error(error)}
@@ -622,21 +624,21 @@ function ImageWatermarkPage() {
                     }}
                     className="bg-muted/60 overflow-hidden px-4 py-4"
                     icon={false}
-                    title="拖拽水印图片到此处，或"
-                    buttonText="选择水印图片"
-                    hint="推荐使用带透明背景的 PNG 图标或 Logo，体积不宜过大。"
+                    title={t('imageWatermark.upload.watermarkDrag')}
+                    buttonText={t('imageWatermark.upload.watermarkSelect')}
+                    hint={t('imageWatermark.upload.watermarkTip')}
                     accept="image/*"
                   />
                   {watermarkImageUrl && (
                     <div className="mt-2 inline-flex items-center gap-2 rounded-md border bg-muted/40 px-2 py-1.5">
-                      <img src={watermarkImageUrl} alt="水印图片预览" className="h-8 w-auto object-contain rounded" />
-                      <span className="text-[11px] text-muted-foreground">当前水印预览</span>
+                      <img src={watermarkImageUrl} alt={t('imageWatermark.preview.watermarkPreview')} className="h-8 w-auto object-contain rounded" />
+                      <span className="text-[11px] text-muted-foreground">{t('imageWatermark.preview.watermarkPreview')}</span>
                     </div>
                   )}
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-xs">水印占底图宽度比例</Label>
+                  <Label className="text-xs">{t('imageWatermark.config.sizeRatio')}</Label>
                   <Slider
                     value={[watermarkScale]}
                     min={5}
@@ -645,7 +647,7 @@ function ImageWatermarkPage() {
                     onValueChange={([value]) => setWatermarkScale(value)}
                   />
                   <p className="text-[11px] text-muted-foreground">
-                    当前约占底图宽度的 {watermarkScale}% ，会按比例等比缩放。
+                    {t('imageWatermark.config.sizeRatioDesc1')} {watermarkScale}%{t('imageWatermark.config.sizeRatioDesc2')}
                   </p>
                 </div>
               </TabsContent>
@@ -653,7 +655,7 @@ function ImageWatermarkPage() {
 
             <div className="space-y-3 border-t pt-3">
               <div className="space-y-2">
-                <Label className="text-xs">水印布局</Label>
+                <Label className="text-xs">{t('imageWatermark.config.layout')}</Label>
                 <RadioGroup
                   value={layoutMode}
                   onValueChange={(value) => setLayoutMode(value as 'single' | 'tiled')}
@@ -662,13 +664,13 @@ function ImageWatermarkPage() {
                   <div className="flex items-center gap-2">
                     <RadioGroupItem id="layout-single" value="single" />
                     <Label htmlFor="layout-single" className="text-[11px]">
-                      单个水印
+                      {t('imageWatermark.config.single')}
                     </Label>
                   </div>
                   <div className="flex items-center gap-2">
                     <RadioGroupItem id="layout-tiled" value="tiled" />
                     <Label htmlFor="layout-tiled" className="text-[11px]">
-                      平铺铺满
+                      {t('imageWatermark.config.tile')}
                     </Label>
                   </div>
                 </RadioGroup>
@@ -676,7 +678,7 @@ function ImageWatermarkPage() {
 
               {layoutMode === 'single' ? (
                 <div className="space-y-2">
-                  <Label className="text-xs">水印位置</Label>
+                  <Label className="text-xs">{t('imageWatermark.config.position')}</Label>
                   <div className="flex items-center justify-center gap-3">
                     <div className="grid grid-cols-3 grid-rows-3 gap-1 w-24 h-24 sm:w-28 sm:h-28 border border-border rounded-md bg-muted/40 p-1">
                       {/* top-left */}
@@ -778,17 +780,17 @@ function ImageWatermarkPage() {
 
               {layoutMode === 'tiled' ? (
                 <div className="space-y-2">
-                  <Label className="text-xs">平铺间距</Label>
+                  <Label className="text-xs">{t('imageWatermark.config.tileGap')}</Label>
                   <Slider value={[tileGap]} min={0} max={320} step={8} onValueChange={([value]) => setTileGap(value)} />
                   <p className="text-[11px] text-muted-foreground">
-                    控制相邻水印之间的水平与垂直间距，数值越大间隔越疏。
+                    {t('imageWatermark.config.tileGapDesc')}
                   </p>
                 </div>
               ) : null}
 
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <Label className="text-xs">水印透明度</Label>
+                  <Label className="text-xs">{t('imageWatermark.config.opacity')}</Label>
                   <Slider
                     value={[opacity]}
                     min={10}
@@ -799,13 +801,13 @@ function ImageWatermarkPage() {
                 </div>
                 {layoutMode === 'single' ? (
                   <div className="space-y-2">
-                    <Label className="text-xs">边距（与边缘的距离）</Label>
+                    <Label className="text-xs">{t('imageWatermark.config.margin')}</Label>
                     <Slider value={[margin]} min={0} max={200} step={4} onValueChange={([value]) => setMargin(value)} />
                   </div>
                 ) : null}
                 <div className="space-y-2 sm:col-span-2">
                   <div className="flex items-center justify-between">
-                    <Label className="text-xs">水印旋转角度</Label>
+                    <Label className="text-xs">{t('imageWatermark.config.rotation')}</Label>
                     <Button
                       type="button"
                       variant="outline"
@@ -813,7 +815,7 @@ function ImageWatermarkPage() {
                       className="h-7 px-2 text-[11px]"
                       onClick={() => setRotation(0)}
                     >
-                      回正
+                      {t('imageWatermark.config.resetRotation')}
                     </Button>
                   </div>
                   <Slider

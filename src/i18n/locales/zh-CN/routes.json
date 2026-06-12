@@ -1,0 +1,158 @@
+{
+  "image-compressor": {
+    "title": "图片压缩",
+    "subtitle": "在线图片压缩与尺寸调整工具，支持实时预览与参数调节",
+    "seoDescription": "免费在线图片压缩工具，支持 JPG、PNG、WebP 等格式，可自定义压缩质量与图片尺寸，实时预览压缩效果。所有处理在浏览器本地完成，保护您的隐私。",
+    "seoKeywords": "图片压缩,在线图片压缩,图片优化,压缩图片,图片尺寸调整,JPG压缩,PNG压缩,WebP转换"
+  },
+  "image-watermark": {
+    "title": "图片水印添加",
+    "subtitle": "在图片上添加文字或图片水印，支持位置、透明度、字体和大小调节，处理全程在本地完成",
+    "seoDescription": "免费在线图片水印工具，支持添加文字或图片水印，可自定义位置、透明度、字体和大小，批量处理图片。所有处理在本地完成，保护您的隐私。",
+    "seoKeywords": "图片水印,添加水印,在线水印工具,图片批量水印,文字水印,图片水印,水印制作"
+  },
+  "svg-converter": {
+    "title": "SVG 转图片",
+    "subtitle": "SVG 转 PNG/JPG/WebP 工具，支持批量转换、自定义尺寸、背景色和透明度",
+    "seoDescription": "免费在线 SVG 转图片工具，支持批量转换为 PNG、JPG、WebP 格式，可自定义导出尺寸、背景色、透明度，支持独立参数模式与预设尺寸。所有处理在浏览器本地完成，保护您的隐私。",
+    "seoKeywords": "SVG转PNG,SVG转JPG,SVG转WebP,SVG转图片,SVG转换器,矢量图转位图,SVG导出,批量SVG转换,在线SVG工具,SVG格式转换"
+  },
+  "scroll-bar": {
+    "title": "滚动条生成器",
+    "subtitle": "可视化调整滚动条样式，并生成可复制的 CSS 代码",
+    "seoDescription": "可视化滚动条样式生成器，支持调整颜色、宽度、圆角等属性，实时预览效果并一键生成 CSS 代码，提升网页设计质量。",
+    "seoKeywords": "CSS滚动条,滚动条样式,scrollbar样式,CSS生成器,自定义滚动条,网页滚动条"
+  },
+  "box-shadow": {
+    "title": "阴影生成器",
+    "subtitle": "可视化叠加多层阴影，并一键生成 CSS 与 Tailwind 代码",
+    "seoDescription": "可视化 CSS 阴影生成器，支持多层阴影叠加，调整颜色、模糊度、偏移量等参数，实时预览并生成 CSS 和 Tailwind 代码。",
+    "seoKeywords": "CSS阴影,box-shadow,阴影生成器,Tailwind阴影,CSS生成器,网页阴影效果"
+  },
+  "gradient-generator": {
+    "title": "渐变生成器",
+    "subtitle": "可视化创建 linear/radial 渐变，支持多色断点与角度调整，并生成 CSS 与 Tailwind 类名",
+    "seoDescription": "可视化 CSS 渐变生成器，支持线性渐变和径向渐变，多色断点调整，实时预览并生成 CSS 和 Tailwind 代码，提升网页设计效率。",
+    "seoKeywords": "CSS渐变,渐变生成器,linear-gradient,radial-gradient,Tailwind渐变,渐变背景,CSS生成器"
+  },
+  "color-converter": {
+    "title": "颜色格式转换",
+    "subtitle": "在线颜色格式转换工具，支持 Hex、RGB/RGBA、HSL/HSLA 格式互转",
+    "seoDescription": "免费在线颜色格式转换工具，支持 Hex、RGB、RGBA、HSL、HSLA 等格式互相转换，实时预览颜色效果，方便前端开发和设计使用。",
+    "seoKeywords": "颜色转换,Hex转RGB,RGB转Hex,HSL转换,颜色格式转换,CSS颜色,颜色代码转换"
+  },
+  "timestamp-converter": {
+    "title": "时间戳转换",
+    "subtitle": "时间戳与日期时间互转，支持多种常用格式并可快速复制当前时间",
+    "seoDescription": "在线时间戳转换工具，支持时间戳与日期时间互转，支持多种时间格式，可快速获取当前时间戳，方便开发调试。",
+    "seoKeywords": "时间戳转换,Unix时间戳,时间戳转日期,日期转时间戳,timestamp,时间格式转换"
+  },
+  "json-formatter": {
+    "title": "JSON 格式化",
+    "subtitle": "JSON 美化、压缩、语法高亮与错误检测工具，也可以存储 JSON",
+    "seoDescription": "免费在线 JSON 格式化工具，支持 JSON 美化、压缩、语法高亮和错误检测，可本地存储 JSON 数据，提升开发效率。",
+    "seoKeywords": "JSON格式化,JSON美化,JSON压缩,JSON验证,JSON编辑器,JSON工具"
+  },
+  "border-radius": {
+    "title": "圆角生成器",
+    "subtitle": "",
+    "seoDescription": "可视化 CSS 圆角生成器，支持独立调整四个角的圆角半径，实时预览并生成 CSS 和 Tailwind 代码，提升设计效率。",
+    "seoKeywords": "CSS圆角,border-radius,圆角生成器,Tailwind圆角,CSS生成器,网页圆角"
+  },
+  "url-encoder": {
+    "title": "URL 编解码",
+    "subtitle": "URL 编码/解码工具，支持 URL 参数解析与可视化展示",
+    "seoDescription": "免费在线 URL 编码解码工具，支持 URL 参数解析和可视化展示，方便开发调试和测试。",
+    "seoKeywords": "URL编码,URL解码,URLEncode,URLDecode,URL参数解析,网址编码"
+  },
+  "base64": {
+    "title": "Base64 编解码",
+    "subtitle": "在文本模式下支持普通文本与 Base64 间互转，在图片模式下可将本地图片转换为 Base64 Data URL，方便内联到 CSS 或 HTML 中",
+    "seoDescription": "免费在线 Base64 编解码工具，支持文本和图片的 Base64 编码解码，可将图片转换为 Data URL，方便嵌入到 CSS 或 HTML 中。",
+    "seoKeywords": "Base64编码,Base64解码,图片转Base64,Base64工具,DataURL,Base64图片"
+  },
+  "uuid-generator": {
+    "title": "UUID 生成器",
+    "subtitle": "在线批量生成 UUID/GUID，支持自定义格式（大小写、连字符）与历史记录功能",
+    "seoDescription": "免费在线 UUID 生成器，支持批量生成 UUID/GUID，可自定义格式（大小写、连字符），提供历史记录功能，方便开发使用。",
+    "seoKeywords": "UUID生成器,GUID生成器,UUID在线生成,批量生成UUID,唯一标识符"
+  },
+  "word-count": {
+    "title": "文本处理和字数统计",
+    "subtitle": "字数、字符数统计工具，支持段落、句子分析与目标字数进度追踪，支持各种格式处理",
+    "seoDescription": "免费在线字数统计工具，支持字数、字符数、段落、句子统计，目标字数进度追踪，支持多种文本格式处理，快速格式化文本，快速去除转义字符。",
+    "seoKeywords": "文本处理工具,文本格式化,去除转义,字数统计,字符统计,文本统计,段落统计,句子统计"
+  },
+  "text-diff": {
+    "title": "文本 Diff 对比",
+    "subtitle": "左右对比两段文本或代码的差异，支持行级与行内高亮显示",
+    "seoDescription": "免费在线文本 Diff 对比工具，支持左右两栏对比代码或配置差异，提供行级与行内高亮显示，适合代码审查与配置变更检查。",
+    "seoKeywords": "文本Diff,代码对比,文本对比工具,配置文件对比,行级Diff,行内Diff,差异对比"
+  },
+  "text-escaper": {
+    "title": "文本转义工具",
+    "subtitle": "HTML 实体、Unicode、JS 字符串的转义与反转义",
+    "seoDescription": "免费在线文本转义工具，支持 HTML 实体、Unicode 编码、JavaScript 字符串的转义与反转义，解决乱码和特殊字符处理问题。",
+    "seoKeywords": "HTML转义,Unicode转义,JS转义,文本转义,反转义,HTML实体,Unicode编码,字符串转义"
+  },
+  "user-agent-parser": {
+    "title": "User-Agent 解析",
+    "subtitle": "解析 User-Agent 字符串，识别浏览器、操作系统、设备信息",
+    "seoDescription": "免费在线 User-Agent 解析工具，支持识别浏览器、操作系统、设备型号、引擎版本等信息，方便开发者排查问题。",
+    "seoKeywords": "User-Agent解析,UA解析,浏览器识别,设备识别,在线UA工具"
+  },
+  "seo-analyzer": {
+    "title": "SEO 分析",
+    "subtitle": "分析网页 SEO 状况，检测 Meta 标签、标题结构、图片优化、结构化数据等",
+    "seoDescription": "免费在线 SEO 分析工具，支持 URL 抓取、HTML 代码分析，检测 Meta 标签、Open Graph、标题结构、图片 Alt、结构化数据等，生成详细的 SEO 优化报告。",
+    "seoKeywords": "SEO分析,SEO检测,网页SEO,Meta标签检测,Open Graph,结构化数据,SEO优化,网站分析"
+  },
+  "qrcode-tool": {
+    "title": "二维码工具",
+    "subtitle": "生成与解析二维码，支持 WiFi、联系人、短信、位置等快捷模板",
+    "seoDescription": "免费在线二维码生成与解析工具，支持自由文本、WiFi 连接、联系人名片、短信、地理位置等多种模板，可上传图片识别二维码内容。",
+    "seoKeywords": "二维码生成,二维码解析,QR码,WiFi二维码,vCard二维码,在线二维码工具"
+  },
+  "json-schema-converter": {
+    "title": "JSON Schema 转 TS",
+    "subtitle": "JSON Schema 与 TypeScript 类型互转，支持 interface/type 输出与多种选项配置",
+    "seoDescription": "免费在线 JSON Schema 与 TypeScript 类型互转工具，支持 interface/type 输出、Draft-07/Draft-04 版本选择，快速生成类型定义或 Schema。",
+    "seoKeywords": "JSON Schema,TypeScript,类型转换,Schema转TS,TS转Schema,interface生成,type生成,JSON Schema转换器"
+  },
+  "regex-visualizer": {
+    "title": "正则可视化",
+    "subtitle": "正则表达式可视化工具，支持铁路图、实时匹配、解释说明与替换预览",
+    "seoDescription": "免费在线正则表达式可视化工具，将正则渲染为铁路图，支持实时匹配测试、捕获组展示、正则解释、替换预览，内置常用正则模板。",
+    "seoKeywords": "正则可视化,正则表达式,regex,铁路图,正则测试,正则解释,正则匹配,正则替换"
+  },
+  "markdown-editor": {
+    "title": "Markdown",
+    "subtitle": "",
+    "seoDescription": "免费在线 Markdown 编辑器，支持实时预览、表格生成、代码高亮、GFM 语法，提供丰富的工具栏快捷操作。",
+    "seoKeywords": "Markdown编辑器,Markdown预览,Markdown表格,在线Markdown,MD编辑器,Markdown工具"
+  },
+  "sse-to-json": {
+    "title": "SSE to JSON",
+    "subtitle": "从 SSE (Server-Sent Events) 原始数据中提取 data 字段并逐条解析为格式化 JSON",
+    "seoDescription": "免费在线 SSE to JSON 解析工具，从 Server-Sent Events 流数据中提取 data 字段，逐条解析为格式化 JSON，支持语法高亮和一键复制。",
+    "seoKeywords": "SSE解析,SSE转JSON,Server-Sent Events,SSE数据提取,JSON格式化,EventStream解析"
+  },
+  "ljson-to-json": {
+    "title": "ljson to JSON",
+    "subtitle": "将 JSON Lines / NDJSON 按行解析为格式化 JSON，支持批量合并与逐条查看",
+    "seoDescription": "免费在线 ljson (JSON Lines / NDJSON) 解析工具，按行解析每一条 JSON，支持语法高亮、逐条查看、错误定位与一键合并复制。",
+    "seoKeywords": "ljson解析,JSON Lines,NDJSON,jsonl解析,换行分隔JSON,日志JSON解析,JSON批量格式化"
+  },
+  "ascii-art": {
+    "title": "ASCII Art",
+    "subtitle": "把文字渲染成 ASCII 大字，可换字体、复制、下载，给 README / 代码注释加点小情趣",
+    "seoDescription": "免费在线 ASCII Art 生成器，输入文字选择字体即可渲染出 ASCII 大字，支持多种 figlet 字体、一键复制与下载，适合给 README、Banner、代码注释加趣味装饰。",
+    "seoKeywords": "ASCII Art,ASCII 字符画,ASCII 大字,figlet,文字 banner,代码注释装饰,README banner"
+  },
+  "cron-translator": {
+    "title": "Cron 表达式翻译",
+    "subtitle": "把 cron 表达式翻译成中文自然语言，并预览未来 5 次执行时间，支持 5 字段与带秒 6 字段",
+    "seoDescription": "免费在线 Cron 表达式翻译工具，将 cron 表达式翻译成中文自然语言，自动拆解字段含义，预览未来 5 次执行时间，支持 5 字段标准格式与带秒 6 字段格式。",
+    "seoKeywords": "cron 翻译,crontab 解析,cron 表达式,cron 在线工具,定时任务,Cron 翻译器,cron 中文"
+  }
+}

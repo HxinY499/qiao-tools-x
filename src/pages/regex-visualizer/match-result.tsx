@@ -3,6 +3,7 @@
  */
 
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { CopyButton } from '@/components/copy-button';
 import { Badge } from '@/components/ui/badge';
@@ -16,20 +17,21 @@ interface MatchResultViewProps {
 }
 
 export function MatchResultView({ testText, matches }: MatchResultViewProps) {
+  const { t } = useTranslation('tools');
   const segments = useMemo(() => highlightMatches(testText, matches), [testText, matches]);
 
   if (!testText) {
-    return <div className="text-center text-muted-foreground py-8 text-sm">输入测试文本以查看匹配结果</div>;
+    return <div className="text-center text-muted-foreground py-8 text-sm">{t('regexVisualizer.match.empty')}</div>;
   }
 
   return (
     <div className="space-y-4">
       {/* 匹配统计 */}
       <div className="flex items-center gap-2 text-sm">
-        <Badge variant={matches.length > 0 ? 'default' : 'secondary'}>{matches.length} 个匹配</Badge>
+        <Badge variant={matches.length > 0 ? 'default' : 'secondary'}>{t('regexVisualizer.match.count', { count: matches.length })}</Badge>
         {matches.length > 0 && (
           <span className="text-muted-foreground">
-            共匹配 {matches.reduce((sum, m) => sum + m.match.length, 0)} 个字符
+            {t('regexVisualizer.match.totalChars', { count: matches.reduce((sum, m) => sum + m.match.length, 0) })}
           </span>
         )}
       </div>
@@ -41,7 +43,7 @@ export function MatchResultView({ testText, matches }: MatchResultViewProps) {
             <mark
               key={index}
               className="bg-yellow-200 dark:bg-yellow-800/60 text-foreground px-0.5 rounded"
-              title={`匹配 #${(segment.matchIndex ?? 0) + 1}`}
+              title={t('regexVisualizer.match.matchTitle', { index: (segment.matchIndex ?? 0) + 1 })}
             >
               {segment.text}
             </mark>
@@ -54,7 +56,7 @@ export function MatchResultView({ testText, matches }: MatchResultViewProps) {
       {/* 匹配详情列表 */}
       {matches.length > 0 && (
         <div className="space-y-2">
-          <h4 className="text-sm font-medium">匹配详情</h4>
+          <h4 className="text-sm font-medium">{t('regexVisualizer.match.detailTitle')}</h4>
           <div className="space-y-2 max-h-60 overflow-y-auto custom-scrollbar">
             {matches.map((match, index) => (
               <div key={index} className="flex items-start gap-3 p-3 rounded-lg border bg-card text-sm">
@@ -64,25 +66,25 @@ export function MatchResultView({ testText, matches }: MatchResultViewProps) {
                 <div className="flex-1 min-w-0 space-y-1">
                   <div className="flex items-center gap-2">
                     <code className="px-2 py-0.5 rounded bg-muted font-mono text-xs break-all">
-                      {match.match || '(空匹配)'}
+                      {match.match || t('regexVisualizer.match.emptyMatch')}
                     </code>
                     <CopyButton text={match.match} mode="icon" size="sm" variant="ghost" className="h-6 w-6" />
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    位置: {match.start} - {match.end}
+                    {t('regexVisualizer.match.position', { start: match.start, end: match.end })}
                   </div>
 
                   {/* 捕获组 */}
                   {match.captures.length > 0 && (
                     <div className="mt-2 space-y-1">
-                      <span className="text-xs text-muted-foreground">捕获组:</span>
+                      <span className="text-xs text-muted-foreground">{t('regexVisualizer.match.captures')}</span>
                       <div className="flex flex-wrap gap-1">
                         {match.captures.map((capture, i) => (
                           <code
                             key={i}
                             className="px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/40 text-xs font-mono"
                           >
-                            ${i + 1}: {capture ?? '(未匹配)'}
+                            ${i + 1}: {capture ?? t('regexVisualizer.match.noMatch')}
                           </code>
                         ))}
                       </div>
@@ -92,14 +94,14 @@ export function MatchResultView({ testText, matches }: MatchResultViewProps) {
                   {/* 命名捕获组 */}
                   {Object.keys(match.groups).length > 0 && (
                     <div className="mt-2 space-y-1">
-                      <span className="text-xs text-muted-foreground">命名组:</span>
+                      <span className="text-xs text-muted-foreground">{t('regexVisualizer.match.namedGroups')}</span>
                       <div className="flex flex-wrap gap-1">
                         {Object.entries(match.groups).map(([name, value]) => (
                           <code
                             key={name}
                             className="px-1.5 py-0.5 rounded bg-purple-100 dark:bg-purple-900/40 text-xs font-mono"
                           >
-                            {name}: {value ?? '(未匹配)'}
+                            {name}: {value ?? t('regexVisualizer.match.noMatch')}
                           </code>
                         ))}
                       </div>

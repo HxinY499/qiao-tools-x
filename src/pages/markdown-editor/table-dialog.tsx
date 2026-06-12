@@ -1,5 +1,6 @@
 import { AlignCenter, AlignLeft, AlignRight, Minus, Plus, Trash2, Upload } from 'lucide-react';
 import { cloneElement, isValidElement, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
@@ -19,8 +20,9 @@ interface TableDialogProps {
 }
 
 export function TableDialog({ trigger, onInsert }: TableDialogProps) {
+  const { t } = useTranslation('tools');
   const [open, setOpen] = useState(false);
-  const [config, setConfig] = useState<TableConfig>(() => createDefaultTableConfig(2, 3));
+  const [config, setConfig] = useState<TableConfig>(() => createDefaultTableConfig(2, 3, t('markdownEditor.table.headerPrefix')));
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const updateRows = (delta: number) => {
@@ -37,7 +39,7 @@ export function TableDialog({ trigger, onInsert }: TableDialogProps) {
     setConfig((prev) => ({
       ...prev,
       cols: newCols,
-      headers: delta > 0 ? [...prev.headers, `标题 ${newCols}`] : prev.headers.slice(0, newCols),
+      headers: delta > 0 ? [...prev.headers, `${t('markdownEditor.table.headerPrefix')} ${newCols}`] : prev.headers.slice(0, newCols),
       data: prev.data.map((row) => (delta > 0 ? [...row, ''] : row.slice(0, newCols))),
       alignments: delta > 0 ? [...prev.alignments, 'left'] : prev.alignments.slice(0, newCols),
     }));
@@ -113,7 +115,7 @@ export function TableDialog({ trigger, onInsert }: TableDialogProps) {
         const newConfig: TableConfig = {
           rows: maxRows || 1,
           cols: maxCols || 1,
-          headers: headers.slice(0, maxCols).length > 0 ? headers.slice(0, maxCols) : ['标题 1'],
+          headers: headers.slice(0, maxCols).length > 0 ? headers.slice(0, maxCols) : [`${t('markdownEditor.table.headerPrefix')} 1`],
           data:
             maxRows > 0
               ? rows.slice(0, maxRows).map((row) => {
@@ -128,7 +130,7 @@ export function TableDialog({ trigger, onInsert }: TableDialogProps) {
         setConfig(newConfig);
       } catch (err) {
         console.error('Excel 解析失败:', err);
-        toast.error('Excel 解析失败，请检查文件格式');
+        toast.error(t('markdownEditor.table.excelParseFailed'));
       }
     };
     reader.readAsArrayBuffer(file);
@@ -142,7 +144,7 @@ export function TableDialog({ trigger, onInsert }: TableDialogProps) {
     onInsert(markdown);
     setOpen(false);
     // 重置为默认配置
-    setConfig(createDefaultTableConfig(2, 3));
+    setConfig(createDefaultTableConfig(2, 3, t('markdownEditor.table.headerPrefix')));
   };
 
   const preview = generateMarkdownTable(config);
@@ -160,7 +162,7 @@ export function TableDialog({ trigger, onInsert }: TableDialogProps) {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
           <DialogHeader className="flex-shrink-0">
-            <DialogTitle>插入表格</DialogTitle>
+            <DialogTitle>{t('markdownEditor.table.dialogTitle')}</DialogTitle>
           </DialogHeader>
 
           <div className="flex-1 overflow-y-auto custom-scrollbar space-y-4 pr-2">
@@ -168,7 +170,7 @@ export function TableDialog({ trigger, onInsert }: TableDialogProps) {
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div className="flex items-center gap-6">
                 <div className="flex items-center gap-2">
-                  <Label className="w-8">行数</Label>
+                  <Label className="w-8">{t('markdownEditor.table.rows')}</Label>
                   <Button
                     variant="outline"
                     size="icon"
@@ -190,7 +192,7 @@ export function TableDialog({ trigger, onInsert }: TableDialogProps) {
                   </Button>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Label className="w-8">列数</Label>
+                  <Label className="w-8">{t('markdownEditor.table.cols')}</Label>
                   <Button
                     variant="outline"
                     size="icon"
@@ -222,7 +224,7 @@ export function TableDialog({ trigger, onInsert }: TableDialogProps) {
                 />
                 <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>
                   <Upload className="h-4 w-4 mr-1.5" />
-                  导入 Excel
+                  {t('markdownEditor.table.importExcel')}
                 </Button>
               </div>
             </div>
@@ -248,7 +250,7 @@ export function TableDialog({ trigger, onInsert }: TableDialogProps) {
                                 <Trash2 className="h-3.5 w-3.5" />
                               </Button>
                             </TooltipTrigger>
-                            <TooltipContent>删除此列</TooltipContent>
+                            <TooltipContent>{t('markdownEditor.table.deleteCol')}</TooltipContent>
                           </Tooltip>
                         </div>
                       </th>
@@ -263,7 +265,7 @@ export function TableDialog({ trigger, onInsert }: TableDialogProps) {
                           value={header}
                           onChange={(e) => updateHeader(i, e.target.value)}
                           className="h-8 text-center font-medium"
-                          placeholder={`标题 ${i + 1}`}
+                          placeholder={t('markdownEditor.table.headerPlaceholder', { n: i + 1 })}
                         />
                       </th>
                     ))}
@@ -307,7 +309,7 @@ export function TableDialog({ trigger, onInsert }: TableDialogProps) {
                               config.alignments[ci] === 'center' && 'text-center',
                               config.alignments[ci] === 'right' && 'text-right',
                             )}
-                            placeholder="单元格内容"
+                            placeholder={t('markdownEditor.table.cellPlaceholder')}
                           />
                         </td>
                       ))}
@@ -325,7 +327,7 @@ export function TableDialog({ trigger, onInsert }: TableDialogProps) {
                               <Trash2 className="h-3.5 w-3.5" />
                             </Button>
                           </TooltipTrigger>
-                          <TooltipContent>删除此行</TooltipContent>
+                          <TooltipContent>{t('markdownEditor.table.deleteRow')}</TooltipContent>
                         </Tooltip>
                       </td>
                     </tr>
@@ -336,7 +338,7 @@ export function TableDialog({ trigger, onInsert }: TableDialogProps) {
 
             {/* 预览 */}
             <div>
-              <Label className="text-sm text-muted-foreground mb-2 block">Markdown 预览</Label>
+              <Label className="text-sm text-muted-foreground mb-2 block">{t('markdownEditor.table.preview')}</Label>
               <pre className="bg-muted/50 rounded-md p-3 text-xs font-mono overflow-x-auto custom-scrollbar">
                 {preview}
               </pre>
@@ -345,9 +347,9 @@ export function TableDialog({ trigger, onInsert }: TableDialogProps) {
 
           <DialogFooter className="flex-shrink-0">
             <Button variant="outline" onClick={() => setOpen(false)}>
-              取消
+              {t('markdownEditor.table.cancel')}
             </Button>
-            <Button onClick={handleInsert}>插入表格</Button>
+            <Button onClick={handleInsert}>{t('markdownEditor.table.insert')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

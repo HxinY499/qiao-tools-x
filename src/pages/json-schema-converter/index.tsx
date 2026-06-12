@@ -1,5 +1,6 @@
 import { ArrowLeftRight, Braces, Code2, FileJson, Sparkles, Trash2 } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
 import { CodeArea } from '@/components/code-area';
@@ -16,6 +17,7 @@ import { ConvertDirection, ConvertOptions, DEFAULT_OPTIONS, EXAMPLE_SCHEMA, EXAM
 import { jsonSchemaToTypeScript, typeScriptToJsonSchema, validateJsonSchema, validateTypeScript } from './utils';
 
 export default function JsonSchemaConverterPage() {
+  const { t } = useTranslation('tools');
   const [direction, setDirection] = useState<ConvertDirection>('schema-to-ts');
   const [input, setInput] = useState('');
   const [output, setOutput] = useState('');
@@ -24,7 +26,9 @@ export default function JsonSchemaConverterPage() {
 
   const isSchemaToTs = direction === 'schema-to-ts';
 
-  const inputPlaceholder = isSchemaToTs ? '在此粘贴 JSON Schema...' : '在此粘贴 TypeScript interface 或 type...';
+  const inputPlaceholder = isSchemaToTs
+    ? t('jsonSchemaConverter.placeholder.schemaInput')
+    : t('jsonSchemaConverter.placeholder.tsInput');
 
   const inputLabel = isSchemaToTs ? 'JSON Schema' : 'TypeScript';
   const outputLabel = isSchemaToTs ? 'TypeScript' : 'JSON Schema';
@@ -42,25 +46,25 @@ export default function JsonSchemaConverterPage() {
       if (isSchemaToTs) {
         const validation = validateJsonSchema(input);
         if (!validation.valid) {
-          setError(validation.error || '无效的 JSON Schema');
+          setError(validation.error || t('jsonSchemaConverter.error.invalidSchema'));
           setOutput('');
           return;
         }
         const result = jsonSchemaToTypeScript(input, options);
         setOutput(result);
         setError(null);
-        toast.success('转换成功');
+        toast.success(t('jsonSchemaConverter.toast.convertSuccess'));
       } else {
         const validation = validateTypeScript(input);
         if (!validation.valid) {
-          setError(validation.error || '无效的 TypeScript 代码');
+          setError(validation.error || t('jsonSchemaConverter.error.invalidTs'));
           setOutput('');
           return;
         }
         const result = typeScriptToJsonSchema(input, options);
         setOutput(result);
         setError(null);
-        toast.success('转换成功');
+        toast.success(t('jsonSchemaConverter.toast.convertSuccess'));
       }
     } catch (e) {
       setError((e as Error).message);
@@ -92,7 +96,7 @@ export default function JsonSchemaConverterPage() {
     }
     setOutput('');
     setError(null);
-    toast.success('已加载示例');
+    toast.success(t('jsonSchemaConverter.toast.exampleLoaded'));
   };
 
   const updateOption = <K extends keyof ConvertOptions>(key: K, value: ConvertOptions[K]) => {
@@ -133,7 +137,7 @@ export default function JsonSchemaConverterPage() {
             {isSchemaToTs ? (
               <>
                 <div className="flex items-center gap-2">
-                  <Label className="text-xs text-muted-foreground whitespace-nowrap">输出类型</Label>
+                  <Label className="text-xs text-muted-foreground whitespace-nowrap">{t('jsonSchemaConverter.options.outputType')}</Label>
                   <Select
                     value={options.exportType}
                     onValueChange={(v) => updateOption('exportType', v as 'interface' | 'type')}
@@ -154,7 +158,7 @@ export default function JsonSchemaConverterPage() {
                     onCheckedChange={(v) => updateOption('addExport', v)}
                   />
                   <Label htmlFor="addExport" className="text-xs text-muted-foreground cursor-pointer">
-                    添加 export
+                    {t('jsonSchemaConverter.options.addExport')}
                   </Label>
                 </div>
                 <div className="flex items-center gap-2">
@@ -164,14 +168,14 @@ export default function JsonSchemaConverterPage() {
                     onCheckedChange={(v) => updateOption('optionalByDefault', v)}
                   />
                   <Label htmlFor="optionalByDefault" className="text-xs text-muted-foreground cursor-pointer">
-                    默认可选
+                    {t('jsonSchemaConverter.options.optionalByDefault')}
                   </Label>
                 </div>
               </>
             ) : (
               <>
                 <div className="flex items-center gap-2">
-                  <Label className="text-xs text-muted-foreground whitespace-nowrap">Schema 版本</Label>
+                  <Label className="text-xs text-muted-foreground whitespace-nowrap">{t('jsonSchemaConverter.options.schemaVersion')}</Label>
                   <Select
                     value={options.schemaVersion}
                     onValueChange={(v) => updateOption('schemaVersion', v as 'draft-07' | 'draft-04')}
@@ -192,7 +196,7 @@ export default function JsonSchemaConverterPage() {
                     onCheckedChange={(v) => updateOption('includeRequired', v)}
                   />
                   <Label htmlFor="includeRequired" className="text-xs text-muted-foreground cursor-pointer">
-                    包含 required
+                    {t('jsonSchemaConverter.options.includeRequired')}
                   </Label>
                 </div>
               </>
@@ -203,11 +207,11 @@ export default function JsonSchemaConverterPage() {
           <div className="flex items-center gap-2 lg:ml-auto">
             <Button onClick={handleConvert} disabled={!hasInput} className="gap-2">
               <Braces className="h-4 w-4" />
-              转换
+              {t('jsonSchemaConverter.button.convert')}
             </Button>
             <Button variant="outline" onClick={handleSwap} disabled={!output} className="gap-2">
               <ArrowLeftRight className="h-4 w-4" />
-              交换
+              {t('jsonSchemaConverter.button.swap')}
             </Button>
           </div>
         </div>
@@ -229,7 +233,7 @@ export default function JsonSchemaConverterPage() {
             <div className="flex items-center gap-2">
               <Button size="sm" variant="outline" onClick={handleLoadExample} className="h-8 gap-1.5">
                 <Sparkles className="h-3.5 w-3.5" />
-                <span className="hidden sm:inline">示例</span>
+                <span className="hidden sm:inline">{t('jsonSchemaConverter.button.example')}</span>
               </Button>
               <Button
                 size="sm"
@@ -239,7 +243,7 @@ export default function JsonSchemaConverterPage() {
                 className="h-8 gap-1.5"
               >
                 <Trash2 className="h-3.5 w-3.5" />
-                <span className="hidden sm:inline">清空</span>
+                <span className="hidden sm:inline">{t('jsonSchemaConverter.button.clear')}</span>
               </Button>
             </div>
           </header>
@@ -289,7 +293,7 @@ export default function JsonSchemaConverterPage() {
                 ) : (
                   <FileJson className="h-12 w-12 opacity-20" />
                 )}
-                <p className="text-sm">等待转换...</p>
+                <p className="text-sm">{t('jsonSchemaConverter.output.waiting')}</p>
               </div>
             )}
           </div>
@@ -298,25 +302,22 @@ export default function JsonSchemaConverterPage() {
 
       {/* 使用说明 */}
       <Card className="p-3 lg:p-4 shrink-0">
-        <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase mb-3">使用说明</h2>
+        <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase mb-3">{t('jsonSchemaConverter.usage.title')}</h2>
         <ul className="list-disc pl-4 text-xs text-muted-foreground space-y-1.5 leading-relaxed">
           <li>
             <span className="font-medium text-foreground">Schema → TS</span>
-            ：将 JSON Schema 转换为 TypeScript interface 或 type，支持嵌套对象、数组、枚举、联合类型等。
+            {t('jsonSchemaConverter.usage.schemaToTs')}
           </li>
           <li>
             <span className="font-medium text-foreground">TS → Schema</span>
-            ：将 TypeScript interface/type 转换为 JSON Schema，支持 Draft-04 和 Draft-07 版本。
+            {t('jsonSchemaConverter.usage.tsToSchema')}
           </li>
           <li>
-            <span className="font-medium text-foreground">交换按钮</span>
-            ：将输出结果作为新的输入，方便双向校验转换结果。
+            <span className="font-medium text-foreground">{t('jsonSchemaConverter.usage.swapButton')}</span>
+            {t('jsonSchemaConverter.usage.swapDesc')}
           </li>
           <li>
-            支持的类型：基本类型、数组、嵌套对象、联合类型（<code className="bg-muted px-1 rounded">|</code>
-            ）、交叉类型（
-            <code className="bg-muted px-1 rounded">&</code>）、枚举、
-            <code className="bg-muted px-1 rounded">$ref</code> 引用等。
+            {t('jsonSchemaConverter.usage.supportedTypes')}
           </li>
         </ul>
       </Card>

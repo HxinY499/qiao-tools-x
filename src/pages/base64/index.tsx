@@ -1,5 +1,6 @@
 import type { ChangeEvent } from 'react';
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
 import { CopyButton } from '@/components/copy-button';
@@ -42,10 +43,11 @@ const base64Pattern = /^[A-Za-z0-9+/]+={0,2}$/;
 type TextMode = 'text-to-base64' | 'base64-to-text';
 
 function Base64ToolPage() {
+  const { t } = useTranslation('tools');
   const [textMode, setTextMode] = useState<TextMode>('text-to-base64');
   const [textInput, setTextInput] = useState('');
 
-  const [fileName, setFileName] = useState('尚未选择图片文件');
+  const [fileName, setFileName] = useState(() => t('base64.noFileSelected'));
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   const [dataUrl, setDataUrl] = useState('');
   const [stripDataUrlPrefix, setStripDataUrlPrefix] = useState(false);
@@ -70,19 +72,19 @@ function Base64ToolPage() {
     const compact = value.replace(/\s+/g, '');
 
     if (compact.length % 4 !== 0) {
-      return { result: '', error: 'Base64 串长度必须是 4 的倍数' };
+      return { result: '', error: t('base64.errorLengthMultiple') };
     }
 
     if (!base64Pattern.test(compact)) {
-      return { result: '', error: '当前内容看起来不是合法的 Base64 字符串' };
+      return { result: '', error: t('base64.errorInvalidBase64') };
     }
 
     try {
       return { result: decodeBase64ToText(compact), error: '' };
     } catch {
-      return { result: '', error: 'Base64 解码失败，请检查内容是否完整' };
+      return { result: '', error: t('base64.errorDecodeFailed') };
     }
-  }, [textInput, textMode]);
+  }, [textInput, textMode, t]);
 
   function handleTextChange(event: ChangeEvent<HTMLTextAreaElement>) {
     setTextInput(event.target.value);
@@ -91,7 +93,7 @@ function Base64ToolPage() {
   function processFile(file: File) {
     const fileSizeLimit = 8 * 1024 * 1024;
     if (file.size > fileSizeLimit) {
-      toast.error('图片过大，请选择 8MB 以内的文件');
+      toast.error(t('base64.toastFileTooLarge'));
       return;
     }
 
@@ -101,7 +103,7 @@ function Base64ToolPage() {
     reader.onload = () => {
       const result = reader.result;
       if (typeof result !== 'string') {
-        toast.error('读取图片失败，请重试或更换文件');
+        toast.error(t('base64.toastReadFailed'));
         setImagePreviewUrl(null);
         setDataUrl('');
         return;
@@ -111,7 +113,7 @@ function Base64ToolPage() {
     };
 
     reader.onerror = () => {
-      toast.error('读取图片失败，请重试或更换文件');
+      toast.error(t('base64.toastReadFailed'));
       setImagePreviewUrl(null);
       setDataUrl('');
     };
@@ -126,7 +128,7 @@ function Base64ToolPage() {
   function handleClearFile() {
     setImagePreviewUrl(null);
     setDataUrl('');
-    setFileName('尚未选择图片文件');
+    setFileName(t('base64.noFileSelected'));
   }
 
   function handleImageFromBase64(imageUrl: string, description: string) {
@@ -170,14 +172,14 @@ function Base64ToolPage() {
         <Tabs defaultValue="image" className="w-full">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">Base64 编解码</h2>
+              <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">{t('base64.sectionTitle')}</h2>
             </div>
             <TabsList className="mt-2 sm:mt-0">
               <TabsTrigger value="image" className="text-xs">
-                图片转 Data URL
+                {t('base64.tabImage')}
               </TabsTrigger>
               <TabsTrigger value="text" className="text-xs">
-                文本 ⇄ Base64
+                {t('base64.tabText')}
               </TabsTrigger>
             </TabsList>
           </div>
@@ -186,7 +188,7 @@ function Base64ToolPage() {
             <div className="grid gap-4 lg:grid-cols-2">
               <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between gap-2">
-                  <Label className="text-xs font-medium">输入区域</Label>
+                  <Label className="text-xs font-medium">{t('base64.labelInput')}</Label>
                   <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
                     <button
                       type="button"
@@ -195,7 +197,7 @@ function Base64ToolPage() {
                       }`}
                       onClick={() => setTextMode('text-to-base64')}
                     >
-                      文本 → Base64
+                      {t('base64.modeTextToBase64')}
                     </button>
                     <button
                       type="button"
@@ -204,7 +206,7 @@ function Base64ToolPage() {
                       }`}
                       onClick={() => setTextMode('base64-to-text')}
                     >
-                      Base64 → 文本
+                      {t('base64.modeBase64ToText')}
                     </button>
                   </div>
                 </div>
@@ -213,16 +215,16 @@ function Base64ToolPage() {
                   onChange={handleTextChange}
                   placeholder={
                     isTextToBase64
-                      ? '在此输入要编码的文本内容，支持多行和中文。'
-                      : '在此粘贴要解码的 Base64 字符串，可包含换行。'
+                      ? t('base64.placeholderEncodeInput')
+                      : t('base64.placeholderDecodeInput')
                   }
                   className="min-h-[160px] text-xs"
                 />
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-[11px] text-muted-foreground">
                     {isTextToBase64
-                      ? '输入任意文本，右侧会实时生成 Base64。'
-                      : '粘贴 Base64 字符串，右侧会尝试还原为原始文本。'}
+                      ? t('base64.hintEncode')
+                      : t('base64.hintDecode')}
                   </span>
                   <div className="flex items-center gap-2">
                     <Button
@@ -232,7 +234,7 @@ function Base64ToolPage() {
                       className="h-7 px-2 text-[11px]"
                       onClick={handleClearText}
                     >
-                      清空
+                      {t('base64.btnClear')}
                     </Button>
                   </div>
                 </div>
@@ -240,19 +242,19 @@ function Base64ToolPage() {
                   <p className="text-[11px] text-destructive mt-1">{textError}</p>
                 ) : (
                   <p className="text-[11px] text-muted-foreground mt-1">
-                    小提示：Base64 应只包含字母、数字、+、/ 和最多两个 = 结尾填充符。
+                    {t('base64.tipBase64Chars')}
                   </p>
                 )}
               </div>
 
               <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between gap-2">
-                  <Label className="text-xs font-medium">输出结果</Label>
+                  <Label className="text-xs font-medium">{t('base64.labelOutput')}</Label>
                   <CopyButton
                     text={encodedResult}
                     mode="text"
-                    copyText="复制结果"
-                    successText="已复制"
+                    copyText={t('base64.btnCopyResult')}
+                    successText={t('base64.btnCopied')}
                     variant="secondary"
                     size="sm"
                     className="h-7 px-2 text-[11px]"
@@ -263,7 +265,7 @@ function Base64ToolPage() {
                   value={encodedResult}
                   readOnly
                   placeholder={
-                    isTextToBase64 ? '右侧会实时展示编码后的 Base64 字符串。' : '右侧会展示还原后的文本内容。'
+                    isTextToBase64 ? t('base64.placeholderEncodeOutput') : t('base64.placeholderDecodeOutput')
                   }
                   className="min-h-[160px] text-xs bg-muted/50"
                 />
@@ -275,7 +277,7 @@ function Base64ToolPage() {
             <div className="grid gap-4 lg:grid-cols-2">
               <div className="flex flex-col gap-3">
                 <div className="flex items-center justify-between gap-2">
-                  <Label className="text-xs font-medium">选择或拖拽图片文件</Label>
+                  <Label className="text-xs font-medium">{t('base64.labelSelectImage')}</Label>
                   <Button
                     type="button"
                     size="sm"
@@ -284,7 +286,7 @@ function Base64ToolPage() {
                     disabled={!imagePreviewUrl && !dataUrl}
                     onClick={handleClearFile}
                   >
-                    清空当前图片
+                    {t('base64.btnClearImage')}
                   </Button>
                 </div>
                 <FileDragUploader
@@ -296,8 +298,8 @@ function Base64ToolPage() {
                   }}
                   className="border-dashed bg-muted/60 px-4 py-6 sm:py-8"
                   icon="🖼️"
-                  title="拖拽图片到此处，或点击选择文件"
-                  hint="支持常见图片格式（PNG / JPG / JPEG / GIF 等），单张不超过 8MB。"
+                  title={t('base64.uploaderTitle')}
+                  hint={t('base64.uploaderHint')}
                   showButton={false}
                   accept="image/*"
                 />
@@ -308,23 +310,23 @@ function Base64ToolPage() {
               </div>
 
               <div className="flex flex-col gap-3">
-                <Label className="text-xs font-medium">预览与 Data URL</Label>
+                <Label className="text-xs font-medium">{t('base64.labelPreview')}</Label>
                 <ImageComponent
                   src={imagePreviewUrl}
-                  alt="图片预览"
-                  placeholder="预览"
+                  alt={t('base64.imageAlt')}
+                  placeholder={t('base64.imagePlaceholder')}
                   canPreview
                   imgClassName="max-h-60 max-w-full object-contain"
                   className="p-3"
                 />
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center justify-between gap-2">
-                    <Label className="text-xs font-medium">Base64 Data URL</Label>
+                    <Label className="text-xs font-medium">{t('base64.labelDataUrl')}</Label>
                     <CopyButton
                       text={displayDataUrl}
                       mode="text"
-                      copyText="复制"
-                      successText="已复制"
+                      copyText={t('base64.btnCopy')}
+                      successText={t('base64.btnCopied')}
                       variant="secondary"
                       size="sm"
                       className="h-7 px-2 text-[11px]"
@@ -340,12 +342,12 @@ function Base64ToolPage() {
                           onCheckedChange={(value) => setStripDataUrlPrefix(Boolean(value))}
                         />
                         <span>
-                          移除 <code>data:...;base64,</code> 前缀
+                          {t('base64.checkboxStripPrefix')} <code>data:...;base64,</code> {t('base64.checkboxStripSuffix')}
                         </span>
                       </label>
                       <label className="inline-flex items-center gap-1 cursor-pointer">
                         <Checkbox checked={wrapDataUrl} onCheckedChange={(value) => setWrapDataUrl(Boolean(value))} />
-                        <span>按固定长度换行</span>
+                        <span>{t('base64.checkboxWrap')}</span>
                       </label>
                       {wrapDataUrl ? (
                         <div className="flex items-center gap-1">
@@ -362,7 +364,7 @@ function Base64ToolPage() {
                             }}
                             className="h-7 w-16 rounded-full px-2 py-1 text-[11px]"
                           />
-                          <span className="text-[11px] text-muted-foreground">字符/行</span>
+                          <span className="text-[11px] text-muted-foreground">{t('base64.charsPerLine')}</span>
                         </div>
                       ) : null}
                     </div>
@@ -375,14 +377,14 @@ function Base64ToolPage() {
       </Card>
 
       <Card className="shadow-sm p-4 lg:p-5">
-        <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">使用说明 & 提示</h2>
+        <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">{t('base64.usageTitle')}</h2>
         <ul className="mt-3 list-disc pl-4 text-[11px] text-muted-foreground space-y-1.5">
-          <li>所有编码与解码操作都在浏览器本地完成，不会上传到服务器，适合处理敏感文本或图片。</li>
-          <li>文本模式适合生成 Authorization 头、简单配置片段等，编码后字符串会明显变长，请谨慎用于体积敏感场景。</li>
-          <li>图片模式常用于在 CSS、HTML 或 JSON 中内联小图标、占位图等资源，大图建议仍然使用 URL 引用。</li>
-          <li>若解码失败，请检查 Base64 是否被换行或中间插入了额外字符，可尝试先移除多余空白后再粘贴。</li>
+          <li>{t('base64.usageTip1')}</li>
+          <li>{t('base64.usageTip2')}</li>
+          <li>{t('base64.usageTip3')}</li>
+          <li>{t('base64.usageTip4')}</li>
           <li>
-            Data URL 一般形如：<code>data:image/png;base64,......</code>，复制时可直接整段粘贴到你的样式或标签属性中。
+            {t('base64.usageTip5Pre')}<code>data:image/png;base64,......</code>{t('base64.usageTip5Post')}
           </li>
         </ul>
       </Card>

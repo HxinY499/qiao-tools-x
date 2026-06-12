@@ -1,6 +1,7 @@
 import imageCompression from 'browser-image-compression';
 import { HelpCircle, Image as ImageIcon, Lock, Unlock } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
 import { FileDragUploader } from '@/components/file-drag-uploader';
@@ -60,8 +61,6 @@ async function checkImageHasAlpha(imageUrl: string): Promise<boolean> {
 type PresetType = 'custom' | 'social' | 'web' | 'extreme';
 
 interface PresetConfig {
-  label: string;
-  description: string;
   quality: number;
   format: 'auto' | 'image/jpeg' | 'image/png' | 'image/webp';
   maxWidth?: number;
@@ -69,28 +68,20 @@ interface PresetConfig {
 
 const PRESETS: Record<PresetType, PresetConfig> = {
   custom: {
-    label: '自定义',
-    description: '手动调整所有参数',
     quality: 80,
     format: 'auto',
   },
   social: {
-    label: '社交媒体',
-    description: '适合微信、朋友圈分享（质量 75%，宽度 1280px）',
     quality: 75,
     format: 'image/jpeg',
     maxWidth: 1280,
   },
   web: {
-    label: '网页优化',
-    description: '响应式友好，兼顾移动与PC（质量 75%，宽度 1080px）',
     quality: 75,
     format: 'image/webp',
     maxWidth: 1080,
   },
   extreme: {
-    label: '极致压缩',
-    description: '最小体积，适合批量上传（质量 65%，宽度 800px）',
     quality: 65,
     format: 'image/webp',
     maxWidth: 800,
@@ -134,7 +125,7 @@ const INITIAL_STATE: CompressorState = {
   originalWidth: null,
   originalHeight: null,
   originalType: null,
-  originalPlaceholder: '上传后在此处显示原图预览',
+  originalPlaceholder: 'preview.originalPlaceholder',
   hasAlpha: null,
 
   compressedBlob: null,
@@ -142,7 +133,7 @@ const INITIAL_STATE: CompressorState = {
   compressedSize: null,
   compressedWidth: null,
   compressedHeight: null,
-  compressedPlaceholder: '调整参数并执行压缩后显示效果',
+  compressedPlaceholder: 'preview.resultPlaceholder',
 
   formatValue: 'auto',
   quality: 80,
@@ -171,6 +162,7 @@ function compressorReducer(state: CompressorState, action: CompressorAction): Co
 }
 
 function ImageCompressorPage() {
+  const { t } = useTranslation('tools');
   const [state, dispatch] = useReducer(compressorReducer, INITIAL_STATE);
   const {
     originalFile, originalUrl, originalSize, originalWidth, originalHeight,
@@ -213,8 +205,8 @@ function ImageCompressorPage() {
     reader.onload = () => {
       const url = typeof reader.result === 'string' ? reader.result : '';
       if (!url) {
-        update({ originalPlaceholder: '原图加载失败，请重试或更换文件' });
-        toast.error('图片加载失败，请尝试更换文件。');
+        update({ originalPlaceholder: t('imageCompressor.preview.originalFailed') });
+        toast.error(t('imageCompressor.preview.imageFailed'));
         return;
       }
       const img = new Image();
@@ -223,12 +215,12 @@ function ImageCompressorPage() {
           originalUrl: url,
           originalWidth: img.width,
           originalHeight: img.height,
-          originalPlaceholder: '上传后在此处显示原图预览',
+          originalPlaceholder: t('imageCompressor.preview.originalPlaceholder'),
           targetWidth: img.width.toString(),
           targetHeight: img.height.toString(),
         });
 
-        toast.success('图片上传成功');
+        toast.success(t('imageCompressor.preview.uploadSuccess'));
 
         // PNG 智能提示逻辑
         if (file.type === 'image/png') {
@@ -239,14 +231,14 @@ function ImageCompressorPage() {
         }
       };
       img.onerror = () => {
-        update({ originalPlaceholder: '原图加载失败，请重试或更换文件' });
-        toast.error('图片加载失败，请尝试更换文件。');
+        update({ originalPlaceholder: t('imageCompressor.preview.originalFailed') });
+        toast.error(t('imageCompressor.preview.imageFailed'));
       };
       img.src = url;
     };
     reader.onerror = () => {
-      update({ originalPlaceholder: '原图加载失败，请重试或更换文件' });
-      toast.error('文件读取失败，请重试。');
+      update({ originalPlaceholder: t('imageCompressor.preview.originalFailed') });
+      toast.error(t('imageCompressor.preview.readFailed'));
     };
 
     reader.readAsDataURL(file);
@@ -333,12 +325,12 @@ function ImageCompressorPage() {
     const finalHeight = parseInt(s.targetHeight) || s.originalHeight;
 
     if (finalWidth <= 0 || finalHeight <= 0) {
-      toast.error('图片尺寸无效');
+      toast.error(t('imageCompressor.preview.invalidSize'));
       return;
     }
 
     try {
-      dispatch({ type: 'UPDATE', payload: { isCompressing: true, compressedPlaceholder: '正在压缩中，请稍候...' } });
+      dispatch({ type: 'UPDATE', payload: { isCompressing: true, compressedPlaceholder: t('imageCompressor.preview.compressing') } });
 
       // 如果启用了"不压缩"且尺寸未变：直接使用原图
       if (s.skipCompression && finalWidth === s.originalWidth && finalHeight === s.originalHeight) {
@@ -350,7 +342,7 @@ function ImageCompressorPage() {
             compressedSize: s.originalFile.size,
             compressedWidth: s.originalWidth,
             compressedHeight: s.originalHeight,
-            compressedPlaceholder: '调整参数并执行压缩后显示效果',
+            compressedPlaceholder: t('imageCompressor.preview.resultPlaceholder'),
             isCompressing: false,
           },
         });
@@ -424,7 +416,7 @@ function ImageCompressorPage() {
           compressedSize: finalBlob.size,
           compressedWidth: finalCompressedWidth,
           compressedHeight: finalCompressedHeight,
-          compressedPlaceholder: '调整参数并执行压缩后显示效果',
+          compressedPlaceholder: t('imageCompressor.preview.resultPlaceholder'),
           isCompressing: false,
         },
       });
@@ -433,13 +425,13 @@ function ImageCompressorPage() {
       dispatch({
         type: 'UPDATE',
         payload: {
-          compressedPlaceholder: '压缩预览生成失败，请调整参数后重试',
+          compressedPlaceholder: t('imageCompressor.preview.failed'),
           isCompressing: false,
         },
       });
-      toast.error('压缩过程中出现错误，请尝试降低尺寸或更换图片。');
+      toast.error(t('imageCompressor.preview.error'));
     }
-  }, []);
+  }, [t]);
 
   // 当压缩参数变化时触发压缩
   useEffect(() => {
@@ -479,33 +471,33 @@ function ImageCompressorPage() {
     if (!originalSize || !compressedSize || originalSize <= 0) return '-';
     const ratio = (compressedSize / originalSize) * 100;
     const delta = 100 - ratio;
-    return `${delta >= 0 ? '减少' : '增大'} ${Math.abs(delta).toFixed(1)}%（${ratio.toFixed(1)}% 原始体积）`;
-  }, [originalSize, compressedSize]);
+    return `${delta >= 0 ? t('imageCompressor.settings.reduce') : t('imageCompressor.settings.increase')} ${Math.abs(delta).toFixed(1)}%（${ratio.toFixed(1)}% ${t('imageCompressor.settings.originalVolume')}）`;
+  }, [originalSize, compressedSize, t]);
 
   const isCompressedSmaller = Boolean(originalSize && compressedSize && compressedSize <= originalSize);
 
   return (
     <div className="max-w-5xl w-full mx-auto px-4 pb-5 lg:py-8 grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
       <Card className="shadow-sm p-4 lg:p-5 flex flex-col">
-        <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase shrink-0">上传图片</h2>
+        <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase shrink-0">{t('imageCompressor.upload.upload')}</h2>
         <FileDragUploader
           onFileSelect={handleFile}
           onError={(error) => toast.error(error)}
           className="mt-3 bg-muted/60 overflow-hidden flex-1 min-h-0"
           icon={<ImageIcon />}
-          title="拖拽图片到此处，或"
-          buttonText="选择图片文件"
+          title={t('imageCompressor.upload.drag')}
+          buttonText={t('imageCompressor.upload.select')}
           hint=""
           accept="image/*"
         />
       </Card>
 
       <Card className="shadow-sm p-4 lg:p-5">
-        <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">设置压缩参数</h2>
+        <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">{t('imageCompressor.settings.title')}</h2>
         <div className="mt-3 grid gap-3">
           {/* 预设模板选择 */}
           <div className="rounded-lg border bg-muted/60 px-2.5 py-2.5">
-            <Label className="mb-1 block text-xs">预设参数</Label>
+            <Label className="mb-1 block text-xs">{t('imageCompressor.settings.preset')}</Label>
             <ToggleGroup
               type="single"
               value={currentPreset}
@@ -513,30 +505,30 @@ function ImageCompressorPage() {
               className="grid grid-cols-2 gap-1.5"
             >
               <ToggleGroupItem value="custom" className="text-xs h-auto py-1.5 px-2 flex flex-col items-start gap-0.5">
-                <span className="font-medium">自定义</span>
-                <span className="text-[10px] text-muted-foreground">手动调整</span>
+                <span className="font-medium">{t('imageCompressor.presets.custom')}</span>
+                <span className="text-[10px] text-muted-foreground">{t('imageCompressor.settings.manual')}</span>
               </ToggleGroupItem>
               <ToggleGroupItem value="social" className="text-xs h-auto py-1.5 px-2 flex flex-col items-start gap-0.5">
-                <span className="font-medium">社交媒体</span>
-                <span className="text-[10px] text-muted-foreground">质量 75%</span>
+                <span className="font-medium">{t('imageCompressor.presets.social')}</span>
+                <span className="text-[10px] text-muted-foreground">75%</span>
               </ToggleGroupItem>
               <ToggleGroupItem value="web" className="text-xs h-auto py-1.5 px-2 flex flex-col items-start gap-0.5">
-                <span className="font-medium">网页优化</span>
-                <span className="text-[10px] text-muted-foreground">质量 75%</span>
+                <span className="font-medium">{t('imageCompressor.presets.web')}</span>
+                <span className="text-[10px] text-muted-foreground">75%</span>
               </ToggleGroupItem>
               <ToggleGroupItem value="extreme" className="text-xs h-auto py-1.5 px-2 flex flex-col items-start gap-0.5">
-                <span className="font-medium">极致压缩</span>
-                <span className="text-[10px] text-muted-foreground">质量 65%</span>
+                <span className="font-medium">{t('imageCompressor.presets.extreme')}</span>
+                <span className="text-[10px] text-muted-foreground">65%</span>
               </ToggleGroupItem>
             </ToggleGroup>
             <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
-              {PRESETS[currentPreset].description}
+              {t(`imageCompressor.presets.${currentPreset}Desc`, { defaultValue: t(`imageCompressor.presets.manual`) })}
             </p>
           </div>
 
           <div className="rounded-lg border bg-muted/60 px-3 py-3">
             <div className="mb-1.5 flex items-center justify-between text-xs">
-              <Label className="text-xs">压缩质量</Label>
+              <Label className="text-xs">{t('imageCompressor.settings.quality')}</Label>
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-1">
                   <Button
@@ -549,10 +541,10 @@ function ImageCompressorPage() {
                     }}
                   >
                     {skipCompression ? (
-                      '✓ 不压缩'
+                      `✓ ${t('imageCompressor.settings.noCompress')}`
                     ) : (
                       <>
-                        <span>不压缩</span>
+                        <span>{t('imageCompressor.settings.noCompress')}</span>
                         <TooltipProvider>
                           <Tooltip>
                             <TooltipTrigger asChild>
@@ -564,7 +556,7 @@ function ImageCompressorPage() {
                               </button>
                             </TooltipTrigger>
                             <TooltipContent side="top" className="max-w-[200px] text-xs">
-                              <p>如果你只想修改图片格式或调整尺寸，可以选择不压缩模式</p>
+                              <p>{t('imageCompressor.settings.noCompressTip')}</p>
                             </TooltipContent>
                           </Tooltip>
                         </TooltipProvider>
@@ -584,37 +576,37 @@ function ImageCompressorPage() {
               <>
                 <Slider value={[quality]} min={10} max={100} step={1} onValueChange={([v]) => update({ quality: v })} />
                 <p className="mt-1.5 text-[11px] leading-relaxed text-muted-foreground">
-                  数值越低，体积越小，但画质会降低
+                  {t('imageCompressor.settings.qualityTip')}
                 </p>
               </>
             )}
             {skipCompression && (
               <p className="mt-1.5 text-[11px] leading-relaxed text-muted-foreground">
-                已启用"不压缩"模式，将直接使用原图（仅当尺寸未调整时生效）
+                {t('imageCompressor.settings.noCompressOn')}
               </p>
             )}
           </div>
 
           <div className="rounded-lg border bg-muted/60 px-3 py-3">
             <Label htmlFor="formatSelect" className="mb-1.5 block text-xs">
-              输出格式
+              {t('imageCompressor.settings.format')}
             </Label>
             <Select value={formatValue} onValueChange={(val) => update({ formatValue: val as typeof formatValue })}>
               <SelectTrigger id="formatSelect" className="h-8 text-xs">
-                <SelectValue placeholder="保持原格式" />
+                <SelectValue placeholder={t('imageCompressor.settings.keepFormat')} />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="auto" className="text-xs">
-                  保持原格式
+                  {t('imageCompressor.settings.keepFormat')}
                 </SelectItem>
                 <SelectItem value="image/jpeg" className="text-xs">
-                  JPEG（适合照片，体积小）
+                  {t('imageCompressor.settings.formatJpg')}
                 </SelectItem>
                 <SelectItem value="image/png" className="text-xs">
-                  PNG（支持透明背景与色彩量化压缩）
+                  {t('imageCompressor.settings.formatPng')}
                 </SelectItem>
                 <SelectItem value="image/webp" className="text-xs">
-                  WebP（支持透明）
+                  {t('imageCompressor.settings.formatWebp')}
                 </SelectItem>
               </SelectContent>
             </Select>
@@ -623,11 +615,11 @@ function ImageCompressorPage() {
                 <p className="text-[11px] leading-relaxed text-blue-700 dark:text-blue-300">
                   {hasAlpha ? (
                     <>
-                      💡 检测到透明背景，建议保持 <strong>PNG</strong> 或切换为 <strong>WebP</strong> 格式
+                      💡 {t('imageCompressor.settings.transparentPng')}
                     </>
                   ) : (
                     <>
-                      💡 未检测到透明背景，建议切换为 <strong>JPEG</strong> 或 <strong>WebP</strong> 以获得更小体积
+                      💡 {t('imageCompressor.settings.noTransparent')}
                     </>
                   )}
                 </p>
@@ -638,7 +630,7 @@ function ImageCompressorPage() {
           {/* 尺寸调整 */}
           <div className="rounded-lg border bg-muted/60 px-3 py-3">
             <Label className="mb-1.5 flex items-center justify-between text-xs">
-              <span>图片尺寸调整</span>
+              <span>{t('imageCompressor.settings.resize')}</span>
               <Button
                 type="button"
                 variant="ghost"
@@ -657,7 +649,7 @@ function ImageCompressorPage() {
             <div className="grid grid-cols-2 gap-2 mb-2">
               <div>
                 <Label htmlFor="targetWidth" className="text-[10px] text-muted-foreground mb-1 block">
-                  宽度 (px)
+                  {t('imageCompressor.settings.width')}
                 </Label>
                 <Input
                   id="targetWidth"
@@ -672,7 +664,7 @@ function ImageCompressorPage() {
               </div>
               <div>
                 <Label htmlFor="targetHeight" className="text-[10px] text-muted-foreground mb-1 block">
-                  高度 (px)
+                  {t('imageCompressor.settings.height')}
                 </Label>
                 <Input
                   id="targetHeight"
@@ -689,7 +681,7 @@ function ImageCompressorPage() {
 
             <div>
               <Label className="mb-1.5 flex items-center justify-between text-[10px] text-muted-foreground">
-                <span>按百分比缩放</span>
+                <span>{t('imageCompressor.settings.percent')}</span>
                 <span className="font-medium text-primary">{scalePercentage}%</span>
               </Label>
               <Slider
@@ -703,7 +695,7 @@ function ImageCompressorPage() {
             </div>
 
             <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">
-              原始尺寸：
+              {t('imageCompressor.settings.originalSize')}
               {originalWidth && originalHeight ? `${originalWidth} × ${originalHeight}` : '—'}
             </p>
           </div>
@@ -711,29 +703,29 @@ function ImageCompressorPage() {
       </Card>
 
       <Card className="lg:col-span-2 shadow-sm p-4 lg:p-5">
-        <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">预览对比</h2>
+        <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">{t('imageCompressor.compare.title')}</h2>
         <div className="mt-3 grid gap-4 lg:grid-cols-2">
           <div className="rounded-lg border bg-muted/40 p-3 sm:p-4">
             <h3 className="text-sm font-medium mb-2 flex items-center justify-between">
-              <span>原始图片</span>
+              <span>{t('imageCompressor.compare.original')}</span>
               {originalSize ? (
                 <span className="text-[11px] text-muted-foreground">{formatBytes(originalSize)}</span>
               ) : null}
             </h3>
-            <ImageComponent src={originalUrl} alt="原始图片预览" placeholder={originalPlaceholder} canPreview />
+            <ImageComponent src={originalUrl} alt={t('imageCompressor.compare.original')} placeholder={t(originalPlaceholder)} canPreview />
             <ul className="mt-2 text-[11px] text-muted-foreground space-y-1">
               <li className="flex justify-between gap-2">
-                <span className="opacity-80">文件大小：</span>
+                <span className="opacity-80">{t('imageCompressor.compare.fileSize')}</span>
                 <span className="font-medium text-foreground">{formatBytes(originalSize)}</span>
               </li>
               <li className="flex justify-between gap-2">
-                <span className="opacity-80">图片尺寸：</span>
+                <span className="opacity-80">{t('imageCompressor.compare.imageSize')}</span>
                 <span className="font-medium text-foreground">
                   {originalWidth && originalHeight ? `${originalWidth} × ${originalHeight}` : '-'}
                 </span>
               </li>
               <li className="flex justify-between gap-2">
-                <span className="opacity-80">格式类型：</span>
+                <span className="opacity-80">{t('imageCompressor.compare.formatType')}</span>
                 <span className="font-medium text-foreground">{originalType || '-'}</span>
               </li>
             </ul>
@@ -741,28 +733,28 @@ function ImageCompressorPage() {
 
           <div className="rounded-lg border bg-muted/40 p-3 sm:p-4">
             <h3 className="text-sm font-medium mb-2 flex items-center justify-between">
-              <span>压缩后图片</span>
+              <span>{t('imageCompressor.compare.compressed')}</span>
               {isCompressing ? (
-                <span className="text-[11px] text-blue-600 dark:text-blue-400 animate-pulse">正在压缩...</span>
+                <span className="text-[11px] text-blue-600 dark:text-blue-400 animate-pulse">{t('imageCompressor.compare.compressing')}</span>
               ) : compressedSize ? (
                 <span className="text-[11px] text-muted-foreground">{formatBytes(compressedSize)}</span>
               ) : null}
             </h3>
-            <ImageComponent src={compressedUrl} alt="压缩后图片预览" placeholder={compressedPlaceholder} canPreview />
+            <ImageComponent src={compressedUrl} alt={t('imageCompressor.compare.compressed')} placeholder={t(compressedPlaceholder)} canPreview />
 
             <ul className="mt-2 text-[11px] text-muted-foreground space-y-1">
               <li className="flex justify-between gap-2">
-                <span className="opacity-80">压缩后大小：</span>
+                <span className="opacity-80">{t('imageCompressor.compare.compressedSize')}</span>
                 <span className="font-medium text-foreground">{formatBytes(compressedSize)}</span>
               </li>
               <li className="flex justify-between gap-2">
-                <span className="opacity-80">图片尺寸：</span>
+                <span className="opacity-80">{t('imageCompressor.compare.imageSize')}</span>
                 <span className="font-medium text-foreground">
                   {compressedWidth && compressedHeight ? `${compressedWidth} × ${compressedHeight}` : '-'}
                 </span>
               </li>
               <li className="flex justify-between gap-2">
-                <span className="opacity-80">压缩比例：</span>
+                <span className="opacity-80">{t('imageCompressor.compare.compressionRatio')}</span>
                 <span
                   className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium ${
                     compressRatioText === '-'
@@ -781,11 +773,11 @@ function ImageCompressorPage() {
       </Card>
 
       <Card className="lg:col-span-2 shadow-sm p-4 lg:p-5">
-        <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">操作 & 使用说明</h2>
+        <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">{t('imageCompressor.actions.helpTitle')}</h2>
         <div className="mt-3 flex flex-col gap-3">
           <div className="flex flex-wrap gap-2">
             <Button type="button" disabled={!canDownload} onClick={handleDownload} variant="default">
-              下载压缩图片
+              {t('imageCompressor.actions.download')}
             </Button>
             <Button
               type="button"
@@ -794,17 +786,17 @@ function ImageCompressorPage() {
               }}
               variant="outline"
             >
-              重新上传
+              {t('imageCompressor.actions.reupload')}
             </Button>
           </div>
 
           <div className="mt-2 border-t border-border pt-3">
-            <h3 className="text-xs font-semibold mb-2">使用说明与注意事项</h3>
+            <h3 className="text-xs font-semibold mb-2">{t('imageCompressor.actions.helpTitle')}</h3>
             <ul className="list-disc pl-4 text-[11px] text-muted-foreground space-y-1">
-              <li>支持 PNG 格式的色彩量化压缩，可有效减小 PNG 文件体积。</li>
-              <li>质量过低会导致明显失真，建议逐步调节并通过右侧预览对比效果。</li>
-              <li>JPEG 适合照片，WebP 兼顾小体积与透明背景，PNG 适合需要透明的图形。</li>
-              <li>压缩过程在独立线程中运行，不会卡顿页面（即使处理大图）。</li>
+              <li>{t('imageCompressor.actions.help1')}</li>
+              <li>{t('imageCompressor.actions.help2')}</li>
+              <li>{t('imageCompressor.actions.help3')}</li>
+              <li>{t('imageCompressor.actions.help4')}</li>
             </ul>
           </div>
         </div>

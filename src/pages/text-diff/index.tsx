@@ -1,6 +1,7 @@
 import { useDebounceFn } from 'ahooks';
 import { ArrowLeftRight, FileDiff, Loader2, Sparkles, Trash2 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
 import { CopyButton } from '@/components/copy-button';
@@ -40,6 +41,7 @@ const AUTO_DIFF_DEBOUNCE_MS = 300;
 const HEAVY_DIFF_CHAR_THRESHOLD = 50_000;
 
 export default function TextDiffPage() {
+  const { t } = useTranslation('tools');
   const { leftText, rightText, setLeftText, setRightText, swapTexts, reset } = useTextDiffStore();
 
   const [viewMode, setViewMode] = useState<DiffViewMode>('all');
@@ -117,7 +119,7 @@ export default function TextDiffPage() {
 
   const handleCompareNow = () => {
     if (!leftText && !rightText) {
-      toast.error('请先在左右输入文本或上传文件');
+      toast.error(t('textDiff.toast.inputRequired'));
       return;
     }
     runDiff(leftText, rightText);
@@ -173,7 +175,7 @@ export default function TextDiffPage() {
             <div className="flex flex-wrap items-center gap-2">
               <Button size="sm" onClick={handleCompareNow} className="gap-1" disabled={isComputing}>
                 {isComputing ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileDiff className="h-4 w-4" />}
-                {isComputing ? '对比中…' : '立即对比'}
+                {isComputing ? t('textDiff.btn.comparing') : t('textDiff.btn.compareNow')}
               </Button>
               <Button
                 size="sm"
@@ -183,7 +185,7 @@ export default function TextDiffPage() {
                 disabled={!leftText && !rightText}
               >
                 <ArrowLeftRight className="h-4 w-4" />
-                交换左右
+                {t('textDiff.btn.swap')}
               </Button>
               <Button
                 size="sm"
@@ -193,12 +195,12 @@ export default function TextDiffPage() {
                 disabled={!leftText && !rightText}
               >
                 <Trash2 className="h-4 w-4" />
-                清空
+                {t('textDiff.btn.clear')}
               </Button>
             </div>
             <Button size="sm" variant="secondary" onClick={handleFillExample} className="gap-1">
               <Sparkles className="h-4 w-4" />
-              填充示例
+              {t('textDiff.btn.fillExample')}
             </Button>
           </div>
 
@@ -211,13 +213,13 @@ export default function TextDiffPage() {
               >
                 <div className="flex items-center justify-between text-xs text-muted-foreground">
                   <div className="flex items-center gap-2">
-                    <span>左侧文本</span>
+                    <span>{t('textDiff.label.leftText')}</span>
                     <TabsList className="h-7 text-[11px]">
                       <TabsTrigger value="paste" className="px-2 py-0.5">
-                        粘贴
+                        {t('textDiff.inputMode.paste')}
                       </TabsTrigger>
                       <TabsTrigger value="upload" className="px-2 py-0.5">
-                        上传
+                        {t('textDiff.inputMode.upload')}
                       </TabsTrigger>
                     </TabsList>
                   </div>
@@ -226,8 +228,8 @@ export default function TextDiffPage() {
                     mode="icon-text"
                     size="sm"
                     variant="ghost"
-                    copyText="复制左侧"
-                    successText="已复制"
+                    copyText={t('textDiff.btn.copyLeft')}
+                    successText={t('textDiff.btn.copied')}
                     disabled={!leftText}
                   />
                 </div>
@@ -251,12 +253,12 @@ export default function TextDiffPage() {
                     >
                       <div className="flex flex-col items-center justify-center gap-1 py-5 text-[11px] text-muted-foreground">
                         <span className="text-lg">📄</span>
-                        <span>拖拽文件到此处，或点击选择文件</span>
-                        <span>支持常见文本/代码文件，单个文件建议不超过 2MB</span>
+                        <span>{t('textDiff.upload.hint')}</span>
+                        <span>{t('textDiff.upload.sizeLimit')}</span>
                       </div>
                     </FileDragUploader>
                     {leftFileName && (
-                      <p className="text-[11px] text-muted-foreground truncate">当前文件：{leftFileName}</p>
+                      <p className="text-[11px] text-muted-foreground truncate">{t('textDiff.upload.currentFile')}：{leftFileName}</p>
                     )}
                   </div>
                 )}
@@ -264,7 +266,7 @@ export default function TextDiffPage() {
 
               <Textarea
                 className="min-h-[220px] text-xs md:text-sm font-mono leading-relaxed resize-y custom-scrollbar"
-                placeholder="在此输入或粘贴原始文本，例如旧版本代码、配置等"
+                placeholder={t('textDiff.placeholder.left')}
                 value={leftText}
                 spellCheck={false}
                 onChange={(event) => setLeftText(event.target.value)}
@@ -279,13 +281,13 @@ export default function TextDiffPage() {
               >
                 <div className="flex items-center justify-between text-xs text-muted-foreground">
                   <div className="flex items-center gap-2">
-                    <span>右侧文本</span>
+                    <span>{t('textDiff.label.rightText')}</span>
                     <TabsList className="h-7 text-[11px]">
                       <TabsTrigger value="paste" className="px-2 py-0.5">
-                        粘贴
+                        {t('textDiff.inputMode.paste')}
                       </TabsTrigger>
                       <TabsTrigger value="upload" className="px-2 py-0.5">
-                        上传
+                        {t('textDiff.inputMode.upload')}
                       </TabsTrigger>
                     </TabsList>
                   </div>
@@ -294,8 +296,8 @@ export default function TextDiffPage() {
                     mode="icon-text"
                     size="sm"
                     variant="ghost"
-                    copyText="复制右侧"
-                    successText="已复制"
+                    copyText={t('textDiff.btn.copyRight')}
+                    successText={t('textDiff.btn.copied')}
                     disabled={!rightText}
                   />
                 </div>
@@ -319,12 +321,12 @@ export default function TextDiffPage() {
                     >
                       <div className="flex flex-col items-center justify-center gap-1 py-5 text-[11px] text-muted-foreground">
                         <span className="text-lg">📄</span>
-                        <span>拖拽文件到此处，或点击选择文件</span>
-                        <span>支持常见文本/代码文件，单个文件建议不超过 2MB</span>
+                        <span>{t('textDiff.upload.hint')}</span>
+                        <span>{t('textDiff.upload.sizeLimit')}</span>
                       </div>
                     </FileDragUploader>
                     {rightFileName && (
-                      <p className="text-[11px] text-muted-foreground truncate">当前文件：{rightFileName}</p>
+                      <p className="text-[11px] text-muted-foreground truncate">{t('textDiff.upload.currentFile')}：{rightFileName}</p>
                     )}
                   </div>
                 )}
@@ -332,7 +334,7 @@ export default function TextDiffPage() {
 
               <Textarea
                 className="min-h-[220px] text-xs md:text-sm font-mono leading-relaxed resize-y custom-scrollbar"
-                placeholder="在此输入或粘贴目标文本，例如新版本代码、配置等"
+                placeholder={t('textDiff.placeholder.right')}
                 value={rightText}
                 spellCheck={false}
                 onChange={(event) => setRightText(event.target.value)}
@@ -357,16 +359,16 @@ export default function TextDiffPage() {
       <AlertDialog open={clearDialogOpen} onOpenChange={setClearDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>清空所有文本？</AlertDialogTitle>
-            <AlertDialogDescription>此操作会清空左右两侧的全部文本与对比结果，且无法撤销。</AlertDialogDescription>
+            <AlertDialogTitle>{t('textDiff.clearDialog.title')}</AlertDialogTitle>
+            <AlertDialogDescription>{t('textDiff.clearDialog.description')}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogCancel>{t('textDiff.clearDialog.cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleClearConfirmed}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              确认清空
+              {t('textDiff.clearDialog.confirm')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

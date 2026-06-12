@@ -34,9 +34,9 @@ export const DEFAULT_FONT: FontName = 'ANSI Shadow';
  * - full: 字符之间留空，舒展
  */
 export const KERNING_OPTIONS = [
-  { value: 'fitted', label: '紧凑' },
-  { value: 'universal smushing', label: '重叠' },
-  { value: 'full', label: '宽松' },
+  { value: 'fitted', labelKey: 'asciiArt.kerningFitted' },
+  { value: 'universal smushing', labelKey: 'asciiArt.kerningOverlap' },
+  { value: 'full', labelKey: 'asciiArt.kerningLoose' },
 ] as const;
 
 export type KerningValue = (typeof KERNING_OPTIONS)[number]['value'];
@@ -48,7 +48,7 @@ export const DEFAULT_KERNING: KerningValue = 'fitted';
  */
 export interface BorderStyle {
   value: BorderValue;
-  label: string;
+  labelKey: string;
   /** 四角字符 [tl, tr, bl, br]；none 时全部为空字符串 */
   corners: [string, string, string, string];
   horizontal: string;
@@ -60,10 +60,10 @@ export interface BorderStyle {
 export type BorderValue = 'none' | 'single' | 'double' | 'star';
 
 export const BORDER_STYLES: BorderStyle[] = [
-  { value: 'none', label: '无边框', corners: ['', '', '', ''], horizontal: '', vertical: '', padding: 0 },
-  { value: 'single', label: '单线', corners: ['┌', '┐', '└', '┘'], horizontal: '─', vertical: '│', padding: 1 },
-  { value: 'double', label: '双线', corners: ['╔', '╗', '╚', '╝'], horizontal: '═', vertical: '║', padding: 1 },
-  { value: 'star', label: '星号', corners: ['*', '*', '*', '*'], horizontal: '*', vertical: '*', padding: 1 },
+  { value: 'none', labelKey: 'asciiArt.borderNone', corners: ['', '', '', ''], horizontal: '', vertical: '', padding: 0 },
+  { value: 'single', labelKey: 'asciiArt.borderSingle', corners: ['┌', '┐', '└', '┘'], horizontal: '─', vertical: '│', padding: 1 },
+  { value: 'double', labelKey: 'asciiArt.borderDouble', corners: ['╔', '╗', '╚', '╝'], horizontal: '═', vertical: '║', padding: 1 },
+  { value: 'star', labelKey: 'asciiArt.borderStar', corners: ['*', '*', '*', '*'], horizontal: '*', vertical: '*', padding: 1 },
 ];
 
 export const DEFAULT_BORDER: BorderValue = 'none';

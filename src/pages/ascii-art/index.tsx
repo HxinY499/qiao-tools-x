@@ -1,5 +1,6 @@
 import { ChevronDown, Code2, Download, RefreshCw, Shuffle, Type } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
 import { CopyButton } from '@/components/copy-button';
@@ -34,6 +35,7 @@ import { applyBorder, downloadAsTxt, pickRandomDifferent, renderAsciiArt, wrapAs
 const MAX_TEXT_LEN = 32;
 
 function AsciiArtPage() {
+  const { t } = useTranslation('tools');
   const { text, font, kerning, border, setText, setFont, setKerning, setBorder } = useAsciiArtStore();
   const [rawOutput, setRawOutput] = useState<string>('');
   const [loading, setLoading] = useState(false);
@@ -49,7 +51,7 @@ function AsciiArtPage() {
       .then((result) => {
         if (cancelled) return;
         if (result === null) {
-          setError('字体加载失败，请换一个字体试试');
+          setError(t('asciiArt.errorFontLoad'));
           setRawOutput('');
         } else {
           setRawOutput(result);
@@ -62,7 +64,7 @@ function AsciiArtPage() {
     return () => {
       cancelled = true;
     };
-  }, [text, font, kerning]);
+  }, [text, font, kerning, t]);
 
   // 应用边框得到最终展示/复制的内容
   const output = useMemo(() => applyBorder(rawOutput, border), [rawOutput, border]);
@@ -84,16 +86,16 @@ function AsciiArtPage() {
     if (!output) return;
     const safeName = (text || 'ascii-art').replace(/[^\w-]+/g, '_').slice(0, 24);
     downloadAsTxt(output, `${safeName}.txt`);
-    toast.success('已下载 .txt 文件');
+    toast.success(t('asciiArt.toastDownloaded'));
   };
 
   const handleCopyAsComment = async (format: CommentFormat) => {
     if (!output) return;
     try {
       await navigator.clipboard.writeText(wrapAsComment(output, format));
-      toast.success(`已复制为 ${format.label.split(' ')[0]} 注释`);
+      toast.success(t('asciiArt.toastCopiedAsComment', { format: format.label.split(' ')[0] }));
     } catch {
-      toast.error('复制失败');
+      toast.error(t('asciiArt.toastCopyFailed'));
     }
   };
 
@@ -104,36 +106,36 @@ function AsciiArtPage() {
         <CardHeader>
           <CardTitle className="text-base font-medium flex items-center gap-2">
             <Type className="w-4 h-4" />
-            生成配置
+            {t('asciiArt.sectionConfig')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-5">
           {/* 文字内容 */}
           <div className="space-y-2">
-            <Label htmlFor="ascii-text">文字内容</Label>
+            <Label htmlFor="ascii-text">{t('asciiArt.labelText')}</Label>
             <div className="flex gap-2">
               <Input
                 id="ascii-text"
                 value={text}
                 maxLength={MAX_TEXT_LEN}
                 onChange={(e) => setText(e.target.value)}
-                placeholder="输入文字（建议英文/数字，最多 32 个字符）"
+                placeholder={t('asciiArt.placeholderText')}
                 className="flex-1"
               />
-              <Button variant="outline" size="icon" onClick={handleRandomText} title="随机示例文案">
+              <Button variant="outline" size="icon" onClick={handleRandomText} title={t('asciiArt.btnRandomTextTitle')}>
                 <Shuffle className="w-4 h-4" />
               </Button>
             </div>
-            <p className="text-xs text-muted-foreground">提示：figlet 字体只支持 ASCII 字符，中文不会渲染。</p>
+            <p className="text-xs text-muted-foreground">{t('asciiArt.hintAsciiOnly')}</p>
           </div>
 
           {/* 字体网格 */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label>字体</Label>
+              <Label>{t('asciiArt.labelFont')}</Label>
               <Button variant="ghost" size="sm" onClick={handleRandomFont} className="h-7 text-xs">
                 <Shuffle className="w-3.5 h-3.5 mr-1" />
-                随机字体
+                {t('asciiArt.btnRandomFont')}
               </Button>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
@@ -162,7 +164,7 @@ function AsciiArtPage() {
           {/* 字符间距 + 边框 同一行展示，桌面双列 */}
           <div className="grid gap-5 md:grid-cols-2">
             <div className="space-y-2">
-              <Label>字符间距</Label>
+              <Label>{t('asciiArt.labelKerning')}</Label>
               <div className="grid grid-cols-3 gap-2">
                 {KERNING_OPTIONS.map((k) => {
                   const active = k.value === kerning;
@@ -178,7 +180,7 @@ function AsciiArtPage() {
                           : 'border-input bg-background hover:bg-accent hover:text-accent-foreground',
                       )}
                     >
-                      {k.label}
+                      {t(k.labelKey)}
                     </button>
                   );
                 })}
@@ -186,7 +188,7 @@ function AsciiArtPage() {
             </div>
 
             <div className="space-y-2">
-              <Label>边框装饰</Label>
+              <Label>{t('asciiArt.labelBorder')}</Label>
               <div className="grid grid-cols-4 gap-2">
                 {BORDER_STYLES.map((b) => {
                   const active = b.value === border;
@@ -202,7 +204,7 @@ function AsciiArtPage() {
                           : 'border-input bg-background hover:bg-accent hover:text-accent-foreground',
                       )}
                     >
-                      {b.label}
+                      {t(b.labelKey)}
                     </button>
                   );
                 })}
@@ -218,9 +220,9 @@ function AsciiArtPage() {
           <CardTitle className="text-base font-medium flex items-center justify-between">
             <span className="flex items-center gap-2">
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-              预览结果
+              {t('asciiArt.sectionPreview')}
               {previewWidth > 0 && (
-                <span className="text-xs font-normal text-muted-foreground">{previewWidth} 列宽</span>
+                <span className="text-xs font-normal text-muted-foreground">{t('asciiArt.colWidth', { count: previewWidth })}</span>
               )}
             </span>
             <div className="flex items-center gap-1">
@@ -231,19 +233,19 @@ function AsciiArtPage() {
                 size="sm"
                 disabled={!output}
                 className="h-8 px-2 lg:px-3"
-                onCopy={() => toast.success('已复制到剪贴板')}
+                onCopy={() => toast.success(t('asciiArt.toastCopied'))}
               />
               {/* 复制为注释下拉 */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm" disabled={!output} className="h-8 px-2 lg:px-3">
                     <Code2 className="w-4 h-4 mr-1" />
-                    注释格式
+                    {t('asciiArt.btnCommentFormat')}
                     <ChevronDown className="w-3 h-3 ml-1 opacity-50" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-64">
-                  <DropdownMenuLabel>复制为代码注释</DropdownMenuLabel>
+                  <DropdownMenuLabel>{t('asciiArt.dropdownCopyAsComment')}</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   {COMMENT_FORMATS.map((f) => (
                     <DropdownMenuItem key={f.key} onClick={() => handleCopyAsComment(f)}>
@@ -254,7 +256,7 @@ function AsciiArtPage() {
               </DropdownMenu>
               <Button variant="ghost" size="sm" disabled={!output} onClick={handleDownload} className="h-8 px-2 lg:px-3">
                 <Download className="w-4 h-4 mr-1" />
-                下载
+                {t('asciiArt.btnDownload')}
               </Button>
             </div>
           </CardTitle>
@@ -267,7 +269,7 @@ function AsciiArtPage() {
           ) : (
             <div className="rounded-md border bg-muted/30 overflow-auto custom-scrollbar">
               <pre className="font-mono text-[12px] leading-tight p-4 whitespace-pre min-h-[200px]">
-                {output || (loading ? '渲染中…' : '在上方输入文字开始生成')}
+                {output || (loading ? t('asciiArt.rendering') : t('asciiArt.emptyHint'))}
               </pre>
             </div>
           )}

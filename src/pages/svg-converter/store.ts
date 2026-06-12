@@ -1,6 +1,8 @@
 import { toast } from 'sonner';
 import { create } from 'zustand';
 
+import i18n from '@/i18n';
+
 import { ConversionParams, PresetType, SvgItem } from './types';
 import { convertSvgToImage, parseSvgFile, PRESETS } from './utils';
 
@@ -50,18 +52,18 @@ export const useSvgConverterStore = create<SvgConverterState>()((set, get) => ({
     // Filter for SVG
     const svgFiles = files.filter((f) => f.type.includes('svg') || f.name.endsWith('.svg'));
     if (svgFiles.length === 0) {
-      toast.error('未找到有效的 SVG 文件');
+      toast.error(i18n.t('svgConverter.toast.noValidSvg', { ns: 'tools' }));
       return;
     }
 
     if (svgFiles.length !== files.length) {
-      toast.warning(`已过滤 ${files.length - svgFiles.length} 个非 SVG 文件`);
+      toast.warning(i18n.t('svgConverter.toast.filteredNonSvg', { ns: 'tools', count: files.length - svgFiles.length }));
     }
 
     for (const file of svgFiles) {
       const parsed = await parseSvgFile(file);
       if (!parsed) {
-        toast.error(`解析失败: ${file.name}`);
+        toast.error(i18n.t('svgConverter.toast.parseFailed', { ns: 'tools', name: file.name }));
         continue;
       }
 
@@ -93,7 +95,7 @@ export const useSvgConverterStore = create<SvgConverterState>()((set, get) => ({
       globalParams: nextGlobalParams,
     }));
 
-    toast.success(`已添加 ${newItems.length} 个文件`);
+    toast.success(i18n.t('svgConverter.toast.added', { ns: 'tools', count: newItems.length }));
 
     // Trigger conversion for new items (immediate)
     newItems.forEach((item) => {

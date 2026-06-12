@@ -2,6 +2,7 @@ import { useDebounceFn, useLatest } from 'ahooks';
 import { defaultTheme, githubDarkTheme, JsonEditor } from 'json-edit-react';
 import { Braces, Eraser, FileJson, Maximize2, Minimize2, Trash2, XCircle } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
 import { CodeArea } from '@/components/code-area';
@@ -17,6 +18,7 @@ import { useJsonFormatterStore } from './store';
 import { ERROR_HIGHLIGHT_RANGE, JsonParseErrorInfo, parseJsonWithBetterError } from './utils';
 
 export default function JsonFormatterPage() {
+  const { t } = useTranslation('tools');
   const [input, setInput] = useState('');
   const [jsonData, setJsonData] = useState<any>(null);
   const [error, setError] = useState<JsonParseErrorInfo | null>(null);
@@ -105,10 +107,10 @@ export default function JsonFormatterPage() {
     });
 
     if (newText === input) {
-      toast.info('未找到可去除的转义符');
+      toast.info(t('jsonFormatter.noEscapesFound'));
     } else {
       setInput(newText);
-      toast.success('已去除转义符');
+      toast.success(t('jsonFormatter.escapesRemoved'));
     }
   };
 
@@ -118,7 +120,7 @@ export default function JsonFormatterPage() {
         <div className="flex items-center gap-2 shrink-0">
           <FileJson className="h-4 w-4 text-muted-foreground" />
           <span className="font-medium text-xs text-muted-foreground uppercase tracking-wider hidden md:block">
-            输入 JSON
+            {t('jsonFormatter.inputLabel')}
           </span>
         </div>
         <div className="flex items-center gap-1 flex-wrap justify-end min-w-0">
@@ -131,10 +133,10 @@ export default function JsonFormatterPage() {
             onClick={removeEscapes}
             disabled={!hasInput}
             className="h-7 px-1.5"
-            title="去除转义符"
+            title={t('jsonFormatter.removeEscapes')}
           >
             <Eraser className="h-3.5 w-3.5" />
-            <span className="hidden 2xl:inline ml-1">去除转义</span>
+            <span className="hidden 2xl:inline ml-1">{t('jsonFormatter.removeEscapes')}</span>
           </Button>
           <Button
             size="sm"
@@ -146,10 +148,10 @@ export default function JsonFormatterPage() {
             }}
             disabled={!hasInput}
             className="h-7 px-1.5"
-            title="清空"
+            title={t('jsonFormatter.clear')}
           >
             <Trash2 className="h-3.5 w-3.5" />
-            <span className="hidden 2xl:inline ml-1">清空</span>
+            <span className="hidden 2xl:inline ml-1">{t('jsonFormatter.clear')}</span>
           </Button>
           <Button
             size="sm"
@@ -157,20 +159,20 @@ export default function JsonFormatterPage() {
             onClick={() => processJson(true)}
             disabled={!hasInput}
             className="h-7 px-1.5"
-            title="压缩"
+            title={t('jsonFormatter.minify')}
           >
             <Minimize2 className="h-3.5 w-3.5" />
-            <span className="hidden 2xl:inline ml-1">压缩</span>
+            <span className="hidden 2xl:inline ml-1">{t('jsonFormatter.minify')}</span>
           </Button>
           <Button
             size="sm"
             onClick={() => processJson(false)}
             disabled={!hasInput}
             className="h-7 px-1.5"
-            title="格式化"
+            title={t('jsonFormatter.format')}
           >
             <Braces className="h-3.5 w-3.5" />
-            <span className="hidden 2xl:inline ml-1">格式化</span>
+            <span className="hidden 2xl:inline ml-1">{t('jsonFormatter.format')}</span>
           </Button>
         </div>
       </header>
@@ -178,7 +180,7 @@ export default function JsonFormatterPage() {
         <Textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="在此粘贴 JSON 代码..."
+          placeholder={t('jsonFormatter.inputPlaceholder')}
           className="h-full w-full font-mono !text-xs resize-none p-4 leading-relaxed custom-scrollbar rounded-none border-0 focus-visible:ring-0"
           spellCheck={false}
         />
@@ -186,7 +188,7 @@ export default function JsonFormatterPage() {
           <div className="absolute bottom-4 left-4 right-4 bg-destructive/80 border border-destructive text-white rounded-md p-3 flex items-start gap-2 text-xs animate-in slide-in-from-bottom-2 shadow-sm backdrop-blur-sm">
             <XCircle className="h-4 w-4 mt-0.5 shrink-0" />
             <div className="flex-1 overflow-hidden">
-              <p className="font-semibold mb-1">解析错误</p>
+              <p className="font-semibold mb-1">{t('jsonFormatter.parseError')}</p>
               <p className="font-mono opacity-90 mb-2">{error.message}</p>
               {error.errorLine !== null && error.column !== null && (
                 <p className="font-mono break-all opacity-90 overflow-x-auto custom-scrollbar">
@@ -210,7 +212,7 @@ export default function JsonFormatterPage() {
         <div className="flex items-center gap-2">
           <Braces className="h-4 w-4 text-muted-foreground" />
           <span className="font-medium text-xs text-muted-foreground uppercase tracking-wider hidden md:block">
-            格式化结果
+            {t('jsonFormatter.outputLabel')}
           </span>
         </div>
         <div className="flex items-center gap-1">
@@ -220,7 +222,7 @@ export default function JsonFormatterPage() {
             size="icon"
             className="h-7 w-7"
             onClick={() => setIsExpanded(!isExpanded)}
-            title={isExpanded ? '退出全屏' : '全屏查看'}
+            title={isExpanded ? t('jsonFormatter.exitFullscreen') : t('jsonFormatter.fullscreen')}
           >
             {isExpanded ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
           </Button>
@@ -265,7 +267,7 @@ export default function JsonFormatterPage() {
         ) : (
           <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground/50 gap-2 pointer-events-none">
             <Braces className="h-12 w-12 opacity-20" />
-            <p className="text-sm">等待输入...</p>
+            <p className="text-sm">{t('jsonFormatter.waitingInput')}</p>
           </div>
         )}
       </div>

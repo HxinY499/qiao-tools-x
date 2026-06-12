@@ -17,6 +17,7 @@ import {
   X,
 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { ColorPicker } from '@/components/color-picker';
 import { CopyButton } from '@/components/copy-button';
@@ -45,24 +46,10 @@ import type {
 } from './types';
 import { downloadQRCode, generateStyledQRCode, getQRContent } from './utils';
 
-const MODE_OPTIONS: { value: QRMode; label: string; icon: typeof Type }[] = [
-  { value: 'text', label: '自由文本', icon: Type },
-  { value: 'wifi', label: 'WiFi', icon: Wifi },
-  { value: 'contact', label: '联系人', icon: Contact },
-  { value: 'sms', label: '短信', icon: MessageSquare },
-  { value: 'location', label: '位置', icon: MapPin },
-];
-
-const ERROR_LEVEL_OPTIONS = [
-  { value: 'L', label: 'L - 7% 容错' },
-  { value: 'M', label: 'M - 15% 容错' },
-  { value: 'Q', label: 'Q - 25% 容错' },
-  { value: 'H', label: 'H - 30% 容错' },
-];
-
 type QRStore = QRCodeStore;
 
 export default function QRCodeToolPage() {
+  const { t } = useTranslation('tools');
   // 细粒度订阅：每个字段只在自身变化时触发重渲染
   const tab = useQRCodeStore((s) => s.tab);
   const mode = useQRCodeStore((s) => s.mode);
@@ -148,7 +135,7 @@ export default function QRCodeToolPage() {
           canvas.height = img.height;
           const ctx = canvas.getContext('2d');
           if (!ctx) {
-            setParseError('无法创建画布上下文');
+            setParseError(t('qrcodeTool.parseErrorCanvasCtx'));
             return;
           }
           ctx.drawImage(img, 0, 0);
@@ -160,19 +147,19 @@ export default function QRCodeToolPage() {
             if (code) {
               setParseResult(code.data);
             } else {
-              setParseError('未能识别二维码，请确保图片清晰且包含有效的二维码');
+              setParseError(t('qrcodeTool.parseErrorNotRecognized'));
             }
           } catch {
-            setParseError('二维码解析模块加载失败');
+            setParseError(t('qrcodeTool.parseErrorModuleLoad'));
           }
         };
         img.onerror = () => {
-          setParseError('图片加载失败');
+          setParseError(t('qrcodeTool.parseErrorImgLoad'));
         };
         img.src = e.target?.result as string;
       };
       reader.onerror = () => {
-        setParseError('文件读取失败');
+        setParseError(t('qrcodeTool.parseErrorFileRead'));
       };
       reader.readAsDataURL(file);
     },
@@ -232,18 +219,18 @@ export default function QRCodeToolPage() {
         break;
       case 'contact':
         setContact({
-          name: '张三',
+          name: t('qrcodeTool.sampleContactName'),
           phone: '13800138000',
           email: 'zhangsan@example.com',
-          company: '示例公司',
-          title: '产品经理',
+          company: t('qrcodeTool.sampleContactCompany'),
+          title: t('qrcodeTool.sampleContactTitle'),
         });
         break;
       case 'sms':
-        setSMS({ phone: '10086', message: '查询话费余额' });
+        setSMS({ phone: '10086', message: t('qrcodeTool.sampleSmsMessage') });
         break;
       case 'location':
-        setLocation({ latitude: '39.9042', longitude: '116.4074', label: '北京天安门' });
+        setLocation({ latitude: '39.9042', longitude: '116.4074', label: t('qrcodeTool.sampleLocationLabel') });
         break;
     }
   };
@@ -256,11 +243,11 @@ export default function QRCodeToolPage() {
             <TabsList className="grid w-full grid-cols-2 mb-6">
               <TabsTrigger value="generate" className="gap-2">
                 <QrCode className="w-4 h-4" />
-                生成二维码
+                {t('qrcodeTool.tabGenerate')}
               </TabsTrigger>
               <TabsTrigger value="parse" className="gap-2">
                 <ImageUp className="w-4 h-4" />
-                解析二维码
+                {t('qrcodeTool.tabParse')}
               </TabsTrigger>
             </TabsList>
 
@@ -280,6 +267,7 @@ export default function QRCodeToolPage() {
                 setStyleOpen={setStyleOpen}
                 logoInputRef={logoInputRef}
                 handleLogoSelect={handleLogoSelect}
+                t={t}
               />
             ) : (
               <ParseTab
@@ -295,6 +283,7 @@ export default function QRCodeToolPage() {
                   setParseResult('');
                   setParseError('');
                 }}
+                t={t}
               />
             )}
           </Tabs>
@@ -303,27 +292,27 @@ export default function QRCodeToolPage() {
 
       {/* 使用说明 */}
       <Card className="shadow-sm p-4 lg:p-5">
-        <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase mb-3">使用说明</h2>
+        <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase mb-3">{t('qrcodeTool.usageTitle')}</h2>
         <ul className="list-disc pl-4 text-xs text-muted-foreground space-y-1.5 leading-relaxed">
           <li>
-            <span className="font-medium text-foreground">自由文本</span>：输入任意文本或网址，生成对应的二维码。
+            <span className="font-medium text-foreground">{t('qrcodeTool.modeText')}</span>：{t('qrcodeTool.usageText')}
           </li>
           <li>
-            <span className="font-medium text-foreground">WiFi</span>
-            ：填写网络名称、密码和加密类型，扫码即可快速连接 WiFi。
+            <span className="font-medium text-foreground">{t('qrcodeTool.modeWifi')}</span>
+            ：{t('qrcodeTool.usageWifi')}
           </li>
           <li>
-            <span className="font-medium text-foreground">联系人</span>：生成 vCard 格式二维码，扫码可直接添加联系人。
+            <span className="font-medium text-foreground">{t('qrcodeTool.modeContact')}</span>：{t('qrcodeTool.usageContact')}
           </li>
           <li>
-            <span className="font-medium text-foreground">短信</span>：填写收件人和内容，扫码可快速发送短信。
+            <span className="font-medium text-foreground">{t('qrcodeTool.modeSms')}</span>：{t('qrcodeTool.usageSms')}
           </li>
           <li>
-            <span className="font-medium text-foreground">位置</span>：输入经纬度坐标，扫码可在地图应用中打开位置。
+            <span className="font-medium text-foreground">{t('qrcodeTool.modeLocation')}</span>：{t('qrcodeTool.usageLocation')}
           </li>
           <li>
-            <span className="font-medium text-foreground">样式设置</span>
-            ：可自定义二维码颜色、尺寸、边距，还可上传品牌 Logo 放置在二维码中心。
+            <span className="font-medium text-foreground">{t('qrcodeTool.usageStyleTitle')}</span>
+            ：{t('qrcodeTool.usageStyle')}
           </li>
         </ul>
       </Card>
@@ -347,6 +336,7 @@ function GenerateTab({
   setStyleOpen,
   logoInputRef,
   handleLogoSelect,
+  t,
 }: {
   mode: QRMode;
   text: string;
@@ -362,12 +352,21 @@ function GenerateTab({
   setStyleOpen: (open: boolean) => void;
   logoInputRef: React.RefObject<HTMLInputElement | null>;
   handleLogoSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  t: (key: string) => string;
 }) {
+  const modeOptions = [
+    { value: 'text' as QRMode, label: t('qrcodeTool.modeText'), icon: Type },
+    { value: 'wifi' as QRMode, label: 'WiFi', icon: Wifi },
+    { value: 'contact' as QRMode, label: t('qrcodeTool.modeContact'), icon: Contact },
+    { value: 'sms' as QRMode, label: t('qrcodeTool.modeSms'), icon: MessageSquare },
+    { value: 'location' as QRMode, label: t('qrcodeTool.modeLocation'), icon: MapPin },
+  ];
+
   return (
     <div className="space-y-6">
       {/* 模式选择 */}
       <div className="flex flex-wrap gap-2">
-        {MODE_OPTIONS.map((option) => {
+        {modeOptions.map((option) => {
           const Icon = option.icon;
           return (
             <Button
@@ -388,28 +387,28 @@ function GenerateTab({
       <div className="flex gap-2">
         <Button variant="outline" size="sm" onClick={fillSample}>
           <Sparkles className="w-3.5 h-3.5 mr-1" />
-          示例
+          {t('qrcodeTool.btnSample')}
         </Button>
         <Button variant="outline" size="sm" onClick={() => store.resetCurrentMode()}>
           <Trash2 className="w-3.5 h-3.5 mr-1" />
-          清空
+          {t('qrcodeTool.btnClear')}
         </Button>
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">
         {/* 输入区 */}
         <div className="space-y-4">
-          {mode === 'text' && <TextInput text={text} setText={store.setText} />}
-          {mode === 'wifi' && <WifiInput wifi={wifi} setWifi={store.setWifi} />}
-          {mode === 'contact' && <ContactInput contact={contact} setContact={store.setContact} />}
-          {mode === 'sms' && <SMSInput sms={sms} setSMS={store.setSMS} />}
-          {mode === 'location' && <LocationInput location={location} setLocation={store.setLocation} />}
+          {mode === 'text' && <TextInput text={text} setText={store.setText} t={t} />}
+          {mode === 'wifi' && <WifiInput wifi={wifi} setWifi={store.setWifi} t={t} />}
+          {mode === 'contact' && <ContactInput contact={contact} setContact={store.setContact} t={t} />}
+          {mode === 'sms' && <SMSInput sms={sms} setSMS={store.setSMS} t={t} />}
+          {mode === 'location' && <LocationInput location={location} setLocation={store.setLocation} t={t} />}
 
           {/* 样式设置折叠面板 */}
           <Collapsible open={styleOpen} onOpenChange={setStyleOpen}>
             <CollapsibleTrigger asChild>
               <Button variant="ghost" size="sm" className="w-full justify-between px-3 h-9 text-muted-foreground">
-                <span className="text-xs font-medium">样式设置</span>
+                <span className="text-xs font-medium">{t('qrcodeTool.styleSettings')}</span>
                 {styleOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
               </Button>
             </CollapsibleTrigger>
@@ -420,6 +419,7 @@ function GenerateTab({
                 resetStyle={store.resetStyle}
                 logoInputRef={logoInputRef}
                 handleLogoSelect={handleLogoSelect}
+                t={t}
               />
             </CollapsibleContent>
           </Collapsible>
@@ -434,13 +434,13 @@ function GenerateTab({
               </div>
               <Button variant="outline" size="sm" className="mt-4 gap-1.5" onClick={() => downloadQRCode(qrDataUrl)}>
                 <Download className="w-3.5 h-3.5" />
-                下载二维码
+                {t('qrcodeTool.btnDownload')}
               </Button>
             </>
           ) : (
             <div className="text-center text-muted-foreground">
               <QrCode className="w-16 h-16 mx-auto mb-3 opacity-20" />
-              <p className="text-sm">请输入内容生成二维码</p>
+              <p className="text-sm">{t('qrcodeTool.previewPlaceholder')}</p>
             </div>
           )}
         </div>
@@ -456,23 +456,32 @@ function StylePanel({
   resetStyle,
   logoInputRef,
   handleLogoSelect,
+  t,
 }: {
   style: QRStyleConfig;
   setStyle: (style: Partial<QRStyleConfig>) => void;
   resetStyle: () => void;
   logoInputRef: React.RefObject<HTMLInputElement | null>;
   handleLogoSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  t: (key: string, opts?: Record<string, unknown>) => string;
 }) {
+  const errorLevelOptions = [
+    { value: 'L', label: `L - 7% ${t('qrcodeTool.errorTolerance')}` },
+    { value: 'M', label: `M - 15% ${t('qrcodeTool.errorTolerance')}` },
+    { value: 'Q', label: `Q - 25% ${t('qrcodeTool.errorTolerance')}` },
+    { value: 'H', label: `H - 30% ${t('qrcodeTool.errorTolerance')}` },
+  ];
+
   return (
     <div className="space-y-4 p-4 bg-muted/20 rounded-lg border border-border/50">
       {/* 颜色设置 */}
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label className="text-xs">前景色（码点）</Label>
+          <Label className="text-xs">{t('qrcodeTool.labelForeground')}</Label>
           <ColorPicker value={style.foreground} onChange={(color) => setStyle({ foreground: color })} />
         </div>
         <div className="space-y-2">
-          <Label className="text-xs">背景色</Label>
+          <Label className="text-xs">{t('qrcodeTool.labelBackground')}</Label>
           <ColorPicker value={style.background} onChange={(color) => setStyle({ background: color })} />
         </div>
       </div>
@@ -480,7 +489,7 @@ function StylePanel({
       {/* 容错级别 */}
       <div className="space-y-2">
         <Label className="text-xs">
-          容错级别 {style.logoDataUrl && <span className="text-muted-foreground">（有 Logo 时自动使用 H 级）</span>}
+          {t('qrcodeTool.labelErrorLevel')} {style.logoDataUrl && <span className="text-muted-foreground">（{t('qrcodeTool.errorLevelAutoH')}）</span>}
         </Label>
         <Select
           value={style.errorCorrectionLevel}
@@ -491,7 +500,7 @@ function StylePanel({
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {ERROR_LEVEL_OPTIONS.map((opt) => (
+            {errorLevelOptions.map((opt) => (
               <SelectItem key={opt.value} value={opt.value} className="text-xs">
                 {opt.label}
               </SelectItem>
@@ -503,7 +512,7 @@ function StylePanel({
       {/* 尺寸和边距 */}
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label className="text-xs">尺寸: {style.size}px</Label>
+          <Label className="text-xs">{t('qrcodeTool.labelSize', { value: style.size })}</Label>
           <Slider
             value={[style.size]}
             onValueChange={([v]) => setStyle({ size: v })}
@@ -514,7 +523,7 @@ function StylePanel({
           />
         </div>
         <div className="space-y-2">
-          <Label className="text-xs">边距: {style.margin}</Label>
+          <Label className="text-xs">{t('qrcodeTool.labelMargin', { value: style.margin })}</Label>
           <Slider
             value={[style.margin]}
             onValueChange={([v]) => setStyle({ margin: v })}
@@ -528,7 +537,7 @@ function StylePanel({
 
       {/* Logo 上传 */}
       <div className="space-y-2">
-        <Label className="text-xs">品牌 Logo</Label>
+        <Label className="text-xs">{t('qrcodeTool.labelLogo')}</Label>
         <input ref={logoInputRef} type="file" accept="image/*" className="hidden" onChange={handleLogoSelect} />
         {style.logoDataUrl ? (
           <div className="flex items-center gap-3">
@@ -537,7 +546,7 @@ function StylePanel({
             </div>
             <div className="flex-1 space-y-2">
               <div className="flex items-center gap-2">
-                <Label className="text-xs">Logo 大小: {Math.round(style.logoSizeRatio * 100)}%</Label>
+                <Label className="text-xs">{t('qrcodeTool.labelLogoSize', { value: Math.round(style.logoSizeRatio * 100) })}</Label>
               </div>
               <Slider
                 value={[style.logoSizeRatio]}
@@ -560,28 +569,28 @@ function StylePanel({
             onClick={() => logoInputRef.current?.click()}
           >
             <ImagePlus className="w-3.5 h-3.5" />
-            上传 Logo 图片
+            {t('qrcodeTool.btnUploadLogo')}
           </Button>
         )}
-        <p className="text-xs text-muted-foreground">Logo 会放置在二维码中心，建议使用正方形透明背景图片</p>
+        <p className="text-xs text-muted-foreground">{t('qrcodeTool.logoHint')}</p>
       </div>
 
       {/* 重置按钮 */}
       <Button variant="ghost" size="sm" className="w-full h-8 text-xs gap-1.5" onClick={resetStyle}>
         <RotateCcw className="w-3 h-3" />
-        重置样式
+        {t('qrcodeTool.btnResetStyle')}
       </Button>
     </div>
   );
 }
 
 // 文本输入组件
-function TextInput({ text, setText }: { text: string; setText: (v: string) => void }) {
+function TextInput({ text, setText, t }: { text: string; setText: (v: string) => void; t: (key: string) => string }) {
   return (
     <div className="space-y-2">
-      <Label>文本内容</Label>
+      <Label>{t('qrcodeTool.labelTextContent')}</Label>
       <Textarea
-        placeholder="输入文本、网址或任意内容..."
+        placeholder={t('qrcodeTool.placeholderText')}
         className="min-h-[200px] font-mono text-sm resize-none"
         value={text}
         onChange={(e) => setText(e.target.value)}
@@ -591,15 +600,15 @@ function TextInput({ text, setText }: { text: string; setText: (v: string) => vo
 }
 
 // WiFi 输入组件
-function WifiInput({ wifi, setWifi }: { wifi: WifiData; setWifi: (v: Partial<WifiData>) => void }) {
+function WifiInput({ wifi, setWifi, t }: { wifi: WifiData; setWifi: (v: Partial<WifiData>) => void; t: (key: string) => string }) {
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label>网络名称 (SSID)</Label>
-        <Input placeholder="输入 WiFi 名称" value={wifi.ssid} onChange={(e) => setWifi({ ssid: e.target.value })} />
+        <Label>{t('qrcodeTool.labelSsid')}</Label>
+        <Input placeholder={t('qrcodeTool.placeholderSsid')} value={wifi.ssid} onChange={(e) => setWifi({ ssid: e.target.value })} />
       </div>
       <div className="space-y-2">
-        <Label>加密类型</Label>
+        <Label>{t('qrcodeTool.labelEncryption')}</Label>
         <Select value={wifi.encryption} onValueChange={(v) => setWifi({ encryption: v as WifiEncryption })}>
           <SelectTrigger>
             <SelectValue />
@@ -607,16 +616,16 @@ function WifiInput({ wifi, setWifi }: { wifi: WifiData; setWifi: (v: Partial<Wif
           <SelectContent>
             <SelectItem value="WPA">WPA/WPA2</SelectItem>
             <SelectItem value="WEP">WEP</SelectItem>
-            <SelectItem value="nopass">无密码</SelectItem>
+            <SelectItem value="nopass">{t('qrcodeTool.encryptionNone')}</SelectItem>
           </SelectContent>
         </Select>
       </div>
       {wifi.encryption !== 'nopass' && (
         <div className="space-y-2">
-          <Label>密码</Label>
+          <Label>{t('qrcodeTool.labelPassword')}</Label>
           <Input
             type="password"
-            placeholder="输入 WiFi 密码"
+            placeholder={t('qrcodeTool.placeholderPassword')}
             value={wifi.password}
             onChange={(e) => setWifi({ password: e.target.value })}
           />
@@ -624,7 +633,7 @@ function WifiInput({ wifi, setWifi }: { wifi: WifiData; setWifi: (v: Partial<Wif
       )}
       <div className="flex items-center gap-2">
         <Switch checked={wifi.hidden} onCheckedChange={(v) => setWifi({ hidden: v })} />
-        <Label className="font-normal">隐藏网络</Label>
+        <Label className="font-normal">{t('qrcodeTool.labelHiddenNetwork')}</Label>
       </div>
     </div>
   );
@@ -634,61 +643,63 @@ function WifiInput({ wifi, setWifi }: { wifi: WifiData; setWifi: (v: Partial<Wif
 function ContactInput({
   contact,
   setContact,
+  t,
 }: {
   contact: ContactData;
   setContact: (v: Partial<ContactData>) => void;
+  t: (key: string) => string;
 }) {
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label>姓名</Label>
-        <Input placeholder="输入姓名" value={contact.name} onChange={(e) => setContact({ name: e.target.value })} />
+        <Label>{t('qrcodeTool.labelName')}</Label>
+        <Input placeholder={t('qrcodeTool.placeholderName')} value={contact.name} onChange={(e) => setContact({ name: e.target.value })} />
       </div>
       <div className="space-y-2">
-        <Label>电话</Label>
+        <Label>{t('qrcodeTool.labelPhone')}</Label>
         <Input
-          placeholder="输入电话号码"
+          placeholder={t('qrcodeTool.placeholderPhone')}
           value={contact.phone}
           onChange={(e) => setContact({ phone: e.target.value })}
         />
       </div>
       <div className="space-y-2">
-        <Label>邮箱</Label>
+        <Label>{t('qrcodeTool.labelEmail')}</Label>
         <Input
           type="email"
-          placeholder="输入邮箱地址"
+          placeholder={t('qrcodeTool.placeholderEmail')}
           value={contact.email}
           onChange={(e) => setContact({ email: e.target.value })}
         />
       </div>
       <div className="space-y-2">
-        <Label>公司</Label>
+        <Label>{t('qrcodeTool.labelCompany')}</Label>
         <Input
-          placeholder="输入公司名称"
+          placeholder={t('qrcodeTool.placeholderCompany')}
           value={contact.company}
           onChange={(e) => setContact({ company: e.target.value })}
         />
       </div>
       <div className="space-y-2">
-        <Label>职位</Label>
-        <Input placeholder="输入职位" value={contact.title} onChange={(e) => setContact({ title: e.target.value })} />
+        <Label>{t('qrcodeTool.labelTitle')}</Label>
+        <Input placeholder={t('qrcodeTool.placeholderTitle')} value={contact.title} onChange={(e) => setContact({ title: e.target.value })} />
       </div>
     </div>
   );
 }
 
 // 短信输入组件
-function SMSInput({ sms, setSMS }: { sms: SMSData; setSMS: (v: Partial<SMSData>) => void }) {
+function SMSInput({ sms, setSMS, t }: { sms: SMSData; setSMS: (v: Partial<SMSData>) => void; t: (key: string) => string }) {
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label>收件人号码</Label>
-        <Input placeholder="输入手机号码" value={sms.phone} onChange={(e) => setSMS({ phone: e.target.value })} />
+        <Label>{t('qrcodeTool.labelSmsRecipient')}</Label>
+        <Input placeholder={t('qrcodeTool.placeholderSmsPhone')} value={sms.phone} onChange={(e) => setSMS({ phone: e.target.value })} />
       </div>
       <div className="space-y-2">
-        <Label>短信内容</Label>
+        <Label>{t('qrcodeTool.labelSmsContent')}</Label>
         <Textarea
-          placeholder="输入短信内容（可选）"
+          placeholder={t('qrcodeTool.placeholderSmsMessage')}
           className="min-h-[120px] resize-none"
           value={sms.message}
           onChange={(e) => setSMS({ message: e.target.value })}
@@ -702,39 +713,41 @@ function SMSInput({ sms, setSMS }: { sms: SMSData; setSMS: (v: Partial<SMSData>)
 function LocationInput({
   location,
   setLocation,
+  t,
 }: {
   location: LocationData;
   setLocation: (v: Partial<LocationData>) => void;
+  t: (key: string) => string;
 }) {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label>纬度</Label>
+          <Label>{t('qrcodeTool.labelLatitude')}</Label>
           <Input
-            placeholder="如 39.9042"
+            placeholder={t('qrcodeTool.placeholderLatitude')}
             value={location.latitude}
             onChange={(e) => setLocation({ latitude: e.target.value })}
           />
         </div>
         <div className="space-y-2">
-          <Label>经度</Label>
+          <Label>{t('qrcodeTool.labelLongitude')}</Label>
           <Input
-            placeholder="如 116.4074"
+            placeholder={t('qrcodeTool.placeholderLongitude')}
             value={location.longitude}
             onChange={(e) => setLocation({ longitude: e.target.value })}
           />
         </div>
       </div>
       <div className="space-y-2">
-        <Label>位置标签（可选）</Label>
+        <Label>{t('qrcodeTool.labelLocationLabel')}</Label>
         <Input
-          placeholder="如 北京天安门"
+          placeholder={t('qrcodeTool.placeholderLocationLabel')}
           value={location.label}
           onChange={(e) => setLocation({ label: e.target.value })}
         />
       </div>
-      <p className="text-xs text-muted-foreground">提示：可以通过地图应用获取经纬度坐标</p>
+      <p className="text-xs text-muted-foreground">{t('qrcodeTool.locationHint')}</p>
     </div>
   );
 }
@@ -750,6 +763,7 @@ function ParseTab({
   handleDragLeave,
   handleDrop,
   onClearResult,
+  t,
 }: {
   parseResult: string;
   parseError: string;
@@ -760,6 +774,7 @@ function ParseTab({
   handleDragLeave: (e: React.DragEvent) => void;
   handleDrop: (e: React.DragEvent) => void;
   onClearResult: () => void;
+  t: (key: string) => string;
 }) {
   return (
     <div className="space-y-6">
@@ -775,15 +790,15 @@ function ParseTab({
       >
         <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileSelect} />
         <Upload className="w-12 h-12 mx-auto mb-4 text-muted-foreground/50" />
-        <p className="text-sm text-muted-foreground mb-2">点击或拖拽图片到此处上传</p>
-        <p className="text-xs text-muted-foreground/70">支持 JPG、PNG、GIF 等常见图片格式</p>
+        <p className="text-sm text-muted-foreground mb-2">{t('qrcodeTool.parseUploadHint')}</p>
+        <p className="text-xs text-muted-foreground/70">{t('qrcodeTool.parseUploadFormats')}</p>
       </div>
 
       {/* 解析结果 */}
       {(parseResult || parseError) && (
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <Label>{parseError ? '解析失败' : '解析结果'}</Label>
+            <Label>{parseError ? t('qrcodeTool.parseFailedLabel') : t('qrcodeTool.parseResultLabel')}</Label>
             {parseResult && <CopyButton text={parseResult} className="h-6 w-6" iconClassName="w-3 h-3" />}
           </div>
           {parseError ? (
@@ -797,7 +812,7 @@ function ParseTab({
           )}
           <Button variant="outline" size="sm" onClick={onClearResult}>
             <Trash2 className="w-3.5 h-3.5 mr-1" />
-            清除结果
+            {t('qrcodeTool.btnClearResult')}
           </Button>
         </div>
       )}

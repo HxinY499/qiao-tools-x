@@ -1,4 +1,5 @@
 import { Lock, Unlock } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,6 +19,8 @@ interface CornerControlProps {
 }
 
 export function CornerControl({ label, value, onUpdate }: CornerControlProps) {
+  const { t } = useTranslation('tools');
+
   return (
     <div className="space-y-3 p-4 rounded-lg border bg-muted/20">
       <div className="flex items-center justify-between">
@@ -27,7 +30,7 @@ export function CornerControl({ label, value, onUpdate }: CornerControlProps) {
           size="icon"
           className="h-6 w-6"
           onClick={() => onUpdate({ locked: !value.locked })}
-          title={value.locked ? 'Unlock X/Y' : 'Lock X/Y'}
+          title={value.locked ? t('borderRadius.unlockXY') : t('borderRadius.lockXY')}
         >
           {value.locked ? <Lock className="h-3 w-3" /> : <Unlock className="h-3 w-3 text-muted-foreground" />}
         </Button>
@@ -37,7 +40,7 @@ export function CornerControl({ label, value, onUpdate }: CornerControlProps) {
         {/* Horizontal Radius (X) */}
         <div className="space-y-1.5">
           <div className="flex items-center justify-between text-xs text-muted-foreground">
-            <span>水平半径 (X)</span>
+            <span>{t('borderRadius.horizontalRadius')}</span>
             <span>{value.x}px</span>
           </div>
           <div className="flex items-center gap-3">
@@ -62,7 +65,7 @@ export function CornerControl({ label, value, onUpdate }: CornerControlProps) {
         {!value.locked && (
           <div className="space-y-1.5 animate-in fade-in slide-in-from-top-1 duration-200">
             <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <span>垂直半径 (Y)</span>
+              <span>{t('borderRadius.verticalRadius')}</span>
               <span>{value.y}px</span>
             </div>
             <div className="flex items-center gap-3">

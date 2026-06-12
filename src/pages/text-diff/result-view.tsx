@@ -1,5 +1,6 @@
 import { FileDiff, Loader2, SquareSplitVertical } from 'lucide-react';
 import { useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { CopyButton } from '@/components/copy-button';
 import { Badge } from '@/components/ui/badge';
@@ -82,6 +83,7 @@ export function TextDiffResultView({
   summaryText,
   stats,
 }: TextDiffResultViewProps) {
+  const { t } = useTranslation('tools');
   const leftResultRef = useRef<HTMLDivElement | null>(null);
   const rightResultRef = useRef<HTMLDivElement | null>(null);
   const isSyncingScrollRef = useRef(false);
@@ -116,13 +118,13 @@ export function TextDiffResultView({
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-2">
             <SquareSplitVertical className="h-5 w-5 text-muted-foreground" />
-            <CardTitle className="text-base lg:text-lg">对比结果</CardTitle>
+            <CardTitle className="text-base lg:text-lg">{t('textDiff.result.title')}</CardTitle>
           </div>
 
           <div className="flex flex-wrap items-center gap-3 justify-end">
             <div className="flex items-center gap-2">
               <Label htmlFor="view-mode" className="text-xs text-muted-foreground">
-                仅显示差异
+                {t('textDiff.result.showDiffOnly')}
               </Label>
               <Switch
                 id="view-mode"
@@ -132,7 +134,7 @@ export function TextDiffResultView({
             </div>
             <div className="flex items-center gap-2">
               <Label htmlFor="sync-scroll" className="text-xs text-muted-foreground">
-                同步滚动
+                {t('textDiff.result.syncScroll')}
               </Label>
               <Switch id="sync-scroll" checked={syncScroll} onCheckedChange={onSyncScrollChange} />
             </div>
@@ -142,8 +144,8 @@ export function TextDiffResultView({
               variant="outline"
               size="sm"
               disabled={!hasResult || !summaryText}
-              copyText="复制对比结果"
-              successText="已复制"
+              copyText={t('textDiff.result.copyResult')}
+              successText={t('textDiff.btn.copied')}
             />
           </div>
         </div>
@@ -151,22 +153,22 @@ export function TextDiffResultView({
         <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
           <Badge variant="outline" className="flex items-center gap-1 px-2 py-0.5">
             <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />
-            新增行
+            {t('textDiff.result.badge.added')}
           </Badge>
           <Badge variant="outline" className="flex items-center gap-1 px-2 py-0.5">
             <span className="inline-block h-2 w-2 rounded-full bg-red-500" />
-            删除行
+            {t('textDiff.result.badge.removed')}
           </Badge>
           <Badge variant="outline" className="flex items-center gap-1 px-2 py-0.5">
             <span className="inline-block h-2 w-2 rounded-full bg-amber-500" />
-            修改行
+            {t('textDiff.result.badge.modified')}
           </Badge>
           <span className="ml-auto flex flex-wrap gap-3">
             <span>
-              左侧：{stats.leftLineCount} 行 / {stats.leftCharCount} 字符
+              {t('textDiff.result.stats.left', { lineCount: stats.leftLineCount, charCount: stats.leftCharCount })}
             </span>
             <span>
-              右侧：{stats.rightLineCount} 行 / {stats.rightCharCount} 字符
+              {t('textDiff.result.stats.right', { lineCount: stats.rightLineCount, charCount: stats.rightCharCount })}
             </span>
           </span>
         </div>
@@ -175,7 +177,7 @@ export function TextDiffResultView({
         {isComputing && !hasResult ? (
           <div className="flex flex-col items-center justify-center gap-2 py-10 text-muted-foreground/70 text-sm">
             <Loader2 className="h-8 w-8 animate-spin opacity-40" />
-            <p>正在对比，文本较大时请稍候…</p>
+            <p>{t('textDiff.result.computing')}</p>
           </div>
         ) : hasResult ? (
           <div className="grid gap-3 md:grid-cols-2">
@@ -185,8 +187,8 @@ export function TextDiffResultView({
               className="relative border rounded-md bg-background/80 max-h-[520px] lg:max-h-[620px] overflow-auto text-xs md:text-sm custom-scrollbar"
             >
               <div className="sticky top-0 z-10 flex border-b border-border/70 bg-muted/80 backdrop-blur px-2 py-1 text-[11px] md:text-xs text-muted-foreground">
-                <span className="w-14 text-right pr-2">行号</span>
-                <span className="flex-1">左侧</span>
+                <span className="w-14 text-right pr-2">{t('textDiff.result.lineNo')}</span>
+                <span className="flex-1">{t('textDiff.result.leftSide')}</span>
               </div>
               <div>
                 {lines.map((line) => (
@@ -212,8 +214,8 @@ export function TextDiffResultView({
               className="relative border rounded-md bg-background/80 max-h-[520px] lg:max-h-[620px] overflow-auto text-xs md:text-sm custom-scrollbar"
             >
               <div className="sticky top-0 z-10 flex border-b border-border/70 bg-muted/80 backdrop-blur px-2 py-1 text-[11px] md:text-xs text-muted-foreground">
-                <span className="w-14 text-right pr-2">行号</span>
-                <span className="flex-1">右侧</span>
+                <span className="w-14 text-right pr-2">{t('textDiff.result.lineNo')}</span>
+                <span className="flex-1">{t('textDiff.result.rightSide')}</span>
               </div>
               <div>
                 {lines.map((line) => (
@@ -236,9 +238,9 @@ export function TextDiffResultView({
         ) : (
           <div className="flex flex-col items-center justify-center gap-2 py-10 text-muted-foreground/70 text-sm">
             <FileDiff className="h-10 w-10 opacity-30" />
-            <p>等待对比结果，先在上方输入文本并点击“开始对比”。</p>
+            <p>{t('textDiff.result.empty.hint')}</p>
             <p className="text-xs max-w-md text-center">
-              所有计算均在浏览器本地完成，不会上传任何文本内容，适合用来对比配置文件、接口响应或代码片段。
+              {t('textDiff.result.empty.privacy')}
             </p>
           </div>
         )}

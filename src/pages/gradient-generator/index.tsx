@@ -1,5 +1,6 @@
 import { SlidersHorizontal } from 'lucide-react';
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { CodeArea } from '@/components/code-area';
 import { ColorPicker } from '@/components/color-picker';
@@ -13,6 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { type ColorStop, createNewStop, type GradientType, initialGradientConfig, useGradientStore } from './store';
 
 function GradientGeneratorPage() {
+  const { t } = useTranslation('tools');
   const { config, setConfig } = useGradientStore();
 
   const snippets = useMemo(() => {
@@ -82,11 +84,11 @@ function GradientGeneratorPage() {
       <Card className="shadow-sm flex flex-col gap-4 p-4 lg:p-5">
         <header className="flex items-center justify-between gap-2">
           <div>
-            <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">配置渐变</h2>
+            <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">{t('gradientGenerator.sections.config')}</h2>
           </div>
           <div className="flex items-center gap-1.5">
             <Button type="button" variant="ghost" size="sm" className="h-7 px-2 text-[11px]" onClick={resetConfig}>
-              重置
+              {t('gradientGenerator.actions.reset')}
             </Button>
             <Button
               type="button"
@@ -96,7 +98,7 @@ function GradientGeneratorPage() {
               onClick={addStop}
             >
               <SlidersHorizontal className="h-3 w-3" />
-              新增断点
+              {t('gradientGenerator.actions.addStop')}
             </Button>
           </div>
         </header>
@@ -104,7 +106,7 @@ function GradientGeneratorPage() {
         <div className="space-y-4 text-xs flex flex-col">
           <div className="shrink-0">
             <div className="rounded-lg border bg-muted/60 px-3 py-3 space-y-2">
-              <Label className="text-[11px]">渐变类型</Label>
+              <Label className="text-[11px]">{t('gradientGenerator.type.label')}</Label>
               <RadioGroup
                 value={config.type}
                 onValueChange={(val) => updateType(val as GradientType)}
@@ -113,13 +115,13 @@ function GradientGeneratorPage() {
                 <div className="flex items-center gap-1.5">
                   <RadioGroupItem id="gradient-linear" value="linear" />
                   <Label htmlFor="gradient-linear" className="text-[11px]">
-                    线性渐变（linear-gradient）
+                    {t('gradientGenerator.type.linear')}
                   </Label>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <RadioGroupItem id="gradient-radial" value="radial" />
                   <Label htmlFor="gradient-radial" className="text-[11px]">
-                    径向渐变（radial-gradient）
+                    {t('gradientGenerator.type.radial')}
                   </Label>
                 </div>
               </RadioGroup>
@@ -128,7 +130,7 @@ function GradientGeneratorPage() {
             {config.type === 'linear' && (
               <div className="rounded-lg border bg-muted/60 px-3 py-3 mt-2">
                 <div className="flex items-end gap-2 mb-1">
-                  <span className="text-sm font-medium">角度</span>
+                  <span className="text-sm font-medium">{t('gradientGenerator.angle.label')}</span>
                   <span className="text-[11px] text-muted-foreground">{config.angle.toFixed(0)}°</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -138,7 +140,7 @@ function GradientGeneratorPage() {
                     value={config.angle}
                     onChange={(event) => updateAngle(Number(event.target.value || 0))}
                   />
-                  <span className="text-[11px] text-muted-foreground">0° 指向上方，顺时针旋转。</span>
+                  <span className="text-[11px] text-muted-foreground">{t('gradientGenerator.angle.hint')}</span>
                 </div>
               </div>
             )}
@@ -146,8 +148,8 @@ function GradientGeneratorPage() {
 
           <div className="rounded-lg border bg-muted/60 px-3 py-3 space-y-2 flex-1 max-h-[50vh] flex flex-col">
             <div className="justify-between shrink-0">
-              <span className="text-sm font-medium">颜色断点</span>
-              <p className="text-[11px] text-muted-foreground mt-0.5">支持多色渐变，按位置从左到右排序。</p>
+              <span className="text-sm font-medium">{t('gradientGenerator.stops.label')}</span>
+              <p className="text-[11px] text-muted-foreground mt-0.5">{t('gradientGenerator.stops.hint')}</p>
             </div>
 
             <div className="space-y-2 overflow-auto min-h-0">
@@ -163,7 +165,7 @@ function GradientGeneratorPage() {
                     <div className="flex flex-col gap-1">
                       <ColorPicker value={stop.color} onChange={(value) => updateStop(stop.id, { color: value })} />
                       <div className="flex items-center gap-2">
-                        <Label className="text-[11px]">位置</Label>
+                        <Label className="text-[11px]">{t('gradientGenerator.stops.position')}</Label>
                         <Input
                           type="number"
                           min={0}
@@ -188,7 +190,7 @@ function GradientGeneratorPage() {
                       className="h-7 px-2 text-[11px] text-muted-foreground hover:text-destructive"
                       onClick={() => removeStop(stop.id)}
                     >
-                      删除
+                      {t('gradientGenerator.actions.delete')}
                     </Button>
                   )}
                 </div>
@@ -200,7 +202,7 @@ function GradientGeneratorPage() {
 
       <Card className="shadow-sm flex flex-col gap-4 p-4 lg:p-5">
         <div>
-          <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">预览 & 代码</h2>
+          <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">{t('gradientGenerator.sections.preview')}</h2>
         </div>
 
         <div className="rounded-lg border bg-background p-12 flex items-center justify-center">
@@ -213,10 +215,10 @@ function GradientGeneratorPage() {
         <Tabs defaultValue="css" className="flex flex-col flex-1">
           <TabsList className="w-max">
             <TabsTrigger value="css" className="text-xs">
-              CSS 代码
+              {t('gradientGenerator.tabs.css')}
             </TabsTrigger>
             <TabsTrigger value="tailwind" className="text-xs">
-              Tailwind 工具类
+              {t('gradientGenerator.tabs.tailwind')}
             </TabsTrigger>
           </TabsList>
 
@@ -225,16 +227,16 @@ function GradientGeneratorPage() {
           </TabsContent>
 
           <TabsContent value="tailwind" className="mt-3 flex-1">
-            <CodeArea title="Tailwind 渐变类名" code={snippets.tailwind} language="ts" />
+            <CodeArea title={t('gradientGenerator.tabs.tailwindTitle')} code={snippets.tailwind} language="ts" />
           </TabsContent>
         </Tabs>
 
         <div className="border-t border-border pt-3 mt-1">
-          <h3 className="text-xs font-semibold mb-1.5">使用小贴士</h3>
+          <h3 className="text-xs font-semibold mb-1.5">{t('gradientGenerator.tips.title')}</h3>
           <ul className="list-disc pl-4 text-[11px] text-muted-foreground space-y-1">
-            <li>线性渐变建议使用 120° ~ 160° 之间的角度，视觉更柔和。</li>
-            <li>至少保留两个颜色断点，更多断点可以营造细腻的渐变层次。</li>
-            <li>Tailwind arbitrary value 形式适合快速试验，可将常用渐变抽成自定义类名复用。</li>
+            <li>{t('gradientGenerator.tips.tip1')}</li>
+            <li>{t('gradientGenerator.tips.tip2')}</li>
+            <li>{t('gradientGenerator.tips.tip3')}</li>
           </ul>
         </div>
       </Card>

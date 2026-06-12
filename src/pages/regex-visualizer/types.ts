@@ -147,6 +147,7 @@ export interface ExplanationItem {
 
 // 常用正则模板
 export interface RegexTemplate {
+  id: string;
   name: string;
   pattern: string;
   description: string;

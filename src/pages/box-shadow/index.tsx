@@ -1,5 +1,6 @@
 import { Layers3 } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { CodeArea } from '@/components/code-area';
 import { ColorPicker } from '@/components/color-picker';
@@ -27,6 +28,7 @@ function buildLayerCss(layer: ShadowLayer): string {
 }
 
 function BoxShadowPage() {
+  const { t } = useTranslation('tools');
   const { config, setConfig } = useBoxShadowStore();
   // activeLayerId 只作为"用户点选意图"的 raw 值；真正用到的 activeLayer 是派生值，
   // 这样 store hydrate / 删除当前层 / 外部清空等场景都不会脱同步。
@@ -98,9 +100,9 @@ function BoxShadowPage() {
             {index + 1}
           </span>
           <div className="flex flex-col">
-            <span className="font-medium">阴影层 {index + 1}</span>
+            <span className="font-medium">{t('boxShadow.layers.layerLabel', { index: index + 1 })}</span>
             <span className="text-[11px] text-muted-foreground">
-              {layer.inset ? '内阴影' : '外阴影'} · {layer.offsetX}px, {layer.offsetY}px, {layer.blurRadius}px
+              {layer.inset ? t('boxShadow.layers.inset') : t('boxShadow.layers.outer')} · {layer.offsetX}px, {layer.offsetY}px, {layer.blurRadius}px
             </span>
           </div>
         </div>
@@ -117,7 +119,7 @@ function BoxShadowPage() {
               removeLayer(layer.id);
             }}
           >
-            删除
+            {t('boxShadow.actions.delete')}
           </button>
         </div>
       </button>
@@ -129,11 +131,11 @@ function BoxShadowPage() {
       <Card className="shadow-sm flex flex-col gap-4 p-4 lg:p-5">
         <header className="flex items-center justify-between gap-2">
           <div>
-            <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">配置阴影层</h2>
+            <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">{t('boxShadow.sections.config')}</h2>
           </div>
           <div className="flex items-center gap-1.5">
             <Button type="button" variant="ghost" size="sm" className="h-7 px-2 text-[11px]" onClick={resetConfig}>
-              重置
+              {t('boxShadow.actions.reset')}
             </Button>
             <Button
               type="button"
@@ -142,19 +144,19 @@ function BoxShadowPage() {
               onClick={addLayer}
             >
               <Layers3 className="h-3 w-3" />
-              新增层
+              {t('boxShadow.actions.addLayer')}
             </Button>
           </div>
         </header>
 
         <div className="grid grid-cols-1 gap-3 text-xs">
           <div className="space-y-2">
-            <Label className="text-[11px]">阴影层列表</Label>
+            <Label className="text-[11px]">{t('boxShadow.layers.listLabel')}</Label>
             <ScrollArea className="h-40 pr-1">
               <div className="space-y-1.5">
                 {layers.map((layer, index) => renderLayerRow(layer, index))}
                 {!layers.length && (
-                  <p className="text-[11px] text-muted-foreground">暂无阴影层，点击右上角「新增层」开始配置。</p>
+                  <p className="text-[11px] text-muted-foreground">{t('boxShadow.layers.empty')}</p>
                 )}
               </div>
             </ScrollArea>
@@ -164,21 +166,21 @@ function BoxShadowPage() {
             <div className="rounded-lg border bg-muted/60 px-3 py-3 space-y-3 mt-2">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium">当前编辑：阴影层 {layers.indexOf(activeLayer) + 1}</p>
-                  <p className="text-[11px] text-muted-foreground">细调每一层的位置、范围和颜色。</p>
+                  <p className="text-sm font-medium">{t('boxShadow.editor.title', { index: layers.indexOf(activeLayer) + 1 })}</p>
+                  <p className="text-[11px] text-muted-foreground">{t('boxShadow.editor.subtitle')}</p>
                 </div>
                 <label className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground cursor-pointer">
                   <Checkbox
                     checked={activeLayer.inset}
                     onCheckedChange={(value) => updateLayer(activeLayer.id, { inset: Boolean(value) })}
                   />
-                  <span>内阴影（inset）</span>
+                  <span>{t('boxShadow.editor.insetLabel')}</span>
                 </label>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <Label className="text-[11px]">水平偏移 X</Label>
+                  <Label className="text-[11px]">{t('boxShadow.editor.offsetX')}</Label>
                   <div className="flex items-center gap-2">
                     <Input
                       type="number"
@@ -190,7 +192,7 @@ function BoxShadowPage() {
                   </div>
                 </div>
                 <div className="space-y-1">
-                  <Label className="text-[11px]">垂直偏移 Y</Label>
+                  <Label className="text-[11px]">{t('boxShadow.editor.offsetY')}</Label>
                   <div className="flex items-center gap-2">
                     <Input
                       type="number"
@@ -202,7 +204,7 @@ function BoxShadowPage() {
                   </div>
                 </div>
                 <div className="space-y-1">
-                  <Label className="text-[11px]">模糊半径 blur</Label>
+                  <Label className="text-[11px]">{t('boxShadow.editor.blurRadius')}</Label>
                   <div className="flex items-center gap-2">
                     <Input
                       type="number"
@@ -215,7 +217,7 @@ function BoxShadowPage() {
                   </div>
                 </div>
                 <div className="space-y-1">
-                  <Label className="text-[11px]">扩展半径 spread</Label>
+                  <Label className="text-[11px]">{t('boxShadow.editor.spreadRadius')}</Label>
                   <div className="flex items-center gap-2">
                     <Input
                       type="number"
@@ -231,7 +233,7 @@ function BoxShadowPage() {
               </div>
 
               <div className="space-y-1 flex flex-col">
-                <Label className="text-[11px]">阴影颜色</Label>
+                <Label className="text-[11px]">{t('boxShadow.editor.shadowColor')}</Label>
                 <ColorPicker
                   value={activeLayer.color}
                   onChange={(value) => updateLayer(activeLayer.id, { color: value })}
@@ -244,7 +246,7 @@ function BoxShadowPage() {
 
       <Card className="shadow-sm flex flex-col gap-4 p-4 lg:p-5">
         <div>
-          <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">预览 & 代码</h2>
+          <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">{t('boxShadow.sections.preview')}</h2>
         </div>
 
         <div className="rounded-lg border bg-background p-12 flex items-center justify-center">
@@ -252,20 +254,20 @@ function BoxShadowPage() {
             className="w-40 h-24 rounded-xl border bg-card text-card-foreground flex items-center justify-center text-xs"
             style={{ boxShadow: snippets.boxShadowValue }}
           >
-            阴影预览
+            {t('boxShadow.preview.label')}
           </div>
         </div>
 
         <Tabs defaultValue="css" className="flex flex-col flex-1">
           <TabsList className="w-max">
             <TabsTrigger value="css" className="text-xs">
-              CSS 代码
+              {t('boxShadow.tabs.css')}
             </TabsTrigger>
             <TabsTrigger value="tailwind" className="text-xs">
-              Tailwind 工具类
+              {t('boxShadow.tabs.tailwind')}
             </TabsTrigger>
             <TabsTrigger value="theme" className="text-xs">
-              主题 boxShadow
+              {t('boxShadow.tabs.theme')}
             </TabsTrigger>
           </TabsList>
 
@@ -283,11 +285,11 @@ function BoxShadowPage() {
         </Tabs>
 
         <div className="border-t border-border pt-3 mt-1">
-          <h3 className="text-xs font-semibold mb-1.5">使用建议</h3>
+          <h3 className="text-xs font-semibold mb-1.5">{t('boxShadow.tips.title')}</h3>
           <ul className="list-disc pl-4 text-[11px] text-muted-foreground space-y-1">
-            <li>使用多层阴影模拟真实光照：一层柔和大阴影 + 一层小而锐利的阴影。</li>
-            <li>扩展半径为负值可以收紧阴影边缘，避免蒙住卡片外部内容。</li>
-            <li>在 Tailwind 中建议把生成的 shadow-[...] 抽成组件 class，保持样式统一。</li>
+            <li>{t('boxShadow.tips.tip1')}</li>
+            <li>{t('boxShadow.tips.tip2')}</li>
+            <li>{t('boxShadow.tips.tip3')}</li>
           </ul>
         </div>
       </Card>

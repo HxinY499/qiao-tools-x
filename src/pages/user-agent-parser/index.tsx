@@ -1,5 +1,7 @@
 import { Cpu, Globe, Monitor, Smartphone, Trash2, User, Zap } from 'lucide-react';
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+
 
 import { CodeArea } from '@/components/code-area';
 import { Button } from '@/components/ui/button';
@@ -31,6 +33,7 @@ const EXAMPLE_UAS = [
 ];
 
 export default function UserAgentParserPage() {
+  const { t } = useTranslation('tools');
   const { data, setUserAgent, reset } = useUserAgentParserStore();
   const { userAgent } = data;
 
@@ -48,21 +51,21 @@ export default function UserAgentParserPage() {
         <CardContent className="space-y-4 pt-4">
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="ua-input">User Agent 字符串</Label>
+              <Label htmlFor="ua-input">{t('userAgentParser.uaString')}</Label>
               <div className="flex items-center gap-2">
                 <Button variant="outline" size="sm" onClick={fillCurrentUA}>
                   <User className="w-3 h-3 mr-1" />
-                  使用我的 UA
+                  {t('userAgentParser.useMyUA')}
                 </Button>
                 <Button variant="outline" size="sm" onClick={reset} disabled={!userAgent}>
                   <Trash2 className="w-3 h-3 mr-1" />
-                  清空
+                  {t('userAgentParser.clear')}
                 </Button>
               </div>
             </div>
             <Textarea
               id="ua-input"
-              placeholder="在此粘贴 User Agent 字符串..."
+              placeholder={t('userAgentParser.placeholder')}
               className="min-h-[100px] font-mono text-sm"
               value={userAgent}
               onChange={(e) => setUserAgent(e.target.value)}
@@ -70,7 +73,7 @@ export default function UserAgentParserPage() {
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <span className="text-sm text-muted-foreground self-center">常用示例：</span>
+            <span className="text-sm text-muted-foreground self-center">{t('userAgentParser.commonExamples')}</span>
             {EXAMPLE_UAS.map((item) => (
               <Button key={item.name} variant="secondary" size="sm" onClick={() => setUserAgent(item.ua)}>
                 {item.name}
@@ -87,21 +90,21 @@ export default function UserAgentParserPage() {
             <CardHeader className="pb-2">
               <CardTitle className="text-base flex items-center gap-2">
                 <Globe className="w-4 h-4 text-primary" />
-                浏览器 (Browser)
+                {t('userAgentParser.browser')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <dl className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <dt className="text-muted-foreground">名称</dt>
+                  <dt className="text-muted-foreground">{t('userAgentParser.name')}</dt>
                   <dd className="font-medium">{parsedResult.browser.name || '-'}</dd>
                 </div>
                 <div className="flex justify-between">
-                  <dt className="text-muted-foreground">版本</dt>
+                  <dt className="text-muted-foreground">{t('userAgentParser.version')}</dt>
                   <dd className="font-medium">{parsedResult.browser.version || '-'}</dd>
                 </div>
                 <div className="flex justify-between">
-                  <dt className="text-muted-foreground">主版本</dt>
+                  <dt className="text-muted-foreground">{t('userAgentParser.major')}</dt>
                   <dd className="font-medium">{parsedResult.browser.major || '-'}</dd>
                 </div>
               </dl>
@@ -113,17 +116,17 @@ export default function UserAgentParserPage() {
             <CardHeader className="pb-2">
               <CardTitle className="text-base flex items-center gap-2">
                 <Zap className="w-4 h-4 text-primary" />
-                引擎 (Engine)
+                {t('userAgentParser.engine')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <dl className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <dt className="text-muted-foreground">名称</dt>
+                  <dt className="text-muted-foreground">{t('userAgentParser.name')}</dt>
                   <dd className="font-medium">{parsedResult.engine.name || '-'}</dd>
                 </div>
                 <div className="flex justify-between">
-                  <dt className="text-muted-foreground">版本</dt>
+                  <dt className="text-muted-foreground">{t('userAgentParser.version')}</dt>
                   <dd className="font-medium">{parsedResult.engine.version || '-'}</dd>
                 </div>
               </dl>
@@ -135,17 +138,17 @@ export default function UserAgentParserPage() {
             <CardHeader className="pb-2">
               <CardTitle className="text-base flex items-center gap-2">
                 <Monitor className="w-4 h-4 text-primary" />
-                操作系统 (OS)
+                {t('userAgentParser.os')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <dl className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <dt className="text-muted-foreground">名称</dt>
+                  <dt className="text-muted-foreground">{t('userAgentParser.name')}</dt>
                   <dd className="font-medium">{parsedResult.os.name || '-'}</dd>
                 </div>
                 <div className="flex justify-between">
-                  <dt className="text-muted-foreground">版本</dt>
+                  <dt className="text-muted-foreground">{t('userAgentParser.version')}</dt>
                   <dd className="font-medium">{parsedResult.os.version || '-'}</dd>
                 </div>
               </dl>
@@ -157,21 +160,21 @@ export default function UserAgentParserPage() {
             <CardHeader className="pb-2">
               <CardTitle className="text-base flex items-center gap-2">
                 <Smartphone className="w-4 h-4 text-primary" />
-                设备 (Device)
+                {t('userAgentParser.device')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <dl className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <dt className="text-muted-foreground">类型</dt>
+                  <dt className="text-muted-foreground">{t('userAgentParser.type')}</dt>
                   <dd className="font-medium">{parsedResult.device.type || 'Desktop (guess)'}</dd>
                 </div>
                 <div className="flex justify-between">
-                  <dt className="text-muted-foreground">厂商</dt>
+                  <dt className="text-muted-foreground">{t('userAgentParser.vendor')}</dt>
                   <dd className="font-medium">{parsedResult.device.vendor || '-'}</dd>
                 </div>
                 <div className="flex justify-between">
-                  <dt className="text-muted-foreground">型号</dt>
+                  <dt className="text-muted-foreground">{t('userAgentParser.model')}</dt>
                   <dd className="font-medium">{parsedResult.device.model || '-'}</dd>
                 </div>
               </dl>
@@ -189,7 +192,7 @@ export default function UserAgentParserPage() {
             <CardContent>
               <dl className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <dt className="text-muted-foreground">架构</dt>
+                  <dt className="text-muted-foreground">{t('userAgentParser.architecture')}</dt>
                   <dd className="font-medium">{parsedResult.cpu.architecture || '-'}</dd>
                 </div>
               </dl>
@@ -199,7 +202,7 @@ export default function UserAgentParserPage() {
           {/* 原始 JSON */}
           <Card className="md:col-span-2 lg:col-span-3">
             <CardHeader className="pb-2">
-              <CardTitle className="text-base">解析结果 (JSON)</CardTitle>
+              <CardTitle className="text-base">{t('userAgentParser.jsonResult')}</CardTitle>
             </CardHeader>
             <CardContent>
               <CodeArea

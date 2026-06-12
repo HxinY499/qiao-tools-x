@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { ChevronDown, ChevronRight, Radio } from 'lucide-react';
 import { memo, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { CodeArea } from '@/components/code-area';
 
@@ -23,6 +24,7 @@ const SseBlock = memo(function SseBlock({
   collapsed: boolean;
   onToggle: (index: number) => void;
 }) {
+  const { t } = useTranslation('tools');
   const handleToggle = useCallback(() => onToggle(block.index), [onToggle, block.index]);
 
   return (
@@ -52,7 +54,7 @@ const SseBlock = memo(function SseBlock({
         )}
         {block.type === 'text' && !block.valid && (
           <Badge variant="destructive" className="text-[10px] h-4 px-1.5">
-            解析失败
+            {t('sseToJson.parseFailed')}
           </Badge>
         )}
       </div>
@@ -69,7 +71,7 @@ const SseBlock = memo(function SseBlock({
           )}
           {block.type === 'signal' && (
             <div className="text-xs text-blue-600 dark:text-blue-400 bg-blue-500/10 rounded-md px-3 py-2 font-mono">
-              流信号: {block.raw}
+              {t('sseToJson.signal', { raw: block.raw })}
             </div>
           )}
           {block.type === 'text' && !block.valid && (
@@ -91,12 +93,18 @@ const SseBlock = memo(function SseBlock({
 const EMPTY_RESULT: ParseResult = { blocks: [], validCount: 0, invalidCount: 0, signalCount: 0 };
 const isMergeable = (b: SseDataBlock) => b.type === 'json' && b.valid;
 const successMessage = (count: number) => `已解析 ${count} 条 SSE 数据`;
+successMessage; // reference for type compatibility, overridden in component
 
 const PASTE_PLACEHOLDER = `event: message\ndata: {"key": "value"}\n\nevent: message\ndata: {"another": "object"}`;
 
 // ─── 主页面 ─────────────────────────────────────────────────
 
 export default function SseToJsonPage() {
+  const { t } = useTranslation('tools');
+  const successMessage = useCallback(
+    (count: number) => t('sseToJson.parsedSuccess', { count }),
+    [t],
+  );
   const controller = useBlockViewer<SseDataBlock, ParseResult>({
     emptyResult: EMPTY_RESULT,
     parse: parseSseToJson,
@@ -115,44 +123,44 @@ export default function SseToJsonPage() {
         open={open}
         onOpenChange={setOpen}
         onConfirm={handleConfirmFromDialog}
-        title="粘贴 SSE 原始数据"
-        description="将 SSE (Server-Sent Events) 原始文本粘贴到下方，点击解析后提取所有 data 字段"
+        title={t('sseToJson.pasteTitle')}
+        description={t('sseToJson.pasteDesc')}
         placeholder={PASTE_PLACEHOLDER}
       />
       <RawTextDialog
         open={rawTextOpen}
         onOpenChange={setRawTextOpen}
         rawText={rawText}
-        title="SSE 原始文本"
-        description="以下是导入时的 SSE 原始数据"
+        title={t('sseToJson.rawTitle')}
+        description={t('sseToJson.rawDesc')}
       />
 
       <BlockListLayout
         controller={controller}
         emptyIcon={Radio}
         dataLabel="SSE"
-        rawTextTitle="查看原始 SSE 文本"
+        rawTextTitle={t('sseToJson.viewRaw')}
         renderBlock={(block, collapsed) => (
           <SseBlock block={block} collapsed={collapsed} onToggle={toggleBlock} />
         )}
         renderStats={() => (
           <>
             <Badge variant="secondary" className="text-[10px] h-5">
-              共 {blocks.length} 条
+              {t('sseToJson.total', { count: blocks.length })}
             </Badge>
             {validCount > 0 && (
               <Badge className="text-[10px] h-5 bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/15">
-                {validCount} 成功
+                {t('sseToJson.success', { count: validCount })}
               </Badge>
             )}
             {signalCount > 0 && (
               <Badge className="text-[10px] h-5 bg-blue-500/15 text-blue-600 dark:text-blue-400 hover:bg-blue-500/15">
-                {signalCount} 信号
+                {t('sseToJson.signalCount', { count: signalCount })}
               </Badge>
             )}
             {invalidCount > 0 && (
               <Badge variant="destructive" className="text-[10px] h-5">
-                {invalidCount} 失败
+                {t('sseToJson.fail', { count: invalidCount })}
               </Badge>
             )}
           </>

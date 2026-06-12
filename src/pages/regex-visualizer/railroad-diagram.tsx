@@ -4,6 +4,7 @@
  */
 
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { ASTNode, RegexNode } from './types';
 
@@ -161,14 +162,20 @@ function renderDot(x: number, y: number, key: string): React.ReactNode {
 // }
 
 // 渲染 AST 节点
-function renderNode(node: ASTNode, x: number, y: number, keyPrefix: string): RenderResult {
+function renderNode(
+  node: ASTNode,
+  x: number,
+  y: number,
+  keyPrefix: string,
+  translations?: Record<string, string>,
+): RenderResult {
   const elements: React.ReactNode[] = [];
   const centerY = y + CONFIG.nodeHeight / 2;
 
   switch (node.type) {
     case 'Regex': {
       const regexNode = node as RegexNode;
-      const bodyResult = renderNode(regexNode.body, x + 20, y, `${keyPrefix}-body`);
+      const bodyResult = renderNode(regexNode.body, x + 20, y, `${keyPrefix}-body`, translations);
 
       // 起点
       elements.push(renderDot(x + 5, centerY, `${keyPrefix}-start`));
@@ -195,7 +202,7 @@ function renderNode(node: ASTNode, x: number, y: number, keyPrefix: string): Ren
       if ('elements' in node) {
         for (let i = 0; i < node.elements.length; i++) {
           const elem = node.elements[i];
-          const result = renderNode(elem, currentX, y, `${keyPrefix}-${i}`);
+          const result = renderNode(elem, currentX, y, `${keyPrefix}-${i}`, translations);
           elements.push(result.svg);
 
           if (i < node.elements.length - 1) {
@@ -229,7 +236,7 @@ function renderNode(node: ASTNode, x: number, y: number, keyPrefix: string): Ren
       let maxWidth = 0;
 
       for (let i = 0; i < node.alternatives.length; i++) {
-        const result = renderNode(node.alternatives[i], 0, 0, `${keyPrefix}-alt-${i}`);
+        const result = renderNode(node.alternatives[i], 0, 0, `${keyPrefix}-alt-${i}`, translations);
         branchResults.push(result);
         maxWidth = Math.max(maxWidth, result.width);
       }
@@ -263,7 +270,7 @@ function renderNode(node: ASTNode, x: number, y: number, keyPrefix: string): Ren
         }
 
         // 渲染分支内容
-        const branchElement = renderNode(node.alternatives[i], branchX, currentY, `${keyPrefix}-branch-${i}`);
+        const branchElement = renderNode(node.alternatives[i], branchX, currentY, `${keyPrefix}-branch-${i}`, translations);
         elements.push(branchElement.svg);
 
         // 右侧连接
@@ -298,7 +305,7 @@ function renderNode(node: ASTNode, x: number, y: number, keyPrefix: string): Ren
       if (!('body' in node)) break;
 
       const groupNode = node;
-      const bodyResult = renderNode(groupNode.body, x + 10, y, `${keyPrefix}-body`);
+      const bodyResult = renderNode(groupNode.body, x + 10, y, `${keyPrefix}-body`, translations);
 
       // 分组边框
       elements.push(
@@ -357,7 +364,7 @@ function renderNode(node: ASTNode, x: number, y: number, keyPrefix: string): Ren
       if (!('body' in node && 'quantifier' in node)) break;
 
       const repNode = node;
-      const bodyResult = renderNode(repNode.body, x, y, `${keyPrefix}-body`);
+      const bodyResult = renderNode(repNode.body, x, y, `${keyPrefix}-body`, translations);
 
       elements.push(bodyResult.svg);
 
@@ -437,13 +444,13 @@ function renderNode(node: ASTNode, x: number, y: number, keyPrefix: string): Ren
           type = 'meta';
           // 显示更友好的名称
           const metaNames: Record<string, string> = {
-            '\\d': '数字',
-            '\\D': '非数字',
-            '\\w': '单词',
-            '\\W': '非单词',
-            '\\s': '空白',
-            '\\S': '非空白',
-            '.': '任意',
+            '\\d': translations?.['meta.digit'] ?? '\\d',
+            '\\D': translations?.['meta.nonDigit'] ?? '\\D',
+            '\\w': translations?.['meta.word'] ?? '\\w',
+            '\\W': translations?.['meta.nonWord'] ?? '\\W',
+            '\\s': translations?.['meta.space'] ?? '\\s',
+            '\\S': translations?.['meta.nonSpace'] ?? '\\S',
+            '.': translations?.['meta.any'] ?? '.',
           };
           displayText = metaNames[node.raw] || node.raw;
         }
@@ -471,10 +478,10 @@ function renderNode(node: ASTNode, x: number, y: number, keyPrefix: string): Ren
       let displayText = node.raw;
       if ('kind' in node) {
         const anchorNames: Record<string, string> = {
-          'start': '开头 ^',
-          'end': '结尾 $',
-          'boundary': '边界 \\b',
-          'non-boundary': '非边界 \\B',
+          'start': translations?.['anchor.start'] ?? '^',
+          'end': translations?.['anchor.end'] ?? '$',
+          'boundary': translations?.['anchor.boundary'] ?? '\\b',
+          'non-boundary': translations?.['anchor.nonBoundary'] ?? '\\B',
         };
         displayText = anchorNames[node.kind] || node.raw;
       }
@@ -517,18 +524,35 @@ interface RailroadDiagramProps {
 }
 
 export function RailroadDiagram({ ast, className = '' }: RailroadDiagramProps) {
+  const { t } = useTranslation('tools');
+
+  const diagramTranslations: Record<string, string> = {
+    'meta.digit': t('regexVisualizer.diagram.digit'),
+    'meta.nonDigit': t('regexVisualizer.diagram.nonDigit'),
+    'meta.word': t('regexVisualizer.diagram.word'),
+    'meta.nonWord': t('regexVisualizer.diagram.nonWord'),
+    'meta.space': t('regexVisualizer.diagram.space'),
+    'meta.nonSpace': t('regexVisualizer.diagram.nonSpace'),
+    'meta.any': t('regexVisualizer.diagram.any'),
+    'anchor.start': t('regexVisualizer.diagram.anchorStart'),
+    'anchor.end': t('regexVisualizer.diagram.anchorEnd'),
+    'anchor.boundary': t('regexVisualizer.diagram.anchorBoundary'),
+    'anchor.nonBoundary': t('regexVisualizer.diagram.anchorNonBoundary'),
+  };
+
   const { svg, width, height } = useMemo(() => {
     if (!ast) {
       return { svg: null, width: 0, height: 0 };
     }
 
-    return renderNode(ast, 20, 30, 'root');
-  }, [ast]);
+    return renderNode(ast, 20, 30, 'root', diagramTranslations);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ast, t]);
 
   if (!ast) {
     return (
       <div className={`flex items-center justify-center h-32 text-muted-foreground ${className}`}>
-        输入正则表达式以查看可视化
+        {t('regexVisualizer.diagram.empty')}
       </div>
     );
   }

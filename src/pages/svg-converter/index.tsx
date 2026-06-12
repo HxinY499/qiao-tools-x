@@ -1,6 +1,7 @@
 import { useDebounceFn } from 'ahooks';
 import { Download, FileImage, RefreshCw, X } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
 import { ColorPicker } from '@/components/color-picker';
@@ -18,6 +19,7 @@ import { ConversionParams, OutputFormat, PresetType, SvgItem } from './types';
 import { formatBytes, PRESETS } from './utils';
 
 function SvgConverterPage() {
+  const { t } = useTranslation('tools');
   const {
     items,
     selectedId,
@@ -115,7 +117,7 @@ function SvgConverterPage() {
   function downloadAllFiles() {
     const convertedFiles = items.filter((item) => item.result?.status === 'success');
     if (convertedFiles.length === 0) {
-      toast.error('没有可下载的文件');
+      toast.error(t('svgConverter.toast.noFilesToDownload'));
       return;
     }
 
@@ -125,23 +127,25 @@ function SvgConverterPage() {
       }, index * 200);
     });
 
-    toast.success(`开始下载 ${convertedFiles.length} 个文件`);
+    toast.success(t('svgConverter.toast.startDownload', { count: convertedFiles.length }));
   }
 
   return (
     <div className="max-w-5xl w-full mx-auto px-4 pb-5 lg:py-8 space-y-4 lg:space-y-6">
       {/* 上传区域 */}
       <Card className="shadow-sm p-4 lg:p-5">
-        <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">上传 SVG</h2>
+        <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">
+          {t('svgConverter.sections.upload')}
+        </h2>
         <FileDragUploader
           onFileSelect={(file) => addFiles([file])}
           onFilesSelect={addFiles}
           onError={(error) => toast.error(error)}
           className="mt-3 bg-muted/60 min-h-[120px]"
           icon={<FileImage />}
-          title="拖拽 SVG 文件到此处，或"
-          buttonText="选择 SVG 文件"
-          hint="支持批量上传多个 SVG 文件"
+          title={t('svgConverter.uploader.title')}
+          buttonText={t('svgConverter.uploader.button')}
+          hint={t('svgConverter.uploader.hint')}
           accept=".svg,image/svg+xml"
           multiple
         />
@@ -154,10 +158,11 @@ function SvgConverterPage() {
             <div className="space-y-2">
               <div className="flex items-center justify-between text-xs text-muted-foreground">
                 <span>
-                  已添加 {items.length} 个文件 {selectedItem && `（当前：${selectedItem.file.name}）`}
+                  {t('svgConverter.fileList.addedCount', { count: items.length })}
+                  {selectedItem && ` ${t('svgConverter.fileList.current', { name: selectedItem.file.name })}`}
                 </span>
                 <Button type="button" variant="secondary" size="sm" className="h-6 px-2 text-[10px]" onClick={clearAll}>
-                  清空列表
+                  {t('svgConverter.fileList.clearAll')}
                 </Button>
               </div>
               <div className="max-h-[200px] overflow-y-auto space-y-1.5 rounded-lg border bg-muted/30 p-2">
@@ -181,7 +186,7 @@ function SvgConverterPage() {
 
                       {isConverting && (
                         <span className="text-[10px] text-blue-600 dark:text-blue-400 animate-pulse shrink-0">
-                          转换中...
+                          {t('svgConverter.fileList.converting')}
                         </span>
                       )}
 
@@ -190,7 +195,7 @@ function SvgConverterPage() {
                           className="text-[10px] text-red-600 dark:text-red-400 shrink-0"
                           title={item.result?.error}
                         >
-                          失败
+                          {t('svgConverter.fileList.failed')}
                         </span>
                       )}
 
@@ -204,7 +209,7 @@ function SvgConverterPage() {
                             e.stopPropagation();
                             downloadFile(item);
                           }}
-                          title="下载"
+                          title={t('svgConverter.fileList.download')}
                         >
                           <Download className="w-3 h-3" />
                         </Button>
@@ -219,7 +224,7 @@ function SvgConverterPage() {
                           e.stopPropagation();
                           removeItem(item.id);
                         }}
-                        title="移除"
+                        title={t('svgConverter.fileList.remove')}
                       >
                         <X className="w-3 h-3" />
                       </Button>
@@ -230,7 +235,7 @@ function SvgConverterPage() {
             </div>
           ) : (
             <Empty>
-              <EmptyDescription>列表为空</EmptyDescription>
+              <EmptyDescription>{t('svgConverter.fileList.empty')}</EmptyDescription>
             </Empty>
           )}
         </Card>
@@ -238,7 +243,9 @@ function SvgConverterPage() {
         {/* 转换参数 */}
         <Card className="shadow-sm p-4 lg:p-5 flex-1">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">转换参数</h2>
+            <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">
+              {t('svgConverter.sections.params')}
+            </h2>
             {items.length > 1 && (
               <Button
                 type="button"
@@ -247,21 +254,23 @@ function SvgConverterPage() {
                 className="h-6 px-2 text-[10px]"
                 onClick={toggleMode}
               >
-                {isIndividualMode ? '✓ 独立参数' : '统一参数'}
+                {isIndividualMode
+                  ? t('svgConverter.params.individualModeActive')
+                  : t('svgConverter.params.unifiedMode')}
               </Button>
             )}
           </div>
 
           {isIndividualMode && (
             <p className="mb-3 text-[11px] text-muted-foreground bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-md px-2 py-1.5">
-              💡 独立参数模式：点击文件列表切换编辑对象，参数将分别应用到每个文件
+              💡 {t('svgConverter.params.individualModeHint')}
             </p>
           )}
 
           <div className="mt-3 grid gap-3 lg:grid-cols-2">
             {/* 预设尺寸 */}
             <div className="rounded-lg border bg-muted/60 px-2.5 py-2.5">
-              <Label className="mb-1 block text-xs">预设尺寸</Label>
+              <Label className="mb-1 block text-xs">{t('svgConverter.params.presetSize')}</Label>
               <ToggleGroup
                 type="single"
                 value={currentPreset}
@@ -278,25 +287,29 @@ function SvgConverterPage() {
                       value={key}
                       className="text-xs h-auto py-1.5 px-2 flex flex-col items-start gap-0.5"
                     >
-                      <span className="font-medium">{config.label}</span>
+                      <span className="font-medium">
+                        {t(`svgConverter.presets.${key}.label`, { defaultValue: config.label })}
+                      </span>
                       <span className="text-[10px] text-muted-foreground">
-                        {config.size ? `${config.size}×${config.size}` : '保持原始'}
+                        {config.size
+                          ? `${config.size}×${config.size}`
+                          : t('svgConverter.presets.keepOriginal')}
                       </span>
                     </ToggleGroupItem>
                   ))}
               </ToggleGroup>
               <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
-                {PRESETS[currentPreset].description}
+                {t(`svgConverter.presets.${currentPreset}.description`, { defaultValue: PRESETS[currentPreset].description })}
               </p>
             </div>
 
             {/* 自定义尺寸 */}
             <div className="rounded-lg border bg-muted/60 px-3 py-3">
-              <Label className="mb-1.5 block text-xs">自定义尺寸</Label>
+              <Label className="mb-1.5 block text-xs">{t('svgConverter.params.customSize')}</Label>
               <div className="grid grid-cols-2 gap-2">
                 <div>
                   <Label htmlFor="targetWidth" className="text-[10px] text-muted-foreground mb-1 block">
-                    宽度 (px)
+                    {t('svgConverter.params.width')}
                   </Label>
                   <Input
                     id="targetWidth"
@@ -315,7 +328,7 @@ function SvgConverterPage() {
                 </div>
                 <div>
                   <Label htmlFor="targetHeight" className="text-[10px] text-muted-foreground mb-1 block">
-                    高度 (px)
+                    {t('svgConverter.params.height')}
                   </Label>
                   <Input
                     id="targetHeight"
@@ -335,15 +348,18 @@ function SvgConverterPage() {
               </div>
               <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">
                 {selectedItem
-                  ? `原始尺寸：${selectedItem.originalWidth} × ${selectedItem.originalHeight}`
-                  : '请上传文件'}
+                  ? t('svgConverter.params.originalSize', {
+                      w: selectedItem.originalWidth,
+                      h: selectedItem.originalHeight,
+                    })
+                  : t('svgConverter.params.uploadFirst')}
               </p>
             </div>
 
             {/* 输出格式 */}
             <div className="rounded-lg border bg-muted/60 px-3 py-3">
               <Label htmlFor="formatSelect" className="mb-1.5 block text-xs">
-                输出格式
+                {t('svgConverter.params.outputFormat')}
               </Label>
               <Select
                 value={displayParams.format}
@@ -354,13 +370,13 @@ function SvgConverterPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="image/png" className="text-xs">
-                    PNG（支持透明背景）
+                    {t('svgConverter.formats.png')}
                   </SelectItem>
                   <SelectItem value="image/jpeg" className="text-xs">
-                    JPEG（适合照片，体积小）
+                    {t('svgConverter.formats.jpeg')}
                   </SelectItem>
                   <SelectItem value="image/webp" className="text-xs">
-                    WebP（体积最小，支持透明）
+                    {t('svgConverter.formats.webp')}
                   </SelectItem>
                 </SelectContent>
               </Select>
@@ -370,7 +386,7 @@ function SvgConverterPage() {
             {displayParams.format !== 'image/jpeg' && (
               <div className="rounded-lg border bg-muted/60 px-3 py-3">
                 <Label className="mb-1.5 flex items-center justify-between text-xs">
-                  <span>背景设置</span>
+                  <span>{t('svgConverter.params.bgSettings')}</span>
                   <Button
                     type="button"
                     variant={displayParams.useTransparent ? 'default' : 'secondary'}
@@ -378,7 +394,9 @@ function SvgConverterPage() {
                     className="h-6 px-2 text-[10px]"
                     onClick={() => updateParams({ useTransparent: !displayParams.useTransparent })}
                   >
-                    {displayParams.useTransparent ? '✓ 透明背景' : '透明背景'}
+                    {displayParams.useTransparent
+                      ? t('svgConverter.params.transparentActive')
+                      : t('svgConverter.params.transparent')}
                   </Button>
                 </Label>
                 {!displayParams.useTransparent && (
@@ -394,7 +412,7 @@ function SvgConverterPage() {
 
             {displayParams.format === 'image/jpeg' && (
               <div className="rounded-lg border bg-muted/60 px-3 py-3">
-                <Label className="mb-1.5 block text-xs">背景色（JPEG 不支持透明）</Label>
+                <Label className="mb-1.5 block text-xs">{t('svgConverter.params.bgColorJpeg')}</Label>
                 <ColorPicker
                   value={displayParams.backgroundColor}
                   onChange={(color) => updateParams({ backgroundColor: color })}
@@ -409,70 +427,78 @@ function SvgConverterPage() {
       {selectedItem && (
         <Card className="shadow-sm p-4 lg:p-5">
           <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">
-            预览对比 {items.length > 1 && `（${items.findIndex((f) => f.id === selectedId) + 1}/${items.length}）`}
+            {t('svgConverter.sections.preview')}
+            {items.length > 1 &&
+              ` (${items.findIndex((f) => f.id === selectedId) + 1}/${items.length})`}
           </h2>
           <div className="mt-3 grid gap-4 lg:grid-cols-2">
-            {/* 原始 SVG */}
-            <div className="rounded-lg border bg-muted/40 p-3 sm:p-4">
-              <h3 className="text-sm font-medium mb-2 flex items-center justify-between">
-                <span>原始 SVG</span>
-                <span className="text-[11px] text-muted-foreground">{formatBytes(selectedItem.file.size)}</span>
-              </h3>
-              <div className="rounded-lg border bg-background p-4 flex items-center justify-center min-h-[200px]">
-                <div
-                  dangerouslySetInnerHTML={{ __html: selectedItem.content }}
-                  className="max-w-full max-h-[300px] svg-preview"
-                />
+              {/* 原始 SVG */}
+              <div className="rounded-lg border bg-muted/40 p-3 sm:p-4">
+                <h3 className="text-sm font-medium mb-2 flex items-center justify-between">
+                  <span>{t('svgConverter.preview.original')}</span>
+                  <span className="text-[11px] text-muted-foreground">{formatBytes(selectedItem.file.size)}</span>
+                </h3>
+                <div className="rounded-lg border bg-background p-4 flex items-center justify-center min-h-[200px]">
+                  <div
+                    dangerouslySetInnerHTML={{ __html: selectedItem.content }}
+                    className="max-w-full max-h-[300px] svg-preview"
+                  />
+                </div>
+                <ul className="mt-2 text-[11px] text-muted-foreground space-y-1">
+                  <li className="flex justify-between gap-2">
+                    <span className="opacity-80">{t('svgConverter.preview.fileSize')}</span>
+                    <span className="font-medium text-foreground">{formatBytes(selectedItem.file.size)}</span>
+                  </li>
+                  <li className="flex justify-between gap-2">
+                    <span className="opacity-80">{t('svgConverter.preview.originalSize')}</span>
+                    <span className="font-medium text-foreground">
+                      {selectedItem.originalWidth} × {selectedItem.originalHeight}
+                    </span>
+                  </li>
+                </ul>
               </div>
-              <ul className="mt-2 text-[11px] text-muted-foreground space-y-1">
-                <li className="flex justify-between gap-2">
-                  <span className="opacity-80">文件大小：</span>
-                  <span className="font-medium text-foreground">{formatBytes(selectedItem.file.size)}</span>
-                </li>
-                <li className="flex justify-between gap-2">
-                  <span className="opacity-80">原始尺寸：</span>
-                  <span className="font-medium text-foreground">
-                    {selectedItem.originalWidth} × {selectedItem.originalHeight}
-                  </span>
-                </li>
-              </ul>
-            </div>
 
             {/* 转换后图片 */}
             <div className="rounded-lg border bg-muted/40 p-3 sm:p-4">
               <h3 className="text-sm font-medium mb-2 flex items-center justify-between">
-                <span>转换后图片</span>
+                <span>{t('svgConverter.preview.converted')}</span>
                 {selectedItem.result?.status === 'loading' ? (
-                  <span className="text-[11px] text-blue-600 dark:text-blue-400 animate-pulse">正在转换...</span>
+                  <span className="text-[11px] text-blue-600 dark:text-blue-400 animate-pulse">
+                    {t('svgConverter.preview.converting')}
+                  </span>
                 ) : selectedItem.result?.status === 'success' ? (
                   <span className="text-[11px] text-muted-foreground">
                     {formatBytes(selectedItem.result?.blob?.size)}
                   </span>
                 ) : selectedItem.result?.status === 'error' ? (
-                  <span className="text-[11px] text-red-600 dark:text-red-400">转换失败</span>
+                  <span className="text-[11px] text-red-600 dark:text-red-400">
+                    {t('svgConverter.preview.convertFailed')}
+                  </span>
                 ) : null}
               </h3>
               <div className="rounded-lg border bg-background p-4 flex items-center justify-center h-[268px]">
                 {selectedItem.result?.status === 'success' ? (
                   <img
                     src={selectedItem.result.url}
-                    alt="转换后预览"
+                    alt={t('svgConverter.preview.convertedAlt')}
                     className="max-w-full max-h-full object-contain"
                   />
                 ) : selectedItem.result?.status === 'loading' ? (
-                  <span className="text-sm text-muted-foreground">正在转换...</span>
+                  <span className="text-sm text-muted-foreground">{t('svgConverter.preview.converting')}</span>
                 ) : selectedItem.result?.status === 'error' ? (
                   <div className="text-center">
-                    <span className="text-sm text-red-600 dark:text-red-400 block mb-1">转换失败</span>
+                    <span className="text-sm text-red-600 dark:text-red-400 block mb-1">
+                      {t('svgConverter.preview.convertFailed')}
+                    </span>
                     <span className="text-xs text-muted-foreground">{selectedItem.result.error}</span>
                   </div>
                 ) : (
-                  <span className="text-sm text-muted-foreground">等待转换...</span>
+                  <span className="text-sm text-muted-foreground">{t('svgConverter.preview.waiting')}</span>
                 )}
               </div>
               <ul className="mt-2 text-[11px] text-muted-foreground space-y-1">
                 <li className="flex justify-between gap-2">
-                  <span className="opacity-80">文件大小：</span>
+                  <span className="opacity-80">{t('svgConverter.preview.fileSize')}</span>
                   <span className="font-medium text-foreground">
                     {selectedItem.result?.status === 'success' && selectedItem.result.blob
                       ? formatBytes(selectedItem.result.blob.size)
@@ -480,13 +506,13 @@ function SvgConverterPage() {
                   </span>
                 </li>
                 <li className="flex justify-between gap-2">
-                  <span className="opacity-80">导出尺寸：</span>
+                  <span className="opacity-80">{t('svgConverter.preview.exportSize')}</span>
                   <span className="font-medium text-foreground">
                     {displayParams.width} × {displayParams.height}
                   </span>
                 </li>
                 <li className="flex justify-between gap-2">
-                  <span className="opacity-80">输出格式：</span>
+                  <span className="opacity-80">{t('svgConverter.preview.outputFormat')}</span>
                   <span className="font-medium text-foreground">
                     {displayParams.format === 'image/png'
                       ? 'PNG'
@@ -503,18 +529,20 @@ function SvgConverterPage() {
 
       {/* 操作 & 使用说明 */}
       <Card className="shadow-sm p-4 lg:p-5">
-        <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">操作 & 使用说明</h2>
+        <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">
+          {t('svgConverter.sections.actions')}
+        </h2>
         <div className="mt-3 flex flex-col gap-3">
           <div className="flex flex-wrap gap-2">
             <Button type="button" disabled={!stats.hasConvertedFiles} onClick={downloadAllFiles} variant="default">
-              批量下载（{stats.successCount} 个文件）
+              {t('svgConverter.actions.downloadAll', { count: stats.successCount })}
             </Button>
             <Button type="button" disabled={items.length === 0} onClick={() => convertAll()} variant="outline">
               <RefreshCw className="w-3 h-3 mr-1" />
-              重新转换
+              {t('svgConverter.actions.reconvert')}
             </Button>
             <Button type="button" onClick={clearAll} variant="outline">
-              清空并重新上传
+              {t('svgConverter.actions.clearAndReupload')}
             </Button>
           </div>
 
@@ -523,19 +551,19 @@ function SvgConverterPage() {
             <div className="rounded-lg border bg-muted/40 px-3 py-2">
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div>
-                  <span className="text-muted-foreground">总文件数：</span>
-                  <span className="font-medium">{items.length} 个</span>
+                  <span className="text-muted-foreground">{t('svgConverter.stats.totalFiles')}</span>
+                  <span className="font-medium">{t('svgConverter.stats.fileCount', { count: items.length })}</span>
                 </div>
                 <div>
-                  <span className="text-muted-foreground">原始总大小：</span>
+                  <span className="text-muted-foreground">{t('svgConverter.stats.originalSize')}</span>
                   <span className="font-medium">{formatBytes(stats.totalOriginalSize)}</span>
                 </div>
                 <div>
-                  <span className="text-muted-foreground">已转换：</span>
-                  <span className="font-medium">{stats.successCount} 个</span>
+                  <span className="text-muted-foreground">{t('svgConverter.stats.converted')}</span>
+                  <span className="font-medium">{t('svgConverter.stats.fileCount', { count: stats.successCount })}</span>
                 </div>
                 <div>
-                  <span className="text-muted-foreground">转换后总大小：</span>
+                  <span className="text-muted-foreground">{t('svgConverter.stats.convertedSize')}</span>
                   <span className="font-medium">{formatBytes(stats.totalConvertedSize)}</span>
                 </div>
               </div>
@@ -543,15 +571,15 @@ function SvgConverterPage() {
           )}
 
           <div className="mt-2 border-t border-border pt-3">
-            <h3 className="text-xs font-semibold mb-2">使用说明与注意事项</h3>
+            <h3 className="text-xs font-semibold mb-2">{t('svgConverter.guide.title')}</h3>
             <ul className="list-disc pl-4 text-[11px] text-muted-foreground space-y-1">
-              <li>支持批量上传多个 SVG 文件，默认统一参数应用到所有文件。</li>
-              <li>点击"独立参数"按钮可为每个文件单独设置转换参数。</li>
-              <li>点击文件列表中的文件可切换预览对象。</li>
-              <li>PNG 格式支持透明背景，适合带透明效果的图标和图形。</li>
-              <li>JPEG 格式体积最小但不支持透明，适合照片类图片。</li>
-              <li>WebP 格式兼顾小体积与透明背景，浏览器兼容性较好。</li>
-              <li>复杂 SVG（外部字体、滤镜、动画）可能导出效果不佳，建议简化后再转换。</li>
+              <li>{t('svgConverter.guide.tip1')}</li>
+              <li>{t('svgConverter.guide.tip2')}</li>
+              <li>{t('svgConverter.guide.tip3')}</li>
+              <li>{t('svgConverter.guide.tip4')}</li>
+              <li>{t('svgConverter.guide.tip5')}</li>
+              <li>{t('svgConverter.guide.tip6')}</li>
+              <li>{t('svgConverter.guide.tip7')}</li>
             </ul>
           </div>
         </div>

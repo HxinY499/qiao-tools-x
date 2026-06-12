@@ -22,6 +22,7 @@ import {
   ZoomOut,
 } from 'lucide-react';
 import { startTransition, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
 import { ResizablePanels } from '@/components/resizable-panels';
@@ -69,6 +70,7 @@ function clampZoom(next: number) {
 }
 
 export default function MarkdownEditorPage() {
+  const { t } = useTranslation('tools');
   // 使用 selector 细粒度订阅，避免无关字段变化触发重渲染
   const content = useMarkdownEditorStore((s) => s.content);
   const previewTheme = useMarkdownEditorStore((s) => s.previewTheme);
@@ -117,7 +119,7 @@ export default function MarkdownEditorPage() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [tocOpen, setTocOpen] = useState(false);
   const [tocPinned, setTocPinned] = useState(false);
-  const [htmlContent, setHtmlContent] = useState('<p><em>开始输入以查看预览...</em></p>');
+  const [htmlContent, setHtmlContent] = useState(`<p><em>${t('markdownEditor.placeholder.preview')}</em></p>`);
   const [readingProgress, setReadingProgress] = useState(0);
 
   useEffect(() => {
@@ -299,10 +301,10 @@ export default function MarkdownEditorPage() {
       } else {
         setContent(text);
       }
-      toast.success(`已导入 ${file.name}`);
+      toast.success(t('markdownEditor.toast.importSuccess', { name: file.name }));
     };
     reader.onerror = () => {
-      toast.error('读取文件失败');
+      toast.error(t('markdownEditor.toast.importFailed'));
     };
     reader.readAsText(file);
 
@@ -312,64 +314,64 @@ export default function MarkdownEditorPage() {
   // 导出处理函数
   const handleExportMd = () => {
     if (!content) {
-      toast.error('没有内容可导出');
+      toast.error(t('markdownEditor.toast.noContent'));
       return;
     }
     exportToMarkdown(content);
-    toast.success('已导出 Markdown 文件');
+    toast.success(t('markdownEditor.toast.exportMd'));
   };
 
   const handleExportHtml = () => {
     if (!content) {
-      toast.error('没有内容可导出');
+      toast.error(t('markdownEditor.toast.noContent'));
       return;
     }
     exportToHtml(htmlContent, themeStyle);
-    toast.success('已导出 HTML 文件');
+    toast.success(t('markdownEditor.toast.exportHtml'));
   };
 
   const handleExportPdf = async () => {
     if (!previewRef.current || !content) {
-      toast.error('没有内容可导出');
+      toast.error(t('markdownEditor.toast.noContent'));
       return;
     }
-    toast.info('正在生成 PDF...');
+    toast.info(t('markdownEditor.toast.generatingPdf'));
     try {
       await exportToPdf(previewRef.current, isDarkTheme);
-      toast.success('已导出 PDF 文件');
+      toast.success(t('markdownEditor.toast.exportPdf'));
     } catch (err) {
       console.error(err);
-      toast.error('PDF 导出失败');
+      toast.error(t('markdownEditor.toast.exportPdfFailed'));
     }
   };
 
   const handleExportDocx = async () => {
     if (!content) {
-      toast.error('没有内容可导出');
+      toast.error(t('markdownEditor.toast.noContent'));
       return;
     }
-    toast.info('正在生成 Word 文档...');
+    toast.info(t('markdownEditor.toast.generatingDocx'));
     try {
       await exportToDocx(content);
-      toast.success('已导出 Word 文件');
+      toast.success(t('markdownEditor.toast.exportDocx'));
     } catch (err) {
       console.error(err);
-      toast.error('Word 导出失败');
+      toast.error(t('markdownEditor.toast.exportDocxFailed'));
     }
   };
 
   const handleExportImage = async () => {
     if (!previewRef.current || !content) {
-      toast.error('没有内容可导出');
+      toast.error(t('markdownEditor.toast.noContent'));
       return;
     }
-    toast.info('正在生成图片...');
+    toast.info(t('markdownEditor.toast.generatingImage'));
     try {
       await exportToImage(previewRef.current, isDarkTheme);
-      toast.success('已导出图片');
+      toast.success(t('markdownEditor.toast.exportImage'));
     } catch (err) {
       console.error(err);
-      toast.error('图片导出失败');
+      toast.error(t('markdownEditor.toast.exportImageFailed'));
     }
   };
 
@@ -395,10 +397,10 @@ export default function MarkdownEditorPage() {
               <TooltipTrigger asChild>
                 <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
                   <Import className="h-4 w-4 mr-2" />
-                  导入
+                  {t('markdownEditor.menu.import')}
                 </DropdownMenuItem>
               </TooltipTrigger>
-              <TooltipContent side="left">支持 .md .html .txt</TooltipContent>
+              <TooltipContent side="left">{t('markdownEditor.menu.importSupport')}</TooltipContent>
             </Tooltip>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -408,7 +410,7 @@ export default function MarkdownEditorPage() {
           ref={textareaRef}
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          placeholder="在此输入 Markdown..."
+          placeholder={t('markdownEditor.placeholder.editor')}
           className="h-full w-full font-mono !text-xs resize-none p-4 leading-relaxed custom-scrollbar rounded-none border-0 focus-visible:ring-0"
           spellCheck={false}
         />
@@ -439,8 +441,7 @@ export default function MarkdownEditorPage() {
                   <ChevronUp className="h-3.5 w-3.5" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>隐藏工具栏</TooltipContent>
-            </Tooltip>
+              <TooltipContent>{t('markdownEditor.preview.hideToolbar')}</TooltipContent>            </Tooltip>
           )}
           {/* 设置下拉菜单 - 多级结构 */}
           <DropdownMenu>
@@ -452,35 +453,35 @@ export default function MarkdownEditorPage() {
                   </Button>
                 </DropdownMenuTrigger>
               </TooltipTrigger>
-              <TooltipContent>设置与导出</TooltipContent>
+              <TooltipContent>{t('markdownEditor.preview.settingsAndExport')}</TooltipContent>
             </Tooltip>
             <DropdownMenuContent align="end" className="w-48">
               {/* 导出子菜单 */}
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger>
                   <Download className="h-4 w-4 mr-2" />
-                  <span>导出</span>
+                  <span>{t('markdownEditor.menu.export')}</span>
                 </DropdownMenuSubTrigger>
                 <DropdownMenuSubContent>
                   <DropdownMenuItem onClick={handleExportMd} disabled={!content}>
                     <Download className="h-4 w-4 mr-2" />
-                    导出 Markdown
+                    {t('markdownEditor.menu.exportMd')}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleExportHtml} disabled={!content}>
                     <Globe className="h-4 w-4 mr-2" />
-                    导出 HTML
+                    {t('markdownEditor.menu.exportHtml')}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleExportPdf} disabled={!content}>
                     <FileText className="h-4 w-4 mr-2" />
-                    导出 PDF
+                    {t('markdownEditor.menu.exportPdf')}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleExportDocx} disabled={!content}>
                     <FileText className="h-4 w-4 mr-2" />
-                    导出 Word
+                    {t('markdownEditor.menu.exportDocx')}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleExportImage} disabled={!content}>
                     <Image className="h-4 w-4 mr-2" />
-                    导出图片
+                    {t('markdownEditor.menu.exportImage')}
                   </DropdownMenuItem>
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
@@ -489,7 +490,7 @@ export default function MarkdownEditorPage() {
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger>
                   <Palette className="h-4 w-4 mr-2" />
-                  <span>预览主题</span>
+                  <span>{t('markdownEditor.menu.previewTheme')}</span>
                 </DropdownMenuSubTrigger>
                 <DropdownMenuSubContent>
                   {(() => {
@@ -499,7 +500,7 @@ export default function MarkdownEditorPage() {
                         {/* 亮色主题 */}
                         {light.length > 0 && (
                           <>
-                            <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">亮色主题</div>
+                            <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">{t('markdownEditor.theme.light')}</div>
                             {light.map((theme) => (
                               <DropdownMenuItem
                                 key={theme.name}
@@ -516,7 +517,7 @@ export default function MarkdownEditorPage() {
                         {dark.length > 0 && (
                           <>
                             <DropdownMenuSeparator />
-                            <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">暗色主题</div>
+                            <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">{t('markdownEditor.theme.dark')}</div>
                             {dark.map((theme) => (
                               <DropdownMenuItem
                                 key={theme.name}
@@ -541,7 +542,7 @@ export default function MarkdownEditorPage() {
               <DropdownMenuItem onClick={() => setShowProgressBar(!showProgressBar)} className="cursor-pointer">
                 <div className="flex items-center space-x-2 w-full">
                   <Checkbox checked={showProgressBar} onChange={() => {}} className="pointer-events-none" />
-                  <span>显示阅读进度条</span>
+                  <span>{t('markdownEditor.menu.showProgressBar')}</span>
                 </div>
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -561,7 +562,7 @@ export default function MarkdownEditorPage() {
                   <ZoomOut className="h-3.5 w-3.5" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>缩小</TooltipContent>
+              <TooltipContent>{t('markdownEditor.preview.zoomOut')}</TooltipContent>
             </Tooltip>
 
             <Popover>
@@ -574,14 +575,14 @@ export default function MarkdownEditorPage() {
                     </Button>
                   </PopoverTrigger>
                 </TooltipTrigger>
-                <TooltipContent>缩放</TooltipContent>
+                <TooltipContent>{t('markdownEditor.preview.zoom')}</TooltipContent>
               </Tooltip>
               <PopoverContent align="end" className="w-72 p-3">
                 <div className="flex items-center justify-between">
-                  <div className="text-xs font-medium">缩放</div>
+                  <div className="text-xs font-medium">{t('markdownEditor.preview.zoom')}</div>
                   <Button variant="ghost" size="sm" className="h-7 px-2 text-xs" onClick={handleZoomReset}>
                     <RotateCcw className="h-3.5 w-3.5 mr-1" />
-                    重置
+                    {t('markdownEditor.preview.zoomReset')}
                   </Button>
                 </div>
                 <div className="mt-3">
@@ -626,7 +627,7 @@ export default function MarkdownEditorPage() {
                   <ZoomIn className="h-3.5 w-3.5" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>放大</TooltipContent>
+              <TooltipContent>{t('markdownEditor.preview.zoomIn')}</TooltipContent>
             </Tooltip>
           </div>
           <Popover open={tocOpen} onOpenChange={(open) => !tocPinned && setTocOpen(open)}>
@@ -651,7 +652,7 @@ export default function MarkdownEditorPage() {
                   </Button>
                 </PopoverTrigger>
               </TooltipTrigger>
-              <TooltipContent>目录大纲</TooltipContent>
+              <TooltipContent>{t('markdownEditor.preview.toc')}</TooltipContent>
             </Tooltip>
             <PopoverContent align="end" className="w-64 p-0 max-h-[calc(100vh-8rem)] overflow-hidden flex flex-col">
               <Toc htmlContent={htmlContent} previewRef={previewRef} pinned={tocPinned} onPinChange={setTocPinned} />
@@ -675,7 +676,7 @@ export default function MarkdownEditorPage() {
                 {isFullscreen ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
               </Button>
             </TooltipTrigger>
-            <TooltipContent>{isFullscreen ? '退出全屏 (ESC)' : '全屏预览'}</TooltipContent>
+            <TooltipContent>{isFullscreen ? t('markdownEditor.preview.exitFullscreen') : t('markdownEditor.preview.fullscreen')}</TooltipContent>
           </Tooltip>
         </header>
       </div>
@@ -699,7 +700,7 @@ export default function MarkdownEditorPage() {
               <PanelTop className="h-4 w-4" />
             </Button>
           </TooltipTrigger>
-          <TooltipContent>显示工具栏</TooltipContent>
+          <TooltipContent>{t('markdownEditor.preview.showToolbar')}</TooltipContent>
         </Tooltip>
       </div>
       {showProgressBar && (

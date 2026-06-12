@@ -39,13 +39,13 @@ export function generateMarkdownTable(config: TableConfig): string {
 /**
  * 创建默认表格配置
  */
-export function createDefaultTableConfig(rows: number, cols: number): TableConfig {
+export function createDefaultTableConfig(rows: number, cols: number, headerPrefix = '标题'): TableConfig {
   return {
     rows,
     cols,
     headers: Array(cols)
       .fill('')
-      .map((_, i) => `标题 ${i + 1}`),
+      .map((_, i) => `${headerPrefix} ${i + 1}`),
     data: Array(rows)
       .fill(null)
       .map(() => Array(cols).fill('')),

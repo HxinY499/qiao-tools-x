@@ -1,0 +1,22 @@
+{
+  "themeTip": "Theme: {{label}} (click to switch)",
+  "themeAria": "Switch theme (current: {{label}})",
+  "themes": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "dataSafety": {
+    "trigger": "Data safety",
+    "title": "Data safety",
+    "para1": "This site never stores your data on any backend. Everything is kept in your browser (LocalStorage, IndexedDB, etc.), so there's no risk of data leakage.",
+    "para2": "Pinned tools are also stored locally — switching browsers or clearing cache will lose them."
+  },
+  "loading": [
+    "Getting the toolbox ready for you, hang tight…",
+    "Heavy-duty tool loading ahead — take a breath…",
+    "Tightening every screw, almost there…",
+    "One moment, dialing in all the parameters…",
+    "Loading… inspiration approaching, hold on…"
+  ]
+}

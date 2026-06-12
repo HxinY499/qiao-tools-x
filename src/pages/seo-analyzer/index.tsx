@@ -1,5 +1,6 @@
 import { Clock, Code2, FileUp, Globe, Loader2, Search, X } from 'lucide-react';
 import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { FileDragUploader } from '@/components/file-drag-uploader';
 import { Button } from '@/components/ui/button';
@@ -18,6 +19,7 @@ import type { FetchHtmlResponse, InputSource, SeoAnalysisResult } from './types'
 import { analyzeHtml } from './utils';
 
 function SeoAnalyzerPage() {
+  const { t } = useTranslation('tools');
   const [inputSource, setInputSource] = useState<InputSource>('url');
   const [protocol, setProtocol] = useState<'https://' | 'http://'>('https://');
   const [url, setUrl] = useState('');
@@ -35,7 +37,7 @@ function SeoAnalyzerPage() {
   // 通过 URL 抓取
   const fetchFromUrl = useCallback(async () => {
     if (!url.trim()) {
-      setError('请输入网址');
+      setError(t('seoAnalyzer.errors.emptyUrl'));
       return;
     }
 
@@ -50,12 +52,12 @@ function SeoAnalyzerPage() {
       const data: FetchHtmlResponse = await response.json();
 
       if (!data.success) {
-        setError(data.error || '抓取失败');
+        setError(data.error || t('seoAnalyzer.errors.fetchFailed'));
         return;
       }
 
       if (!data.html) {
-        setError('未获取到 HTML 内容');
+        setError(t('seoAnalyzer.errors.noHtml'));
         return;
       }
 
@@ -67,7 +69,7 @@ function SeoAnalyzerPage() {
       // 添加到历史记录
       addUrlToHistory(targetUrl);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '请求失败');
+      setError(err instanceof Error ? err.message : t('seoAnalyzer.errors.requestFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -76,7 +78,7 @@ function SeoAnalyzerPage() {
   // 分析粘贴的 HTML 代码
   const analyzeCode = useCallback(() => {
     if (!htmlCode.trim()) {
-      setError('请输入 HTML 代码');
+      setError(t('seoAnalyzer.errors.emptyCode'));
       return;
     }
 
@@ -88,7 +90,7 @@ function SeoAnalyzerPage() {
   // 文件读取完成后分析（读取交由 FileDragUploader 内置能力）
   const handleFileRead = useCallback((content: string | ArrayBuffer | null) => {
     if (typeof content !== 'string' || !content) {
-      setError('文件内容为空或读取失败');
+      setError(t('seoAnalyzer.errors.emptyFile'));
       setIsLoading(false);
       return;
     }
@@ -136,15 +138,15 @@ function SeoAnalyzerPage() {
               <TabsList className="h-8">
                 <TabsTrigger value="url" className="gap-1.5 px-3 text-xs">
                   <Globe className="h-3.5 w-3.5" />
-                  网址
+                  {t('seoAnalyzer.inputTabs.url')}
                 </TabsTrigger>
                 <TabsTrigger value="code" className="gap-1.5 px-3 text-xs">
                   <Code2 className="h-3.5 w-3.5" />
-                  代码
+                  {t('seoAnalyzer.inputTabs.code')}
                 </TabsTrigger>
                 <TabsTrigger value="file" className="gap-1.5 px-3 text-xs">
                   <FileUp className="h-3.5 w-3.5" />
-                  文件
+                  {t('seoAnalyzer.inputTabs.file')}
                 </TabsTrigger>
               </TabsList>
             </Tabs>
@@ -170,7 +172,7 @@ function SeoAnalyzerPage() {
                 )}
                 <div className="relative flex-1">
                   <Input
-                    placeholder={urlHasProtocol ? '输入完整网址' : 'example.com/page'}
+                    placeholder={urlHasProtocol ? t('seoAnalyzer.urlInput.placeholderFull') : 'example.com/page'}
                     value={url}
                     onChange={(e) => setUrl(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleAnalyze()}
@@ -191,7 +193,9 @@ function SeoAnalyzerPage() {
                       </PopoverTrigger>
                       <PopoverContent className="w-[400px] p-0" align="end">
                         <div className="border-b px-3 py-2">
-                          <span className="text-xs font-medium text-muted-foreground">历史记录</span>
+                          <span className="text-xs font-medium text-muted-foreground">
+                            {t('seoAnalyzer.urlInput.history')}
+                          </span>
                         </div>
                         <ScrollArea className="max-h-[300px]">
                           <div className="p-1">
@@ -221,11 +225,11 @@ function SeoAnalyzerPage() {
                 </div>
                 <Button onClick={handleAnalyze} disabled={isLoading || !url.trim()} size="sm" className="h-9 gap-1.5">
                   {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
-                  <span className="hidden sm:inline">分析</span>
+                  <span className="hidden sm:inline">{t('seoAnalyzer.actions.analyze')}</span>
                 </Button>
               </div>
               <p className="text-[11px] text-muted-foreground">
-                输入网页地址进行 SEO 分析。部分网站可能因反爬虫机制无法抓取。
+                {t('seoAnalyzer.urlInput.hint')}
               </p>
             </div>
           )}
@@ -233,7 +237,7 @@ function SeoAnalyzerPage() {
           {inputSource === 'code' && (
             <div className="space-y-3">
               <Textarea
-                placeholder="粘贴 HTML 代码..."
+                placeholder={t('seoAnalyzer.codeInput.placeholder')}
                 value={htmlCode}
                 onChange={(e) => setHtmlCode(e.target.value)}
                 onKeyDown={(e) => {
@@ -246,7 +250,7 @@ function SeoAnalyzerPage() {
                 className="min-h-[240px] font-mono text-xs"
               />
               <div className="flex items-center justify-between">
-                <p className="text-[11px] text-muted-foreground">粘贴完整的 HTML 代码进行分析（⌘/Ctrl + Enter 快捷分析）</p>
+                <p className="text-[11px] text-muted-foreground">{t('seoAnalyzer.codeInput.hint')}</p>
                 <Button
                   onClick={handleAnalyze}
                   disabled={isLoading || !htmlCode.trim()}
@@ -254,7 +258,7 @@ function SeoAnalyzerPage() {
                   className="h-8 gap-1.5"
                 >
                   <Search className="h-3.5 w-3.5" />
-                  分析
+                  {t('seoAnalyzer.actions.analyze')}
                 </Button>
               </div>
             </div>
@@ -276,9 +280,9 @@ function SeoAnalyzerPage() {
               readAs="text"
               onFileRead={handleFileRead}
               icon={<FileUp className="h-8 w-8 text-muted-foreground/40" />}
-              title="点击选择或拖放 HTML 文件"
-              hint="支持 .html 和 .htm 文件，单个文件不超过 2MB"
-              buttonText="选择文件"
+              title={t('seoAnalyzer.fileInput.title')}
+              hint={t('seoAnalyzer.fileInput.hint')}
+              buttonText={t('seoAnalyzer.fileInput.button')}
               className="min-h-[200px]"
             />
           )}

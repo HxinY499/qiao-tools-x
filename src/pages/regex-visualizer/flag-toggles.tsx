@@ -2,9 +2,10 @@
  * 正则 Flag 切换组件
  */
 
+import { useTranslation } from 'react-i18next';
+
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
-import { FLAG_EXPLANATIONS } from './constants';
 import type { RegexFlags } from './types';
 
 interface FlagTogglesProps {
@@ -22,11 +23,12 @@ const FLAG_KEYS: { key: keyof RegexFlags; char: string }[] = [
 ];
 
 export function FlagToggles({ flags, onToggle }: FlagTogglesProps) {
+  const { t } = useTranslation('tools');
+
   return (
     <TooltipProvider delayDuration={200}>
       <div className="flex items-center gap-1">
         {FLAG_KEYS.map(({ key, char }) => {
-          const info = FLAG_EXPLANATIONS[char];
           const isPressed = flags[key];
 
           return (
@@ -45,8 +47,8 @@ export function FlagToggles({ flags, onToggle }: FlagTogglesProps) {
                 </button>
               </TooltipTrigger>
               <TooltipContent side="bottom" className="max-w-xs">
-                <p className="font-medium">{info.label}</p>
-                <p className="text-xs text-muted-foreground">{info.description}</p>
+                <p className="font-medium">{t(`regexVisualizer.flag.${char}.label`)}</p>
+                <p className="text-xs text-muted-foreground">{t(`regexVisualizer.flag.${char}.description`)}</p>
               </TooltipContent>
             </Tooltip>
           );

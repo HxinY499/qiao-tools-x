@@ -60,8 +60,8 @@ export const COMMAND_GROUPS: CommandGroup[] = [
       {
         id: 'heading',
         icon: Heading,
-        label: '标题',
-        description: '插入标题',
+        label: 'markdownEditor.toolbar.heading',
+        description: 'markdownEditor.toolbar.headingDesc',
         keywords: ['heading', 'title', '标题', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
         isHeading: true,
       },
@@ -72,24 +72,24 @@ export const COMMAND_GROUPS: CommandGroup[] = [
       {
         id: 'bold',
         icon: Bold,
-        label: '粗体',
-        description: '加粗文字',
+        label: 'markdownEditor.toolbar.bold',
+        description: 'markdownEditor.toolbar.boldDesc',
         keywords: ['bold', 'strong', '加粗'],
         shortcut: { key: 'b', ctrl: true },
       },
       {
         id: 'italic',
         icon: Italic,
-        label: '斜体',
-        description: '倾斜文字',
+        label: 'markdownEditor.toolbar.italic',
+        description: 'markdownEditor.toolbar.italicDesc',
         keywords: ['italic', 'em', '斜体'],
         shortcut: { key: 'i', ctrl: true },
       },
       {
         id: 'strikethrough',
         icon: Strikethrough,
-        label: '删除线',
-        description: '划掉文字',
+        label: 'markdownEditor.toolbar.strikethrough',
+        description: 'markdownEditor.toolbar.strikethroughDesc',
         keywords: ['strikethrough', 'del', '删除'],
         shortcut: { key: 's', ctrl: true, shift: true },
       },
@@ -100,16 +100,16 @@ export const COMMAND_GROUPS: CommandGroup[] = [
       {
         id: 'inlineCode',
         icon: Code,
-        label: '行内代码',
-        description: '内联代码',
+        label: 'markdownEditor.toolbar.inlineCode',
+        description: 'markdownEditor.toolbar.inlineCodeDesc',
         keywords: ['code', 'inline', '代码'],
         shortcut: { key: 'e', ctrl: true },
       },
       {
         id: 'codeBlock',
         icon: Code,
-        label: '代码块',
-        description: '多行代码',
+        label: 'markdownEditor.toolbar.codeBlock',
+        description: 'markdownEditor.toolbar.codeBlockDesc',
         keywords: ['code', 'block', '代码块'],
         isText: true,
         text: '</>',
@@ -122,16 +122,16 @@ export const COMMAND_GROUPS: CommandGroup[] = [
       {
         id: 'link',
         icon: Link,
-        label: '链接',
-        description: '插入链接',
+        label: 'markdownEditor.toolbar.link',
+        description: 'markdownEditor.toolbar.linkDesc',
         keywords: ['link', 'url', '链接'],
         shortcut: { key: 'k', ctrl: true },
       },
       {
         id: 'image',
         icon: Image,
-        label: '图片',
-        description: '插入图片',
+        label: 'markdownEditor.toolbar.image',
+        description: 'markdownEditor.toolbar.imageDesc',
         keywords: ['image', 'img', '图片'],
         shortcut: { key: 'i', ctrl: true, shift: true },
       },
@@ -142,40 +142,40 @@ export const COMMAND_GROUPS: CommandGroup[] = [
       {
         id: 'ul',
         icon: List,
-        label: '无序列表',
-        description: '项目符号列表',
+        label: 'markdownEditor.toolbar.ul',
+        description: 'markdownEditor.toolbar.ulDesc',
         keywords: ['list', 'ul', '列表', '无序'],
         shortcut: { key: 'u', ctrl: true },
       },
       {
         id: 'ol',
         icon: ListOrdered,
-        label: '有序列表',
-        description: '数字编号列表',
+        label: 'markdownEditor.toolbar.ol',
+        description: 'markdownEditor.toolbar.olDesc',
         keywords: ['list', 'ol', 'ordered', '列表', '有序'],
         shortcut: { key: 'o', ctrl: true, shift: true },
       },
       {
         id: 'quote',
         icon: Quote,
-        label: '引用',
-        description: '引用块',
+        label: 'markdownEditor.toolbar.quote',
+        description: 'markdownEditor.toolbar.quoteDesc',
         keywords: ['quote', 'blockquote', '引用'],
         shortcut: { key: 'q', ctrl: true, shift: true },
       },
       {
         id: 'taskUnchecked',
         icon: Square,
-        label: '任务列表',
-        description: '未完成任务',
+        label: 'markdownEditor.toolbar.taskUnchecked',
+        description: 'markdownEditor.toolbar.taskUncheckedDesc',
         keywords: ['task', 'todo', 'checkbox', '任务', '待办'],
         shortcut: { key: 'x', ctrl: true, shift: true },
       },
       {
         id: 'taskChecked',
         icon: CheckSquare,
-        label: '已完成任务',
-        description: '已完成任务',
+        label: 'markdownEditor.toolbar.taskChecked',
+        description: 'markdownEditor.toolbar.taskCheckedDesc',
         keywords: ['task', 'done', 'checked', '任务', '完成'],
       },
     ],
@@ -185,16 +185,16 @@ export const COMMAND_GROUPS: CommandGroup[] = [
       {
         id: 'inlineMath',
         icon: Sigma,
-        label: '行内公式',
-        description: '行内数学公式',
+        label: 'markdownEditor.toolbar.inlineMath',
+        description: 'markdownEditor.toolbar.inlineMathDesc',
         keywords: ['math', 'latex', 'katex', '公式', '数学'],
         shortcut: { key: 'm', ctrl: true },
       },
       {
         id: 'blockMath',
         icon: Sigma,
-        label: '公式块',
-        description: '块级数学公式',
+        label: 'markdownEditor.toolbar.blockMath',
+        description: 'markdownEditor.toolbar.blockMathDesc',
         keywords: ['math', 'latex', 'katex', '公式', '数学'],
         isText: true,
         text: '∑',
@@ -204,27 +204,27 @@ export const COMMAND_GROUPS: CommandGroup[] = [
   },
   {
     items: [
-      { id: 'table', icon: Table, label: '表格', description: '插入表格', keywords: ['table', '表格'], isTable: true },
+      { id: 'table', icon: Table, label: 'markdownEditor.toolbar.table', description: 'markdownEditor.toolbar.tableDesc', keywords: ['table', '表格'], isTable: true },
       {
         id: 'hr',
         icon: Minus,
-        label: '分隔线',
-        description: '水平分隔线',
+        label: 'markdownEditor.toolbar.hr',
+        description: 'markdownEditor.toolbar.hrDesc',
         keywords: ['hr', 'horizontal', 'divider', '分隔', '横线'],
         shortcut: { key: '-', ctrl: true, shift: true },
       },
       {
         id: 'toc',
         icon: ListTree,
-        label: '目录',
-        description: '生成文档目录',
+        label: 'markdownEditor.toolbar.toc',
+        description: 'markdownEditor.toolbar.tocDesc',
         keywords: ['toc', 'table of contents', '目录'],
       },
       {
         id: 'chart',
         icon: Workflow,
-        label: '图表',
-        description: '插入 Mermaid 图表',
+        label: 'markdownEditor.toolbar.chart',
+        description: 'markdownEditor.toolbar.chartDesc',
         keywords: ['chart', 'mermaid', 'diagram', '图表', '流程图'],
         isChart: true,
       },
@@ -249,12 +249,12 @@ export const DEFAULT_TABLE = `| 标题 1 | 标题 2 | 标题 3 |
 
 // 标题级别命令
 export const HEADING_ITEMS: CommandItem[] = [
-  { id: 'h1', icon: Heading1, label: '一级标题', shortcut: { key: '1', ctrl: true } },
-  { id: 'h2', icon: Heading2, label: '二级标题', shortcut: { key: '2', ctrl: true } },
-  { id: 'h3', icon: Heading3, label: '三级标题', shortcut: { key: '3', ctrl: true } },
-  { id: 'h4', icon: Heading4, label: '四级标题', shortcut: { key: '4', ctrl: true } },
-  { id: 'h5', icon: Heading5, label: '五级标题', shortcut: { key: '5', ctrl: true } },
-  { id: 'h6', icon: Heading6, label: '六级标题', shortcut: { key: '6', ctrl: true } },
+  { id: 'h1', icon: Heading1, label: 'markdownEditor.toolbar.h1', shortcut: { key: '1', ctrl: true } },
+  { id: 'h2', icon: Heading2, label: 'markdownEditor.toolbar.h2', shortcut: { key: '2', ctrl: true } },
+  { id: 'h3', icon: Heading3, label: 'markdownEditor.toolbar.h3', shortcut: { key: '3', ctrl: true } },
+  { id: 'h4', icon: Heading4, label: 'markdownEditor.toolbar.h4', shortcut: { key: '4', ctrl: true } },
+  { id: 'h5', icon: Heading5, label: 'markdownEditor.toolbar.h5', shortcut: { key: '5', ctrl: true } },
+  { id: 'h6', icon: Heading6, label: 'markdownEditor.toolbar.h6', shortcut: { key: '6', ctrl: true } },
 ];
 
 // Mermaid 图表模板
@@ -269,7 +269,7 @@ export const CHART_TEMPLATES: ChartTemplate[] = [
   {
     id: 'flowchart',
     icon: Workflow,
-    label: '流程图',
+    label: 'markdownEditor.chart.flowchart',
     template: `\`\`\`mermaid
 flowchart TD
     A[开始] --> B{判断条件}
@@ -282,7 +282,7 @@ flowchart TD
   {
     id: 'sequence',
     icon: GitBranch,
-    label: '时序图',
+    label: 'markdownEditor.chart.sequence',
     template: `\`\`\`mermaid
 sequenceDiagram
     participant A as 用户
@@ -294,7 +294,7 @@ sequenceDiagram
   {
     id: 'state',
     icon: GitBranch,
-    label: '状态图',
+    label: 'markdownEditor.chart.state',
     template: `\`\`\`mermaid
 stateDiagram-v2
     [*] --> 待处理
@@ -308,7 +308,7 @@ stateDiagram-v2
   {
     id: 'gantt',
     icon: GitBranch,
-    label: '甘特图',
+    label: 'markdownEditor.chart.gantt',
     template: `\`\`\`mermaid
 gantt
     title 项目计划
@@ -324,7 +324,7 @@ gantt
   {
     id: 'class',
     icon: GitBranch,
-    label: '类图',
+    label: 'markdownEditor.chart.class',
     template: `\`\`\`mermaid
 classDiagram
     class Animal {
@@ -345,7 +345,7 @@ classDiagram
   {
     id: 'pie',
     icon: GitBranch,
-    label: '饼图',
+    label: 'markdownEditor.chart.pie',
     template: `\`\`\`mermaid
 pie title 数据分布
     "类别A": 40
@@ -357,7 +357,7 @@ pie title 数据分布
   {
     id: 'mindmap',
     icon: GitBranch,
-    label: '脑图',
+    label: 'markdownEditor.chart.mindmap',
     template: `\`\`\`mermaid
 mindmap
   root((项目规划))

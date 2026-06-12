@@ -1,4 +1,4 @@
-import { ArrowLeft, HelpCircle, Pin } from 'lucide-react';
+import { ArrowLeft, Pin } from 'lucide-react';
 import { lazy, Suspense, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, NavLink, Route, Routes, useLocation } from 'react-router-dom';
@@ -20,7 +20,6 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar';
 import { Toaster } from '@/components/ui/sonner';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { toolRoutes } from '@/router';
 import { useMenuStore } from '@/store/menu';
 import { cn } from '@/utils';
@@ -68,13 +67,16 @@ function ToolLayout() {
     const Icon = route.icon;
     const pinned = groupedRoutes.pinnedSet.has(route.path);
     const isActive = location.pathname === route.path;
+    // i18n 标题：约定每个工具的 i18n key 与 ToolKey 同名（同 path 字符串去掉前置斜杠）。
+    // 第二个参数作为兜底值，万一没翻译就退回 router.ts 里的原 title。
+    const title = t(`routes:${route.key}.title`, route.title);
 
     return (
       <SidebarMenuItem key={route.path}>
         <SidebarMenuButton asChild isActive={isActive}>
           <NavLink to={route.path}>
             <Icon />
-            <span>{route.title}</span>
+            <span>{title}</span>
           </NavLink>
         </SidebarMenuButton>
         <SidebarMenuAction
@@ -101,12 +103,11 @@ function ToolLayout() {
       >
         {/* Sidebar Header - 点击 Logo 回首页 */}
         <SidebarHeader className="border-b border-sidebar-border h-16">
-          <NavLink
-            to="/"
-            className="group flex items-center h-14 pl-12 transition-opacity hover:opacity-80"
-          >
+          <NavLink to="/" className="group flex items-center h-14 pl-12 transition-opacity hover:opacity-80">
             <div className="flex flex-col">
-              <span className="text-[10px] uppercase tracking-[0.3em] text-sidebar-foreground/50 font-medium">QIAO</span>
+              <span className="text-[10px] uppercase tracking-[0.3em] text-sidebar-foreground/50 font-medium">
+                QIAO
+              </span>
               <span className="text-base font-semibold tracking-wide text-sidebar-foreground">Tools</span>
             </div>
             <ArrowLeft className="ml-2 h-3.5 w-3.5 text-sidebar-foreground/0 transition-all duration-200 group-hover:text-sidebar-foreground/50 group-hover:-translate-x-0.5" />
@@ -139,19 +140,6 @@ function ToolLayout() {
         {/* Sidebar Footer */}
         <SidebarFooter className="border-t border-sidebar-border gap-2">
           <LanguageSwitcher />
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="flex items-center gap-1.5 text-[10px] text-sidebar-foreground/60 cursor-help">
-                  <HelpCircle className="h-3 w-3 shrink-0" />
-                  <span className="line-clamp-1">置顶数据存储说明</span>
-                </div>
-              </TooltipTrigger>
-              <TooltipContent side="right" className="max-w-[200px] text-xs">
-                <p>工具置顶数据保存在浏览器本地存储中，清除浏览器数据会导致置顶信息丢失。</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
         </SidebarFooter>
       </Sidebar>
 

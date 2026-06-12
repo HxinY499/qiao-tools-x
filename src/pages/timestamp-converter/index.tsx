@@ -1,6 +1,7 @@
 import { format, parse } from 'date-fns';
 import { RefreshCcw } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { CopyButton } from '@/components/copy-button';
 import { Button } from '@/components/ui/button';
@@ -36,24 +37,24 @@ const FORMAT_CONFIGS: FormatConfig[] = [
   { id: 'us', label: 'MM-dd-yyyy HH:mm:ss', pattern: 'MM-dd-yyyy HH:mm:ss' },
   { id: 'date-only', label: 'yyyy-MM-dd', pattern: 'yyyy-MM-dd' },
   { id: 'iso', label: 'ISO 8601', type: 'iso' },
-  { id: 'utc', label: 'UTC 字符串', type: 'utc' },
-  { id: 'locale', label: '本地字符串', type: 'locale' },
+  { id: 'utc', label: 'UTC', type: 'utc' },
+  { id: 'locale', label: 'locale', type: 'locale' },
 ];
 
 const COMMON_FORMAT_ITEMS: FormatItem[] = [
   {
     id: 'common-unix-seconds',
-    label: 'Unix 秒 (10 位)',
+    label: 'unix-seconds',
     formatter: (date) => Math.floor(date.getTime() / 1000).toString(),
   },
   {
     id: 'common-unix-milliseconds',
-    label: 'Unix 毫秒 (13 位)',
+    label: 'unix-milliseconds',
     formatter: (date) => date.getTime().toString(),
   },
   ...FORMAT_CONFIGS.map((config) => ({
     id: `common-${config.id}`,
-    label: config.label,
+    label: config.id,
     formatter: (date: Date) => formatByConfig(date, config),
   })),
 ];
@@ -111,6 +112,7 @@ function tryParseDatetimeInput(value: string) {
 }
 
 function TimestampConverterPage() {
+  const { t } = useTranslation('tools');
   const initialDateRef = useRef<Date | null>(null);
   if (!initialDateRef.current) {
     initialDateRef.current = new Date();
@@ -139,8 +141,8 @@ function TimestampConverterPage() {
 
   // 批量计算所有常用格式，避免每次渲染在 JSX 中各自调用 formatter
   const formatItemValues = useMemo(
-    () => COMMON_FORMAT_ITEMS.map((item) => ({ id: item.id, label: item.label, value: item.formatter(currentDate) })),
-    [currentDate],
+    () => COMMON_FORMAT_ITEMS.map((item) => ({ id: item.id, label: t(`timestampConverter.formatLabel.${item.label}`), value: item.formatter(currentDate) })),
+    [currentDate, t],
   );
 
   // currentDate 格式化的标准字符串（标题和复制按钮共用，避免两次 format 调用）
@@ -168,11 +170,11 @@ function TimestampConverterPage() {
     setTimestampValue(value);
     const trimmed = value.trim();
     if (!trimmed) {
-      setTimestampError('请输入时间戳');
+      setTimestampError(t('timestampConverter.error.timestampRequired'));
       return;
     }
     if (!/^-?\d+$/.test(trimmed)) {
-      setTimestampError('时间戳只能包含数字');
+      setTimestampError(t('timestampConverter.error.timestampInvalidChars'));
       return;
     }
     const numeric = Number(trimmed);
@@ -181,7 +183,7 @@ function TimestampConverterPage() {
     const normalized = nextPrecision === 'seconds' ? numeric * 1000 : numeric;
     const parsedDate = new Date(normalized);
     if (Number.isNaN(parsedDate.getTime())) {
-      setTimestampError('无法解析该时间戳');
+      setTimestampError(t('timestampConverter.error.timestampParseFailed'));
       return;
     }
     setTimestampError('');
@@ -195,12 +197,12 @@ function TimestampConverterPage() {
     setDatetimeInput(value);
     const trimmed = value.trim();
     if (!trimmed) {
-      setDatetimeError('请输入日期时间');
+      setDatetimeError(t('timestampConverter.error.datetimeRequired'));
       return;
     }
     const parsed = tryParseDatetimeInput(trimmed);
     if (!parsed) {
-      setDatetimeError('无法解析该日期时间格式');
+      setDatetimeError(t('timestampConverter.error.datetimeParseFailed'));
       return;
     }
     const containsMilliseconds = /\.\d{1,3}/.test(trimmed);
@@ -219,11 +221,11 @@ function TimestampConverterPage() {
       <Card className="shadow-sm">
         <CardContent className="p-5">
           <div className="mb-4">
-            <h3 className="text-base font-semibold">时间戳 ⇄ 日期时间</h3>
+            <h3 className="text-base font-semibold">{t('timestampConverter.converterTitle')}</h3>
           </div>
           <div className="space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="timestamp-input">Unix 时间戳</Label>
+              <Label htmlFor="timestamp-input">{t('timestampConverter.label.unixTimestamp')}</Label>
               <div className="flex flex-col sm:flex-row gap-3">
                 <Input
                   id="timestamp-input"
@@ -239,7 +241,7 @@ function TimestampConverterPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="datetime-input">日期时间（{timezoneLabel}）</Label>
+              <Label htmlFor="datetime-input">{t('timestampConverter.label.datetime', { tz: timezoneLabel })}</Label>
               <div className="flex flex-col sm:flex-row gap-3">
                 <Input
                   id="datetime-input"
@@ -260,7 +262,7 @@ function TimestampConverterPage() {
                 <p className="text-xs text-red-500">{datetimeError}</p>
               ) : (
                 <p className="text-xs text-muted-foreground">
-                  支持 ISO8601、yyyy-MM-dd HH:mm:ss、yyyy/MM/dd 等常见格式，解析结果已规范化。
+                  {t('timestampConverter.datetimeHint')}
                 </p>
               )}
             </div>
@@ -272,7 +274,7 @@ function TimestampConverterPage() {
         <CardContent className="p-6">
           <div className="flex flex-wrap gap-4 items-center justify-between mb-6">
             <div>
-              <p className="text-sm font-medium text-muted-foreground">当前时间</p>
+              <p className="text-sm font-medium text-muted-foreground">{t('timestampConverter.currentTime.label')}</p>
               <div className="flex items-center gap-2 mt-1">
                 <h2 className="text-2xl font-semibold">{currentDateText}</h2>
                 <CopyButton
@@ -284,17 +286,17 @@ function TimestampConverterPage() {
                 />
               </div>
               <p className="text-xs text-muted-foreground mt-1">
-                {timezoneLabel} {autoRefresh ? '· 自动刷新中' : '· 自动刷新已暂停'}
+                {timezoneLabel} {autoRefresh ? t('timestampConverter.currentTime.autoRefreshing') : t('timestampConverter.currentTime.autoRefreshPaused')}
               </p>
             </div>
             <div className="flex flex-wrap gap-2 items-center">
               {!autoRefresh && (
                 <Button variant="outline" size="sm" onClick={resumeAutoRefresh}>
                   <RefreshCcw className="h-4 w-4 mr-1" />
-                  恢复自动刷新
+                  {t('timestampConverter.currentTime.resumeRefresh')}
                 </Button>
               )}
-              <DateTimePicker value={currentDate} onChange={handleManualCurrentDateChange} buttonClassName="w-52" />
+              <DateTimePicker value={currentDate} onChange={handleManualCurrentDateChange} buttonClassName="w-52" timeLabel={t('timestampConverter.datePicker.timeLabel')} />
             </div>
           </div>
 

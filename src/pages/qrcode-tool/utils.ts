@@ -165,7 +165,7 @@ export async function generateStyledQRCode(content: string, style: QRStyleConfig
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     if (!ctx) {
-      reject(new Error('无法创建画布'));
+      reject(new Error('canvas ctx error'));
       return;
     }
 
@@ -203,7 +203,7 @@ export async function generateStyledQRCode(content: string, style: QRStyleConfig
       logoImage.src = style.logoDataUrl;
     };
     qrImage.onerror = () => {
-      reject(new Error('二维码图片加载失败'));
+      reject(new Error('qrcode image load error'));
     };
     qrImage.src = qrDataUrl;
   });

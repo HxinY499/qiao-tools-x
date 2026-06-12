@@ -1,0 +1,158 @@
+{
+  "image-compressor": {
+    "title": "Image Compressor",
+    "subtitle": "Compress and resize images online with live preview and adjustable settings",
+    "seoDescription": "Free online image compression tool. Supports JPG, PNG, WebP with custom quality and dimensions. All processing happens locally in your browser to protect your privacy.",
+    "seoKeywords": "image compression,online image compressor,image optimizer,resize image,JPG compress,PNG compress,WebP converter"
+  },
+  "image-watermark": {
+    "title": "Image Watermark",
+    "subtitle": "Add text or image watermarks with adjustable position, opacity, font and size — all processed locally",
+    "seoDescription": "Free online image watermark tool. Add text or image watermarks with custom position, opacity, font and size. Batch processing. All processing happens locally.",
+    "seoKeywords": "image watermark,add watermark,online watermark tool,batch watermark,text watermark,watermark generator"
+  },
+  "svg-converter": {
+    "title": "SVG to Image",
+    "subtitle": "Convert SVG to PNG/JPG/WebP — supports batch conversion, custom size, background and transparency",
+    "seoDescription": "Free online SVG to image converter. Batch convert to PNG, JPG, WebP with custom export size, background color, transparency and per-file settings. All processing happens locally.",
+    "seoKeywords": "SVG to PNG,SVG to JPG,SVG to WebP,SVG converter,vector to bitmap,SVG export,batch SVG conversion,online SVG tool"
+  },
+  "scroll-bar": {
+    "title": "Scrollbar Generator",
+    "subtitle": "Visually tweak scrollbar styles and copy the generated CSS",
+    "seoDescription": "Visual CSS scrollbar generator. Adjust color, width, radius and more, preview in real time and generate copy-ready CSS.",
+    "seoKeywords": "CSS scrollbar,scrollbar style,scrollbar generator,custom scrollbar,CSS generator"
+  },
+  "box-shadow": {
+    "title": "Box Shadow",
+    "subtitle": "Stack multiple shadow layers visually and copy CSS or Tailwind classes",
+    "seoDescription": "Visual CSS box-shadow generator. Stack multiple shadow layers, adjust color, blur and offsets, preview in real time and generate CSS / Tailwind classes.",
+    "seoKeywords": "CSS shadow,box-shadow,shadow generator,Tailwind shadow,CSS generator,web shadow effects"
+  },
+  "gradient-generator": {
+    "title": "Gradient Generator",
+    "subtitle": "Build linear/radial gradients with multi-stop colors and angle controls, output CSS and Tailwind classes",
+    "seoDescription": "Visual CSS gradient generator. Build linear and radial gradients with multi-stop colors, live preview and CSS / Tailwind output.",
+    "seoKeywords": "CSS gradient,gradient generator,linear-gradient,radial-gradient,Tailwind gradient,gradient background,CSS generator"
+  },
+  "color-converter": {
+    "title": "Color Converter",
+    "subtitle": "Convert colors between Hex, RGB/RGBA, HSL/HSLA with live preview",
+    "seoDescription": "Free online color converter. Convert between Hex, RGB, RGBA, HSL, HSLA with live preview — ideal for frontend developers and designers.",
+    "seoKeywords": "color converter,Hex to RGB,RGB to Hex,HSL converter,color format conversion,CSS color,color code converter"
+  },
+  "timestamp-converter": {
+    "title": "Timestamp Converter",
+    "subtitle": "Convert between timestamps and datetime in multiple formats, with quick current-time copy",
+    "seoDescription": "Online timestamp converter. Convert between Unix timestamps and datetime, support multiple formats, quickly grab the current timestamp — handy for debugging.",
+    "seoKeywords": "timestamp converter,Unix timestamp,timestamp to date,date to timestamp,timestamp format"
+  },
+  "json-formatter": {
+    "title": "JSON Formatter",
+    "subtitle": "Beautify, minify, validate and store JSON with syntax highlighting",
+    "seoDescription": "Free online JSON formatter. Beautify, minify, validate and syntax-highlight JSON. Store JSON locally for later reuse.",
+    "seoKeywords": "JSON formatter,JSON beautifier,JSON minifier,JSON validator,JSON editor,JSON tool"
+  },
+  "border-radius": {
+    "title": "Border Radius",
+    "subtitle": "",
+    "seoDescription": "Visual CSS border-radius generator. Adjust each corner independently, preview in real time and copy CSS / Tailwind classes.",
+    "seoKeywords": "CSS border-radius,border-radius generator,Tailwind radius,CSS generator,web corner radius"
+  },
+  "url-encoder": {
+    "title": "URL Encode/Decode",
+    "subtitle": "Encode/decode URLs and parse URL parameters visually",
+    "seoDescription": "Free online URL encoder/decoder. Encode/decode strings and parse URL parameters visually — handy for debugging and testing.",
+    "seoKeywords": "URL encode,URL decode,URLEncode,URLDecode,URL parameter parser"
+  },
+  "base64": {
+    "title": "Base64 Encode/Decode",
+    "subtitle": "Encode/decode text in Text mode, or convert local images to Base64 Data URL for inlining into CSS/HTML",
+    "seoDescription": "Free online Base64 encoder/decoder. Encode/decode text and convert images to Base64 Data URLs for inlining into CSS or HTML.",
+    "seoKeywords": "Base64 encode,Base64 decode,image to Base64,Base64 tool,DataURL,Base64 image"
+  },
+  "uuid-generator": {
+    "title": "UUID Generator",
+    "subtitle": "Batch generate UUID/GUID with custom format (case, hyphens) and history",
+    "seoDescription": "Free online UUID generator. Batch generate UUID/GUID with customizable format (case, hyphens) and per-batch history.",
+    "seoKeywords": "UUID generator,GUID generator,UUID online,batch UUID,unique identifier"
+  },
+  "word-count": {
+    "title": "Word Count & Text Tools",
+    "subtitle": "Word/char counting with paragraph and sentence analysis, target progress and a variety of text utilities",
+    "seoDescription": "Free online word counter. Count words, characters, paragraphs and sentences, track target progress and apply various text utilities (formatting, escape removal, etc.).",
+    "seoKeywords": "text tool,text formatter,unescape,word count,character count,paragraph count,sentence count"
+  },
+  "text-diff": {
+    "title": "Text Diff",
+    "subtitle": "Side-by-side diff for text or code, with line- and word-level highlighting",
+    "seoDescription": "Free online text diff tool. Side-by-side comparison of code or config with line- and word-level highlighting — useful for code reviews and config change checks.",
+    "seoKeywords": "text diff,code compare,text comparison tool,config diff,line diff,inline diff"
+  },
+  "text-escaper": {
+    "title": "Text Escaper",
+    "subtitle": "Escape/unescape HTML entities, Unicode and JavaScript strings",
+    "seoDescription": "Free online text escaper. Escape/unescape HTML entities, Unicode and JavaScript strings to handle encoding issues and special characters.",
+    "seoKeywords": "HTML escape,Unicode escape,JS escape,text escape,unescape,HTML entities,Unicode encoding,string escape"
+  },
+  "user-agent-parser": {
+    "title": "User-Agent Parser",
+    "subtitle": "Parse User-Agent strings to identify browser, OS and device",
+    "seoDescription": "Free online User-Agent parser. Identify browser, OS, device model and engine version — handy for debugging.",
+    "seoKeywords": "User-Agent parser,UA parser,browser detection,device detection,online UA tool"
+  },
+  "seo-analyzer": {
+    "title": "SEO Analyzer",
+    "subtitle": "Analyze page SEO — meta tags, heading structure, image optimization, structured data and more",
+    "seoDescription": "Free online SEO analyzer. Fetch a URL or paste HTML to analyze meta tags, Open Graph, heading structure, image alts, structured data — produces a detailed SEO report.",
+    "seoKeywords": "SEO analysis,SEO checker,page SEO,meta tag check,Open Graph,structured data,SEO optimization,site analysis"
+  },
+  "qrcode-tool": {
+    "title": "QR Code Tool",
+    "subtitle": "Generate and parse QR codes with quick templates for WiFi, contacts, SMS and location",
+    "seoDescription": "Free online QR code generator and parser. Supports free text, WiFi, vCard, SMS, geolocation templates and image decoding.",
+    "seoKeywords": "QR code generator,QR code parser,QR,WiFi QR,vCard QR,online QR code tool"
+  },
+  "json-schema-converter": {
+    "title": "JSON Schema ↔ TS",
+    "subtitle": "Convert between JSON Schema and TypeScript types (interface/type) with rich options",
+    "seoDescription": "Free online JSON Schema ↔ TypeScript converter. Supports interface/type output, Draft-07/Draft-04 versions, and rich generation options.",
+    "seoKeywords": "JSON Schema,TypeScript,type conversion,Schema to TS,TS to Schema,interface generator,type generator,JSON Schema converter"
+  },
+  "regex-visualizer": {
+    "title": "Regex Visualizer",
+    "subtitle": "Visualize regex as railroad diagrams with live matching, explanations and replace preview",
+    "seoDescription": "Free online regex visualizer. Render regex as railroad diagrams, run live matching tests, view capture groups, get explanations and preview replacements — comes with common templates.",
+    "seoKeywords": "regex visualizer,regular expression,regex,railroad diagram,regex tester,regex explain,regex match,regex replace"
+  },
+  "markdown-editor": {
+    "title": "Markdown",
+    "subtitle": "",
+    "seoDescription": "Free online Markdown editor with live preview, table insertion, code highlighting, GFM syntax and a rich toolbar.",
+    "seoKeywords": "Markdown editor,Markdown preview,Markdown table,online Markdown,MD editor,Markdown tool"
+  },
+  "sse-to-json": {
+    "title": "SSE to JSON",
+    "subtitle": "Extract data fields from raw SSE (Server-Sent Events) and parse each into formatted JSON",
+    "seoDescription": "Free online SSE to JSON parser. Extracts data fields from Server-Sent Events streams and parses each into formatted JSON with syntax highlighting and one-click copy.",
+    "seoKeywords": "SSE parser,SSE to JSON,Server-Sent Events,SSE data extraction,JSON formatter,EventStream parser"
+  },
+  "ljson-to-json": {
+    "title": "ljson to JSON",
+    "subtitle": "Parse JSON Lines / NDJSON line by line into formatted JSON, with merging and per-line view",
+    "seoDescription": "Free online ljson (JSON Lines / NDJSON) parser. Parse each line into formatted JSON with syntax highlighting, per-line view, error locating and one-click merged copy.",
+    "seoKeywords": "ljson parser,JSON Lines,NDJSON,jsonl parser,newline-delimited JSON,log JSON parser,JSON batch format"
+  },
+  "ascii-art": {
+    "title": "ASCII Art",
+    "subtitle": "Render text into ASCII art with font, copy and download — a fun touch for your README or code comments",
+    "seoDescription": "Free online ASCII Art generator. Render text into ASCII banners with multiple figlet fonts, copy and download — great for READMEs, banners and code comments.",
+    "seoKeywords": "ASCII Art,ASCII art generator,figlet,text banner,code comment decoration,README banner"
+  },
+  "cron-translator": {
+    "title": "Cron Translator",
+    "subtitle": "Translate cron expressions into natural language and preview the next 5 runs — supports 5/6-field formats",
+    "seoDescription": "Free online cron translator. Translates cron expressions into natural language, breaks down each field and previews the next 5 runs. Supports 5-field standard and 6-field (with seconds).",
+    "seoKeywords": "cron translator,crontab parser,cron expression,cron online tool,scheduled task,cron explained"
+  }
+}

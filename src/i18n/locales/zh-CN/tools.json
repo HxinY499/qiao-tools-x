@@ -1,0 +1,1469 @@
+{
+  "imageCompressor": {
+    "presets": {
+      "custom": "自定义",
+      "manual": "手动调整所有参数",
+      "social": "社交媒体",
+      "socialDesc": "适合微信、朋友圈分享（质量 75%，宽度 1280px）",
+      "web": "网页优化",
+      "webDesc": "响应式友好，兼顾移动与PC（质量 75%，宽度 1080px）",
+      "extreme": "极致压缩",
+      "extremeDesc": "最小体积，适合批量上传（质量 65%，宽度 800px）"
+    },
+    "preview": {
+      "originalPlaceholder": "上传后在此处显示原图预览",
+      "resultPlaceholder": "调整参数并执行压缩后显示效果",
+      "originalFailed": "原图加载失败，请重试或更换文件",
+      "imageFailed": "图片加载失败，请尝试更换文件。",
+      "uploadSuccess": "图片上传成功",
+      "readFailed": "文件读取失败，请重试。",
+      "invalidSize": "图片尺寸无效",
+      "compressing": "正在压缩中，请稍候...",
+      "failed": "压缩预览生成失败，请调整参数后重试",
+      "error": "压缩过程中出现错误，请尝试降低尺寸或更换图片。"
+    },
+    "upload": {
+      "upload": "上传图片",
+      "drag": "拖拽图片到此处，或",
+      "select": "选择图片文件"
+    },
+    "settings": {
+      "title": "设置压缩参数",
+      "preset": "预设参数",
+      "manual": "手动调整",
+      "quality": "压缩质量",
+      "noCompress": "不压缩",
+      "noCompressTip": "如果你只想修改图片格式或调整尺寸，可以选择不压缩模式",
+      "qualityTip": "数值越低，体积越小，但画质会降低",
+      "noCompressOn": "已启用\"不压缩\"模式，将直接使用原图（仅当尺寸未调整时生效）",
+      "format": "输出格式",
+      "keepFormat": "保持原格式",
+      "formatJpg": "JPEG（适合照片，体积小）",
+      "formatPng": "PNG（支持透明背景与色彩量化压缩）",
+      "formatWebp": "WebP（支持透明）",
+      "transparentPng": "检测到透明背景，建议保持 PNG 或切换为 WebP 格式",
+      "noTransparent": "未检测到透明背景，建议切换为 JPEG 或 WebP 以获得更小体积",
+      "resize": "图片尺寸调整",
+      "width": "宽度 (px)",
+      "height": "高度 (px)",
+      "percent": "按百分比缩放",
+      "originalSize": "原始尺寸：",
+      "reduce": "减少",
+      "increase": "增大",
+      "originalVolume": "原始体积"
+    },
+    "compare": {
+      "title": "预览对比",
+      "original": "原始图片",
+      "compressed": "压缩后图片",
+      "fileSize": "文件大小：",
+      "imageSize": "图片尺寸：",
+      "formatType": "格式类型：",
+      "compressing": "正在压缩...",
+      "compressedSize": "压缩后大小：",
+      "compressionRatio": "压缩比例："
+    },
+    "actions": {
+      "download": "下载压缩图片",
+      "reupload": "重新上传",
+      "helpTitle": "操作 & 使用说明",
+      "help1": "支持 PNG 格式的色彩量化压缩，可有效减小 PNG 文件体积。",
+      "help2": "质量过低会导致明显失真，建议逐步调节并通过右侧预览对比效果。",
+      "help3": "JPEG 适合照片，WebP 兼顾小体积与透明背景，PNG 适合需要透明的图形。",
+      "help4": "压缩过程在独立线程中运行，不会卡顿页面（即使处理大图）。"
+    }
+  },
+  "imageWatermark": {
+    "watermarkText": "© qiao-tools",
+    "noImage": "尚未选择图片",
+    "selected": "已选择：",
+    "upload": {
+      "title": "上传图片",
+      "drag": "拖拽图片到此处，或",
+      "select": "选择图片文件",
+      "watermarkDrag": "拖拽水印图片到此处，或",
+      "watermarkSelect": "选择水印图片",
+      "watermarkTip": "推荐使用带透明背景的 PNG 图标或 Logo，体积不宜过大。"
+    },
+    "config": {
+      "title": "水印配置",
+      "text": "文字水印",
+      "image": "图片水印",
+      "textContent": "水印文字内容",
+      "textPlaceholder": "例如：© 2025 Your Name / your-website.com",
+      "fontSize": "字体大小",
+      "fontFamily": "字体样式",
+      "fontSystem": "系统字体",
+      "fontSerif": "衬线字体（Serif）",
+      "fontMono": "等宽字体（Monospace）",
+      "fontRounded": "圆角标题（Rounded）",
+      "fontDisplay": "展示标题（Display）",
+      "fontHand": "手写风格（Handwriting）",
+      "fontComic": "漫画风格（Comic）",
+      "fontNarrow": "窄体字体（Narrow）",
+      "fontCondensed": "紧凑字体（Condensed）",
+      "fontWeight": "字重：",
+      "normal": "常规",
+      "bold": "加粗",
+      "color": "文字颜色",
+      "sizeRatio": "水印占底图宽度比例",
+      "sizeRatioDesc1": "当前约占底图宽度的",
+      "sizeRatioDesc2": "，会按比例等比缩放。",
+      "layout": "水印布局",
+      "single": "单个水印",
+      "tile": "平铺铺满",
+      "position": "水印位置",
+      "tileGap": "平铺间距",
+      "tileGapDesc": "控制相邻水印之间的水平与垂直间距，数值越大间隔越疏。",
+      "opacity": "水印透明度",
+      "margin": "边距（与边缘的距离）",
+      "rotation": "水印旋转角度",
+      "resetRotation": "回正"
+    },
+    "preview": {
+      "title": "水印效果预览",
+      "real": "预览为真实导出效果",
+      "watermarkPreview": "当前水印预览"
+    },
+    "basePreviewTitle": "底图与预览",
+    "exportFormat": "导出格式",
+    "exportOriginal": "保持原格式",
+    "exportPng": "PNG（无损）",
+    "exportJpeg": "JPEG（体积更小）",
+    "download": "下载带水印图片"
+  },
+  "uuidGenerator": {
+    "config": {
+      "title": "配置",
+      "quantity": "数量：{{count}}",
+      "uppercase": "大写",
+      "uppercaseDesc": "使用 A-F 替代 a-f",
+      "hyphens": "包含连字符",
+      "hyphensDesc": "包含 \"-\" 分隔符",
+      "generate": "生成 UUID"
+    },
+    "result": {
+      "title": "结果",
+      "placeholder": "点击按钮生成..."
+    },
+    "history": {
+      "title": "历史记录",
+      "empty": "暂无历史记录",
+      "clear": "清空历史",
+      "countSuffix": "个 UUID"
+    },
+    "toast": {
+      "generated": "已生成 {{count}} 个 UUID",
+      "copied": "已复制到剪贴板"
+    }
+  },
+  "urlEncoder": {
+    "title": "URL 编解码",
+    "decode": "解码",
+    "encode": "编码",
+    "input": "输入",
+    "sample": "示例",
+    "clear": "清空",
+    "encodePlaceholder": "输入需要编码的文本或 URL...",
+    "decodePlaceholder": "输入需要解码的 URL 编码字符串...",
+    "result": "结果",
+    "urlAnalysis": "URL 参数解析",
+    "usageGuide": "使用说明",
+    "guideComponent": " 会对除字母、数字和 ",
+    "guideComponentSuffix": " 以外的所有字符进行编码，适合对 URL 参数值编码。",
+    "guideUri": " 会保留 URL 结构字符 ",
+    "guideUriSuffix": " 不编码，适合对完整 URL 编码。",
+    "guideDecodeTerm": "解码",
+    "guideDecode": " 会自动尝试对 URL 编码字符串进行解码，恢复原始文本。"
+  },
+  "textEscaper": {
+    "htmlEntities": "HTML 实体",
+    "unicode": "Unicode",
+    "jsString": "JS 字符串",
+    "encode": "转义",
+    "decode": "反转义",
+    "exampleHtmlEncode": "文本 → HTML 实体",
+    "exampleHtmlDecode": "HTML 实体 → 文本",
+    "exampleUnicodeEncode": "文本 → Unicode 编码",
+    "exampleUnicodeDecode": "Unicode 编码 → 文本",
+    "exampleJsEncode": "文本 → JS 转义字符串",
+    "exampleJsDecode": "JS 转义字符串 → 文本",
+    "sample": "填充示例",
+    "clear": "清空",
+    "inputLabel": "输入",
+    "inputPlaceholderEncode": "输入需要转义的文本...",
+    "inputPlaceholderDecode": "输入需要反转义的文本...",
+    "outputLabel": "输出",
+    "waitingInput": "等待输入...",
+    "usageGuide": "使用说明",
+    "guideHtmlTerm": "HTML 实体",
+    "guideHtml": " 转义用于 HTML 内容，防止 XSS 攻击，如 `<` → `&lt;`、`>` → `&gt;`。",
+    "guideUnicodeTerm": "Unicode",
+    "guideUnicode": " 编码将字符转为 \\uXXXX 格式，常用于处理非 ASCII 字符。",
+    "guideJsTerm": "JS 字符串",
+    "guideJs": " 转义处理 JavaScript 字符串中的特殊字符，如 `\"` → `\\\"`、换行 → `\\n`。"
+  },
+  "colorConverter": {
+    "inputRequired": "请输入颜色值",
+    "mustStartWithHash": "Hex 颜色必须以 # 开头",
+    "invalidLength": "Hex 颜色长度无效，应为 3、4、6 或 8 位",
+    "invalidHexFormat": "包含无效的十六进制字符",
+    "invalidColorFormat": "颜色格式无效",
+    "hexFormatHint": "支持 #RGB、#RGBA、#RRGGBB、#RRGGBBAA 格式"
+  },
+  "borderRadius": {
+    "title": "圆角控制",
+    "reset": "重置",
+    "topLeft": "左上角",
+    "topRight": "右上角",
+    "bottomRight": "右下角",
+    "bottomLeft": "左下角",
+    "lockXY": "锁定 X/Y 轴（点击解锁）",
+    "unlockXY": "解锁 X/Y 轴（点击锁定）",
+    "horizontalRadius": "水平半径 (X)",
+    "verticalRadius": "垂直半径 (Y)",
+    "tip": "解锁 X/Y 轴可独立调整水平与垂直方向的圆角半径，生成椭圆形圆角。",
+    "previewAndCode": "预览与代码"
+  },
+  "ljsonToJson": {
+    "parseFailed": "解析失败",
+    "pasteTitle": "粘贴 ljson 数据",
+    "pasteDesc": "粘贴 JSON Lines / NDJSON 格式数据，每行一条 JSON 对象",
+    "rawTitle": "原始文本",
+    "rawDesc": "查看输入的原始 ljson 文本",
+    "viewRaw": "查看原始文本",
+    "parsedSuccess": "已解析 {{count}} 条数据",
+    "total": "共 {{count}} 条",
+    "success": "{{count}} 条成功",
+    "fail": "{{count}} 条失败"
+  },
+  "sseToJson": {
+    "parseFailed": "解析失败",
+    "pasteTitle": "粘贴 SSE 数据",
+    "pasteDesc": "粘贴 Server-Sent Events 原始数据，将提取 data 字段逐条解析为 JSON",
+    "rawTitle": "原始文本",
+    "rawDesc": "查看输入的原始 SSE 文本",
+    "viewRaw": "查看原始文本",
+    "parsedSuccess": "已解析 {{count}} 条 SSE 数据",
+    "signal": "信号：{{raw}}",
+    "total": "共 {{count}} 条",
+    "success": "{{count}} 条 JSON",
+    "signalCount": "{{count}} 条信号",
+    "fail": "{{count}} 条失败"
+  },
+  "cronTranslator": {
+    "title": "Cron 表达式翻译",
+    "formatLabel": "格式",
+    "formats": {
+      "standard": {
+        "label": "标准 (5 字段)",
+        "desc": "分 时 日 月 周"
+      },
+      "with-seconds": {
+        "label": "带秒 (6 字段)",
+        "desc": "秒 分 时 日 月 周"
+      }
+    },
+    "exprLabel": "Cron 表达式",
+    "placeholder": "例如：0 9 * * 1-5",
+    "placeholderWithSeconds": "例如：0 0 9 * * 1-5",
+    "clear": "清空",
+    "hintPrefix": "提示：",
+    "detectHint": "当前输入有 {{fields}} 个字段，可能是 {{label}} 格式",
+    "templatesLabel": "常用模板",
+    "templates": {
+      "everyMinute": "每分钟",
+      "every5Minutes": "每 5 分钟",
+      "hourly": "每小时整点",
+      "daily": "每天 0 点",
+      "workdays9am": "工作日早 9 点",
+      "monday9am": "每周一 9 点",
+      "monthly1st": "每月 1 号 0 点",
+      "yearlyJan1": "每年 1 月 1 日 0 点"
+    },
+    "translation": "翻译结果",
+    "copied": "已复制",
+    "fieldsBreakdown": "字段拆解",
+    "colField": "字段",
+    "colValue": "值",
+    "colRange": "说明",
+    "nextRunsTitle": "未来 {{count}} 次执行时间",
+    "nextRunsEmpty": "无法计算下次执行时间",
+    "localTimeNote": "以上时间均为本地时区时间"
+  },
+  "userAgentParser": {
+    "uaString": "User-Agent 字符串",
+    "useMyUA": "使用当前 UA",
+    "clear": "清空",
+    "placeholder": "粘贴 User-Agent 字符串，或点击「使用当前 UA」自动填入...",
+    "commonExamples": "常用示例：",
+    "browser": "浏览器",
+    "engine": "渲染引擎",
+    "os": "操作系统",
+    "device": "设备",
+    "name": "名称",
+    "version": "版本",
+    "major": "主版本",
+    "type": "类型",
+    "vendor": "厂商",
+    "model": "型号",
+    "architecture": "架构",
+    "jsonResult": "完整解析结果（JSON）"
+  },
+  "boxShadow": {
+    "sections": {
+      "config": "配置阴影层",
+      "preview": "预览 & 代码"
+    },
+    "actions": {
+      "reset": "重置",
+      "addLayer": "新增层",
+      "delete": "删除"
+    },
+    "layers": {
+      "listLabel": "阴影层列表",
+      "layerLabel": "阴影层 {{index}}",
+      "inset": "内阴影",
+      "outer": "外阴影",
+      "empty": "暂无阴影层，点击右上角「新增层」开始配置。"
+    },
+    "editor": {
+      "title": "当前编辑：阴影层 {{index}}",
+      "subtitle": "细调每一层的位置、范围和颜色。",
+      "insetLabel": "内阴影（inset）",
+      "offsetX": "水平偏移 X",
+      "offsetY": "垂直偏移 Y",
+      "blurRadius": "模糊半径 blur",
+      "spreadRadius": "扩展半径 spread",
+      "shadowColor": "阴影颜色"
+    },
+    "preview": {
+      "label": "阴影预览"
+    },
+    "tabs": {
+      "css": "CSS 代码",
+      "tailwind": "Tailwind 工具类",
+      "theme": "主题 boxShadow"
+    },
+    "tips": {
+      "title": "使用建议",
+      "tip1": "使用多层阴影模拟真实光照：一层柔和大阴影 + 一层小而锐利的阴影。",
+      "tip2": "扩展半径为负值可以收紧阴影边缘，避免蒙住卡片外部内容。",
+      "tip3": "在 Tailwind 中建议把生成的 shadow-[...] 抽成组件 class，保持样式统一。"
+    }
+  },
+  "gradientGenerator": {
+    "sections": {
+      "config": "配置渐变",
+      "preview": "预览 & 代码"
+    },
+    "actions": {
+      "reset": "重置",
+      "addStop": "新增断点",
+      "delete": "删除"
+    },
+    "type": {
+      "label": "渐变类型",
+      "linear": "线性渐变（linear-gradient）",
+      "radial": "径向渐变（radial-gradient）"
+    },
+    "angle": {
+      "label": "角度",
+      "hint": "0° 指向上方，顺时针旋转。"
+    },
+    "stops": {
+      "label": "颜色断点",
+      "hint": "支持多色渐变，按位置从左到右排序。",
+      "position": "位置"
+    },
+    "tabs": {
+      "css": "CSS 代码",
+      "tailwind": "Tailwind 工具类",
+      "tailwindTitle": "Tailwind 渐变类名"
+    },
+    "tips": {
+      "title": "使用小贴士",
+      "tip1": "线性渐变建议使用 120° ~ 160° 之间的角度，视觉更柔和。",
+      "tip2": "至少保留两个颜色断点，更多断点可以营造细腻的渐变层次。",
+      "tip3": "Tailwind arbitrary value 形式适合快速试验，可将常用渐变抽成自定义类名复用。"
+    }
+  },
+  "scrollBar": {
+    "configTitle": "配置滚动条样式",
+    "reset": "重置",
+    "scrollbarSection": "主体",
+    "trackSection": "轨道",
+    "thumbSection": "滑块",
+    "cornerSection": "拐角",
+    "previewTitle": "预览 & CSS 代码",
+    "previewAreaLabel": "滚动条预览区域",
+    "showOnHover": "仅 hover 时显示",
+    "includeHorizontal": "包含横向滚动",
+    "previewText": "这里是滚动条预览区域，你可以上下滚动（如果开启横向，也可以左右滚动）来查看样式效果。",
+    "previewRow": "第 {{count}} 行：Scrollbar visual config demo — 调整左侧参数，观察滚动条的宽度、颜色、圆角、边框等变化。",
+    "tipsTitle": "使用小贴士",
+    "tip1": "生成的 CSS 默认使用选择器 .scrollbar-code-area，你可以根据实际项目修改为自己的类名。",
+    "tip2": "如果只想在 hover 时显示滚动条，请勾选「仅 hover 时显示」。",
+    "tip3": "横向滚动开关只影响预览区域的内容宽度，方便你同时预览横向滚动条样式。"
+  },
+  "jsonFormatter": {
+    "inputLabel": "输入 JSON",
+    "outputLabel": "格式化结果",
+    "inputPlaceholder": "在此粘贴 JSON 代码...",
+    "removeEscapes": "去除转义",
+    "clear": "清空",
+    "minify": "压缩",
+    "format": "格式化",
+    "parseError": "解析错误",
+    "waitingInput": "等待输入...",
+    "fullscreen": "全屏查看",
+    "exitFullscreen": "退出全屏",
+    "noEscapesFound": "未找到可去除的转义符",
+    "escapesRemoved": "已去除转义符",
+    "repository": "仓库",
+    "repositoryTitle": "JSON 仓库",
+    "repositoryDesc": "管理保存在本地 IndexedDB 中的 JSON 数据",
+    "loading": "加载中...",
+    "noRecords": "暂无保存的记录",
+    "deleteRecord": "删除此记录",
+    "loadHistoryFailed": "加载历史记录失败",
+    "deleteSuccess": "删除成功",
+    "deleteFailed": "删除失败",
+    "jsonLoaded": "已加载 JSON 内容",
+    "save": "保存",
+    "saveTooltip": "数据将存储在本地 IndexedDB 中",
+    "saveDialogTitle": "保存 JSON",
+    "saveDialogDesc": "将保存在您的浏览器本地数据库（IndexedDB）中",
+    "saveName": "名称",
+    "saveNamePlaceholder": "输入名称...",
+    "saveNameRequired": "请输入保存名称",
+    "saveEmptyContent": "无法保存空内容",
+    "saveSuccess": "保存成功",
+    "saveFailed": "保存失败",
+    "saving": "保存中...",
+    "cancel": "取消",
+    "settingsTitle": "编辑器设置",
+    "resetAllSettings": "重置所有设置",
+    "simpleMode": "简易模式",
+    "simpleModeDesc": "使用静态代码高亮",
+    "basicAppearance": "基础外观",
+    "fontSize": "字体大小 ({{size}}px)",
+    "indentWidth": "缩进宽度 ({{count}} 空格)",
+    "displayControl": "显示控制",
+    "collapseAll": "默认折叠所有节点",
+    "showArrayIndices": "显示数组索引",
+    "showStringQuotes": "显示字符串引号",
+    "showCollectionCount": "显示元素数量",
+    "arrayIndexFromOne": "数组索引从 1 开始",
+    "showIconTooltips": "显示图标提示",
+    "advancedFeatures": "高级功能",
+    "viewOnly": "只读模式",
+    "enableClipboard": "启用剪贴板",
+    "sortKeys": "按键名排序",
+    "stringTruncate": "长字符串截断 ({{length}})",
+    "animationSpeed": "动画速度 ({{time}}ms)"
+  },
+  "base64": {
+    "sectionTitle": "Base64 编解码",
+    "tabImage": "图片转 Data URL",
+    "tabText": "文本 ⇄ Base64",
+    "labelInput": "输入区域",
+    "modeTextToBase64": "文本 → Base64",
+    "modeBase64ToText": "Base64 → 文本",
+    "placeholderEncodeInput": "在此输入要编码的文本内容，支持多行和中文。",
+    "placeholderDecodeInput": "在此粘贴要解码的 Base64 字符串，可包含换行。",
+    "hintEncode": "输入任意文本，右侧会实时生成 Base64。",
+    "hintDecode": "粘贴 Base64 字符串，右侧会尝试还原为原始文本。",
+    "btnClear": "清空",
+    "tipBase64Chars": "小提示：Base64 应只包含字母、数字、+、/ 和最多两个 = 结尾填充符。",
+    "errorLengthMultiple": "Base64 串长度必须是 4 的倍数",
+    "errorInvalidBase64": "当前内容看起来不是合法的 Base64 字符串",
+    "errorDecodeFailed": "Base64 解码失败，请检查内容是否完整",
+    "labelOutput": "输出结果",
+    "btnCopyResult": "复制结果",
+    "btnCopied": "已复制",
+    "placeholderEncodeOutput": "右侧会实时展示编码后的 Base64 字符串。",
+    "placeholderDecodeOutput": "右侧会展示还原后的文本内容。",
+    "labelSelectImage": "选择或拖拽图片文件",
+    "btnClearImage": "清空当前图片",
+    "uploaderTitle": "拖拽图片到此处，或点击选择文件",
+    "uploaderHint": "支持常见图片格式（PNG / JPG / JPEG / GIF 等），单张不超过 8MB。",
+    "noFileSelected": "尚未选择图片文件",
+    "toastFileTooLarge": "图片过大，请选择 8MB 以内的文件",
+    "toastReadFailed": "读取图片失败，请重试或更换文件",
+    "labelPreview": "预览与 Data URL",
+    "imageAlt": "图片预览",
+    "imagePlaceholder": "预览",
+    "labelDataUrl": "Base64 Data URL",
+    "btnCopy": "复制",
+    "checkboxStripPrefix": "移除",
+    "checkboxStripSuffix": "前缀",
+    "checkboxWrap": "按固定长度换行",
+    "charsPerLine": "字符/行",
+    "usageTitle": "使用说明 & 提示",
+    "usageTip1": "所有编码与解码操作都在浏览器本地完成，不会上传到服务器，适合处理敏感文本或图片。",
+    "usageTip2": "文本模式适合生成 Authorization 头、简单配置片段等，编码后字符串会明显变长，请谨慎用于体积敏感场景。",
+    "usageTip3": "图片模式常用于在 CSS、HTML 或 JSON 中内联小图标、占位图等资源，大图建议仍然使用 URL 引用。",
+    "usageTip4": "若解码失败，请检查 Base64 是否被换行或中间插入了额外字符，可尝试先移除多余空白后再粘贴。",
+    "usageTip5Pre": "Data URL 一般形如：",
+    "usageTip5Post": "，复制时可直接整段粘贴到你的样式或标签属性中。",
+    "btnPasteFromBase64": "从 Base64 粘贴图片",
+    "dialogTitle": "粘贴图片 Base64 / Data URL",
+    "dialogPlaceholder": "将 data:image/... 或纯 Base64 串粘贴到这里，例如从网络请求或配置文件中复制。",
+    "dialogHint": "支持完整的 Data URL（包含 data:image/...;base64, 前缀）或仅包含 Base64 主体的字符串，换行和空白会被自动忽略。",
+    "dialogLocalOnly": "所有解析操作仅在本地完成，不会上传到服务器。",
+    "dialogErrorEmpty": "请输入要解析的图片 Base64 或 Data URL",
+    "dialogErrorInvalid": "当前内容看起来不是合法的图片 Base64",
+    "pastedImageDescription": "来自 Base64 粘贴的图片",
+    "btnCancel": "取消",
+    "btnParseAndPreview": "解析并预览"
+  },
+  "asciiArt": {
+    "sectionConfig": "生成配置",
+    "labelText": "文字内容",
+    "placeholderText": "输入文字（建议英文/数字，最多 32 个字符）",
+    "btnRandomTextTitle": "随机示例文案",
+    "hintAsciiOnly": "提示：figlet 字体只支持 ASCII 字符，中文不会渲染。",
+    "labelFont": "字体",
+    "btnRandomFont": "随机字体",
+    "labelKerning": "字符间距",
+    "kerningFitted": "紧凑",
+    "kerningOverlap": "重叠",
+    "kerningLoose": "宽松",
+    "labelBorder": "边框装饰",
+    "borderNone": "无边框",
+    "borderSingle": "单线",
+    "borderDouble": "双线",
+    "borderStar": "星号",
+    "sectionPreview": "预览结果",
+    "colWidth": "{{count}} 列宽",
+    "toastCopied": "已复制到剪贴板",
+    "btnCommentFormat": "注释格式",
+    "dropdownCopyAsComment": "复制为代码注释",
+    "btnDownload": "下载",
+    "toastDownloaded": "已下载 .txt 文件",
+    "toastCopiedAsComment": "已复制为 {{format}} 注释",
+    "toastCopyFailed": "复制失败",
+    "errorFontLoad": "字体加载失败，请换一个字体试试",
+    "rendering": "渲染中…",
+    "emptyHint": "在上方输入文字开始生成"
+  },
+  "textDiff": {
+    "btn": {
+      "compareNow": "立即对比",
+      "comparing": "对比中…",
+      "swap": "交换左右",
+      "clear": "清空",
+      "fillExample": "填充示例",
+      "copyLeft": "复制左侧",
+      "copyRight": "复制右侧",
+      "copied": "已复制"
+    },
+    "label": {
+      "leftText": "左侧文本",
+      "rightText": "右侧文本"
+    },
+    "inputMode": {
+      "paste": "粘贴",
+      "upload": "上传"
+    },
+    "upload": {
+      "hint": "拖拽文件到此处，或点击选择文件",
+      "sizeLimit": "支持常见文本/代码文件，单个文件建议不超过 2MB",
+      "currentFile": "当前文件"
+    },
+    "placeholder": {
+      "left": "在此输入或粘贴原始文本，例如旧版本代码、配置等",
+      "right": "在此输入或粘贴目标文本，例如新版本代码、配置等"
+    },
+    "clearDialog": {
+      "title": "清空所有文本？",
+      "description": "此操作会清空左右两侧的全部文本与对比结果，且无法撤销。",
+      "cancel": "取消",
+      "confirm": "确认清空"
+    },
+    "toast": {
+      "inputRequired": "请先在左右输入文本或上传文件"
+    },
+    "result": {
+      "title": "对比结果",
+      "showDiffOnly": "仅显示差异",
+      "syncScroll": "同步滚动",
+      "copyResult": "复制对比结果",
+      "badge": {
+        "added": "新增行",
+        "removed": "删除行",
+        "modified": "修改行"
+      },
+      "stats": {
+        "left": "左侧：{{lineCount}} 行 / {{charCount}} 字符",
+        "right": "右侧：{{lineCount}} 行 / {{charCount}} 字符"
+      },
+      "lineNo": "行号",
+      "leftSide": "左侧",
+      "rightSide": "右侧",
+      "computing": "正在对比，文本较大时请稍候…",
+      "empty": {
+        "hint": "等待对比结果，先在上方输入文本并点击开始对比。",
+        "privacy": "所有计算均在浏览器本地完成，不会上传任何文本内容，适合用来对比配置文件、接口响应或代码片段。"
+      }
+    }
+  },
+  "timestampConverter": {
+    "converterTitle": "时间戳 ⇄ 日期时间",
+    "label": {
+      "unixTimestamp": "Unix 时间戳",
+      "datetime": "日期时间（{{tz}}）"
+    },
+    "datetimeHint": "支持 ISO8601、yyyy-MM-dd HH:mm:ss、yyyy/MM/dd 等常见格式，解析结果已规范化。",
+    "error": {
+      "timestampRequired": "请输入时间戳",
+      "timestampInvalidChars": "时间戳只能包含数字",
+      "timestampParseFailed": "无法解析该时间戳",
+      "datetimeRequired": "请输入日期时间",
+      "datetimeParseFailed": "无法解析该日期时间格式"
+    },
+    "currentTime": {
+      "label": "当前时间",
+      "autoRefreshing": "· 自动刷新中",
+      "autoRefreshPaused": "· 自动刷新已暂停",
+      "resumeRefresh": "恢复自动刷新"
+    },
+    "datePicker": {
+      "timeLabel": "时间（精确到秒）"
+    },
+    "formatLabel": {
+      "unix-seconds": "Unix 秒 (10 位)",
+      "unix-milliseconds": "Unix 毫秒 (13 位)",
+      "standard": "yyyy-MM-dd HH:mm:ss",
+      "slash": "yyyy/MM/dd HH:mm:ss",
+      "us": "MM-dd-yyyy HH:mm:ss",
+      "date-only": "yyyy-MM-dd",
+      "iso": "ISO 8601",
+      "utc": "UTC 字符串",
+      "locale": "本地字符串"
+    }
+  },
+  "markdownEditor": {
+    "placeholder": {
+      "editor": "在此输入 Markdown...",
+      "preview": "开始输入以查看预览..."
+    },
+    "menu": {
+      "import": "导入",
+      "importSupport": "支持 .md .html .txt",
+      "export": "导出",
+      "exportMd": "导出 Markdown",
+      "exportHtml": "导出 HTML",
+      "exportPdf": "导出 PDF",
+      "exportDocx": "导出 Word",
+      "exportImage": "导出图片",
+      "previewTheme": "预览主题",
+      "showProgressBar": "显示阅读进度条"
+    },
+    "preview": {
+      "hideToolbar": "隐藏工具栏",
+      "showToolbar": "显示工具栏",
+      "settingsAndExport": "设置与导出",
+      "zoomOut": "缩小",
+      "zoomIn": "放大",
+      "zoom": "缩放",
+      "zoomReset": "重置",
+      "toc": "目录大纲",
+      "fullscreen": "全屏预览",
+      "exitFullscreen": "退出全屏 (ESC)"
+    },
+    "theme": {
+      "light": "亮色主题",
+      "dark": "暗色主题"
+    },
+    "toast": {
+      "importSuccess": "已导入 {{name}}",
+      "importFailed": "读取文件失败",
+      "noContent": "没有内容可导出",
+      "exportMd": "已导出 Markdown 文件",
+      "exportHtml": "已导出 HTML 文件",
+      "generatingPdf": "正在生成 PDF...",
+      "exportPdf": "已导出 PDF 文件",
+      "exportPdfFailed": "PDF 导出失败",
+      "generatingDocx": "正在生成 Word 文档...",
+      "exportDocx": "已导出 Word 文件",
+      "exportDocxFailed": "Word 导出失败",
+      "generatingImage": "正在生成图片...",
+      "exportImage": "已导出图片",
+      "exportImageFailed": "图片导出失败"
+    },
+    "toc": {
+      "title": "目录",
+      "empty": "暂无标题"
+    },
+    "table": {
+      "dialogTitle": "插入表格",
+      "rows": "行数",
+      "cols": "列数",
+      "importExcel": "导入 Excel",
+      "deleteCol": "删除此列",
+      "deleteRow": "删除此行",
+      "headerPrefix": "标题",
+      "headerPlaceholder": "标题 {{n}}",
+      "cellPlaceholder": "单元格内容",
+      "preview": "Markdown 预览",
+      "cancel": "取消",
+      "insert": "插入表格",
+      "excelParseFailed": "Excel 解析失败，请检查文件格式"
+    },
+    "toolbar": {
+      "heading": "标题",
+      "headingDesc": "插入标题",
+      "bold": "粗体",
+      "boldDesc": "加粗文字",
+      "italic": "斜体",
+      "italicDesc": "倾斜文字",
+      "strikethrough": "删除线",
+      "strikethroughDesc": "划掉文字",
+      "inlineCode": "行内代码",
+      "inlineCodeDesc": "内联代码",
+      "codeBlock": "代码块",
+      "codeBlockDesc": "多行代码",
+      "link": "链接",
+      "linkDesc": "插入链接",
+      "image": "图片",
+      "imageDesc": "插入图片",
+      "ul": "无序列表",
+      "ulDesc": "项目符号列表",
+      "ol": "有序列表",
+      "olDesc": "数字编号列表",
+      "quote": "引用",
+      "quoteDesc": "引用块",
+      "taskUnchecked": "任务列表",
+      "taskUncheckedDesc": "未完成任务",
+      "taskChecked": "已完成任务",
+      "taskCheckedDesc": "已完成任务",
+      "inlineMath": "行内公式",
+      "inlineMathDesc": "行内数学公式",
+      "blockMath": "公式块",
+      "blockMathDesc": "块级数学公式",
+      "table": "表格",
+      "tableDesc": "插入表格",
+      "hr": "分隔线",
+      "hrDesc": "水平分隔线",
+      "toc": "目录",
+      "tocDesc": "生成文档目录",
+      "chart": "图表",
+      "chartDesc": "插入 Mermaid 图表",
+      "h1": "一级标题",
+      "h2": "二级标题",
+      "h3": "三级标题",
+      "h4": "四级标题",
+      "h5": "五级标题",
+      "h6": "六级标题"
+    },
+    "chart": {
+      "flowchart": "流程图",
+      "sequence": "时序图",
+      "state": "状态图",
+      "gantt": "甘特图",
+      "class": "类图",
+      "pie": "饼图",
+      "mindmap": "脑图"
+    }
+  },
+  "jsonSchemaConverter": {
+    "placeholder": {
+      "schemaInput": "在此粘贴 JSON Schema...",
+      "tsInput": "在此粘贴 TypeScript interface 或 type..."
+    },
+    "options": {
+      "outputType": "输出类型",
+      "addExport": "添加 export",
+      "optionalByDefault": "默认可选",
+      "schemaVersion": "Schema 版本",
+      "includeRequired": "包含 required"
+    },
+    "button": {
+      "convert": "转换",
+      "swap": "交换",
+      "example": "示例",
+      "clear": "清空"
+    },
+    "error": {
+      "invalidSchema": "无效的 JSON Schema",
+      "invalidTs": "无效的 TypeScript 代码"
+    },
+    "toast": {
+      "convertSuccess": "转换成功",
+      "exampleLoaded": "已加载示例"
+    },
+    "output": {
+      "waiting": "等待转换..."
+    },
+    "usage": {
+      "title": "使用说明",
+      "schemaToTs": "：将 JSON Schema 转换为 TypeScript interface 或 type，支持嵌套对象、数组、枚举、联合类型等。",
+      "tsToSchema": "：将 TypeScript interface/type 转换为 JSON Schema，支持 Draft-04 和 Draft-07 版本。",
+      "swapButton": "交换按钮",
+      "swapDesc": "：将输出结果作为新的输入，方便双向校验转换结果。",
+      "supportedTypes": "支持的类型：基本类型、数组、嵌套对象、联合类型（| ）、交叉类型（&）、枚举、 引用等。"
+    }
+  },
+  "regexVisualizer": {
+    "label": {
+      "pattern": "正则表达式",
+      "testText": "测试文本"
+    },
+    "placeholder": {
+      "pattern": "输入正则表达式，如 \\d+、[a-z]+、(\\w+)@(\\w+)\\.(\\w+)",
+      "testText": "输入要测试的文本..."
+    },
+    "button": {
+      "clear": "清空"
+    },
+    "confirmClear": "确定要清空所有内容吗？",
+    "section": {
+      "railroad": "可视化铁路图"
+    },
+    "tab": {
+      "match": "匹配结果",
+      "explain": "正则解释",
+      "replace": "替换预览"
+    },
+    "legend": {
+      "title": "图例说明",
+      "literal": "字符",
+      "meta": "元字符",
+      "class": "字符类",
+      "group": "分组",
+      "anchor": "锚点",
+      "quantifier": "量词"
+    },
+    "explanation": {
+      "empty": "输入正则表达式以查看解释"
+    },
+    "typeLabel": {
+      "literal": "字符",
+      "meta": "元字符",
+      "escape": "转义",
+      "class": "字符类",
+      "group": "分组",
+      "quantifier": "量词"
+    },
+    "match": {
+      "empty": "输入测试文本以查看匹配结果",
+      "count": "{{count}} 个匹配",
+      "totalChars": "共匹配 {{count}} 个字符",
+      "matchTitle": "匹配 #{{index}}",
+      "detailTitle": "匹配详情",
+      "emptyMatch": "(空匹配)",
+      "position": "位置: {{start}} - {{end}}",
+      "captures": "捕获组:",
+      "namedGroups": "命名组:",
+      "noMatch": "(未匹配)"
+    },
+    "replace": {
+      "label": "替换模式",
+      "placeholder": "输入替换文本，支持 $1, $2, $& 等",
+      "hint": "提示",
+      "hintMatch": "匹配的文本",
+      "hintGroup1": "第一个捕获组",
+      "hintBefore": "匹配前的文本",
+      "hintAfter": "匹配后的文本",
+      "previewTitle": "替换预览",
+      "copyResult": "复制结果",
+      "copied": "已复制",
+      "empty": "(空)",
+      "cannotReplace": "(无法替换)"
+    },
+    "template": {
+      "button": "常用模板"
+    },
+    "templates": {
+      "email": {
+        "name": "邮箱地址",
+        "description": "匹配常见的邮箱地址格式"
+      },
+      "phone-cn": {
+        "name": "手机号码（中国）",
+        "description": "匹配中国大陆 11 位手机号"
+      },
+      "url": {
+        "name": "URL 链接",
+        "description": "匹配 HTTP/HTTPS 链接"
+      },
+      "ipv4": {
+        "name": "IPv4 地址",
+        "description": "匹配 IPv4 地址格式"
+      },
+      "date": {
+        "name": "日期 (YYYY-MM-DD)",
+        "description": "匹配 YYYY-MM-DD 格式日期"
+      },
+      "time": {
+        "name": "时间 (HH:MM:SS)",
+        "description": "匹配 24 小时制时间"
+      },
+      "hex-color": {
+        "name": "十六进制颜色",
+        "description": "匹配 CSS 十六进制颜色值"
+      },
+      "id-cn": {
+        "name": "身份证号（中国）",
+        "description": "匹配 18 位中国身份证号"
+      },
+      "html-tag": {
+        "name": "HTML 标签",
+        "description": "匹配 HTML 标签（简单版）"
+      },
+      "chinese": {
+        "name": "中文字符",
+        "description": "匹配连续的中文字符"
+      },
+      "number": {
+        "name": "数字（整数或小数）",
+        "description": "匹配整数或小数"
+      },
+      "username": {
+        "name": "用户名",
+        "description": "字母开头，3-16 位字母数字下划线"
+      }
+    },
+    "flag": {
+      "g": {
+        "label": "全局",
+        "description": "查找所有匹配项，而非在第一个匹配后停止"
+      },
+      "i": {
+        "label": "忽略大小写",
+        "description": "匹配时不区分大小写"
+      },
+      "m": {
+        "label": "多行",
+        "description": "^ 和 $ 匹配每行的开头和结尾"
+      },
+      "s": {
+        "label": "单行",
+        "description": ". 可以匹配换行符"
+      },
+      "u": {
+        "label": "Unicode",
+        "description": "启用 Unicode 模式"
+      },
+      "y": {
+        "label": "粘性",
+        "description": "从 lastIndex 位置开始匹配"
+      }
+    },
+    "diagram": {
+      "empty": "输入正则表达式以查看可视化",
+      "digit": "数字",
+      "nonDigit": "非数字",
+      "word": "单词",
+      "nonWord": "非单词",
+      "space": "空白",
+      "nonSpace": "非空白",
+      "any": "任意",
+      "anchorStart": "开头 ^",
+      "anchorEnd": "结尾 $",
+      "anchorBoundary": "边界 \\b",
+      "anchorNonBoundary": "非边界 \\B"
+    },
+    "meta": {
+      "anyChar": "匹配任意单个字符（除换行符）",
+      "zeroOrMore": "匹配前面的元素零次或多次",
+      "oneOrMore": "匹配前面的元素一次或多次",
+      "zeroOrOne": "匹配前面的元素零次或一次",
+      "start": "匹配字符串开头",
+      "end": "匹配字符串结尾",
+      "or": "或运算，匹配左边或右边",
+      "digit": "匹配数字 [0-9]",
+      "nonDigit": "匹配非数字 [^0-9]",
+      "wordChar": "匹配单词字符 [a-zA-Z0-9_]",
+      "nonWordChar": "匹配非单词字符",
+      "whitespace": "匹配空白字符（空格、制表符等）",
+      "nonWhitespace": "匹配非空白字符",
+      "wordBoundary": "匹配单词边界",
+      "nonWordBoundary": "匹配非单词边界",
+      "newline": "匹配换行符",
+      "carriageReturn": "匹配回车符",
+      "tab": "匹配制表符",
+      "null": "匹配 NULL 字符"
+    },
+    "explain": {
+      "escape": "转义字符 \"{{char}}\"",
+      "positiveClass": "匹配字符集 {{class}}",
+      "negativeClass": "不匹配字符集 {{class}}",
+      "captureGroup": "捕获组",
+      "nonCaptureGroup": "非捕获组",
+      "lookahead": "正向前瞻断言",
+      "negativeLookahead": "负向前瞻断言",
+      "lookbehind": "正向后瞻断言",
+      "negativeLookbehind": "负向后瞻断言",
+      "namedCaptureGroup": "命名捕获组 \"{{name}}\"",
+      "exactTimes": "精确匹配 {{count}} 次",
+      "atLeastTimes": "匹配至少 {{count}} 次",
+      "betweenTimes": "匹配 {{min}} 到 {{max}} 次",
+      "literal": "匹配字符 \"{{char}}\""
+    }
+  },
+  "qrcodeTool": {
+    "tabGenerate": "生成二维码",
+    "tabParse": "解析二维码",
+    "modeText": "自由文本",
+    "modeWifi": "WiFi",
+    "modeContact": "联系人",
+    "modeSms": "短信",
+    "modeLocation": "位置",
+    "btnSample": "示例",
+    "btnClear": "清空",
+    "btnDownload": "下载二维码",
+    "previewPlaceholder": "请输入内容生成二维码",
+    "styleSettings": "样式设置",
+    "labelForeground": "前景色（码点）",
+    "labelBackground": "背景色",
+    "labelErrorLevel": "容错级别",
+    "errorTolerance": "容错",
+    "errorLevelAutoH": "有 Logo 时自动使用 H 级",
+    "labelSize": "尺寸: {{value}}px",
+    "labelMargin": "边距: {{value}}",
+    "labelLogo": "品牌 Logo",
+    "labelLogoSize": "Logo 大小: {{value}}%",
+    "btnUploadLogo": "上传 Logo 图片",
+    "logoHint": "Logo 会放置在二维码中心，建议使用正方形透明背景图片",
+    "btnResetStyle": "重置样式",
+    "labelTextContent": "文本内容",
+    "placeholderText": "输入文本、网址或任意内容...",
+    "labelSsid": "网络名称 (SSID)",
+    "placeholderSsid": "输入 WiFi 名称",
+    "labelEncryption": "加密类型",
+    "encryptionNone": "无密码",
+    "labelPassword": "密码",
+    "placeholderPassword": "输入 WiFi 密码",
+    "labelHiddenNetwork": "隐藏网络",
+    "labelName": "姓名",
+    "placeholderName": "输入姓名",
+    "labelPhone": "电话",
+    "placeholderPhone": "输入电话号码",
+    "labelEmail": "邮箱",
+    "placeholderEmail": "输入邮箱地址",
+    "labelCompany": "公司",
+    "placeholderCompany": "输入公司名称",
+    "labelTitle": "职位",
+    "placeholderTitle": "输入职位",
+    "labelSmsRecipient": "收件人号码",
+    "placeholderSmsPhone": "输入手机号码",
+    "labelSmsContent": "短信内容",
+    "placeholderSmsMessage": "输入短信内容（可选）",
+    "labelLatitude": "纬度",
+    "placeholderLatitude": "如 39.9042",
+    "labelLongitude": "经度",
+    "placeholderLongitude": "如 116.4074",
+    "labelLocationLabel": "位置标签（可选）",
+    "placeholderLocationLabel": "如 北京天安门",
+    "locationHint": "提示：可以通过地图应用获取经纬度坐标",
+    "parseUploadHint": "点击或拖拽图片到此处上传",
+    "parseUploadFormats": "支持 JPG、PNG、GIF 等常见图片格式",
+    "parseFailedLabel": "解析失败",
+    "parseResultLabel": "解析结果",
+    "btnClearResult": "清除结果",
+    "parseErrorNotRecognized": "未能识别二维码，请确保图片清晰且包含有效的二维码",
+    "parseErrorModuleLoad": "二维码解析模块加载失败",
+    "parseErrorImgLoad": "图片加载失败",
+    "parseErrorFileRead": "文件读取失败",
+    "usageTitle": "使用说明",
+    "usageText": "输入任意文本或网址，生成对应的二维码。",
+    "usageWifi": "填写网络名称、密码和加密类型，扫码即可快速连接 WiFi。",
+    "usageContact": "生成 vCard 格式二维码，扫码可直接添加联系人。",
+    "usageSms": "填写收件人和内容，扫码可快速发送短信。",
+    "usageLocation": "输入经纬度坐标，扫码可在地图应用中打开位置。",
+    "usageStyleTitle": "样式设置",
+    "usageStyle": "可自定义二维码颜色、尺寸、边距，还可上传品牌 Logo 放置在二维码中心。",
+    "sampleContactName": "张三",
+    "sampleContactCompany": "示例公司",
+    "sampleContactTitle": "产品经理",
+    "sampleSmsMessage": "查询话费余额",
+    "sampleLocationLabel": "北京天安门"
+  },
+  "wordCount": {
+    "statsTitle": "统计数据",
+    "toggleStats": "切换统计面板",
+    "statWords": "字数",
+    "statChars": "字符数",
+    "statCharsNoSpaces": "无空格",
+    "statReadingTime": "阅读时间",
+    "statParagraphs": "段落",
+    "statSentences": "句子",
+    "readingTimeZero": "0 分钟",
+    "readingTimeLessThanOne": "少于 1 分钟",
+    "readingTimeMinutes": "{{count}} 分钟",
+    "targetWordCount": "目标字数",
+    "targetWordCountPlaceholder": "设置目标字数（可选）",
+    "progress": "完成度",
+    "textContentTitle": "文本内容",
+    "btnFindReplace": "查找替换",
+    "findReplaceTitle": "查找与替换",
+    "findReplaceTooltip": "这是一个轻量级文本处理工具，不支持查找高亮。如果需要，请使用浏览器自带查找功能（快捷键 Ctrl/Cmd + F）",
+    "labelFind": "查找",
+    "placeholderFind": "输入查找内容...",
+    "labelReplaceWith": "替换为",
+    "placeholderReplace": "输入替换内容...",
+    "useRegex": "使用正则表达式",
+    "commonRegex": "常用正则",
+    "selectCommonRegex": "选择常用正则",
+    "regexNumbers": "匹配数字",
+    "regexLetters": "匹配字母",
+    "regexChinese": "匹配中文",
+    "regexWhitespace": "匹配空白字符",
+    "regexNewline": "匹配换行符",
+    "regexEmail": "匹配邮箱",
+    "quickReplaceNewline": "将 \\n 替换为真实换行",
+    "quickRemoveEscape": "去除转义符",
+    "btnCancel": "取消",
+    "btnReplaceAll": "全部替换",
+    "btnCleanFormat": "清理格式",
+    "selectCleanMethod": "选择清理方式",
+    "cleanSpaces": "去除多余空格",
+    "cleanLines": "去除空行",
+    "cleanTabs": "去除制表符",
+    "cleanFullwidth": "全角转半角",
+    "cleanAll": "一键全部清理",
+    "btnCopy": "复制",
+    "btnCopied": "已复制",
+    "btnClearText": "清空",
+    "placeholderTextarea": "在此输入或粘贴文本...",
+    "confirmClear": "确定要清空内容吗？",
+    "toastSpacesRemoved": "已去除多余空格",
+    "toastLinesRemoved": "已去除空行",
+    "toastTabsRemoved": "已去除制表符",
+    "toastFullwidthConverted": "已将全角转半角",
+    "toastAllCleaned": "已执行全部清理",
+    "toastFindEmpty": "请输入查找内容",
+    "toastNoMatch": "未找到匹配内容或内容未发生变化",
+    "toastReplaced": "替换完成，共替换 {{count}} 处",
+    "toastRegexError": "正则表达式错误",
+    "toastNoNewline": "未找到 \\n 文本",
+    "toastNewlineReplaced": "已将所有 \\n 替换为真实换行符",
+    "toastNoEscape": "未找到可去除的转义符",
+    "toastEscapeRemoved": "已去除所有转义符"
+  },
+  "seoAnalyzer": {
+    "inputTabs": {
+      "url": "网址",
+      "code": "代码",
+      "file": "文件"
+    },
+    "urlInput": {
+      "placeholderFull": "输入完整网址",
+      "history": "历史记录",
+      "hint": "输入网页地址进行 SEO 分析。部分网站可能因反爬虫机制无法抓取。"
+    },
+    "codeInput": {
+      "placeholder": "粘贴 HTML 代码...",
+      "hint": "粘贴完整的 HTML 代码进行分析（⌘/Ctrl + Enter 快捷分析）"
+    },
+    "fileInput": {
+      "title": "点击选择或拖放 HTML 文件",
+      "hint": "支持 .html 和 .htm 文件，单个文件不超过 2MB",
+      "button": "选择文件"
+    },
+    "actions": {
+      "analyze": "分析",
+      "reanalyze": "重新分析",
+      "copyReport": "复制报告",
+      "copied": "已复制"
+    },
+    "errors": {
+      "emptyUrl": "请输入网址",
+      "fetchFailed": "抓取失败",
+      "noHtml": "未获取到 HTML 内容",
+      "requestFailed": "请求失败",
+      "emptyCode": "请输入 HTML 代码",
+      "emptyFile": "文件内容为空或读取失败"
+    },
+    "scoreLabels": {
+      "excellent": "优秀",
+      "good": "良好",
+      "average": "一般",
+      "poor": "较差"
+    },
+    "scoreUnit": "分",
+    "stats": {
+      "errors": "错误",
+      "warnings": "警告",
+      "passed": "通过"
+    },
+    "sections": {
+      "checkResults": "检测结果",
+      "structuredData": "结构化数据",
+      "pageStats": "页面统计"
+    },
+    "tabs": {
+      "headings": "标题",
+      "images": "图片",
+      "links": "链接"
+    },
+    "categories": {
+      "meta": "基础 Meta 信息",
+      "social": "社交媒体标签",
+      "headings": "标题结构",
+      "images": "图片优化",
+      "links": "链接分析",
+      "structured": "结构化数据",
+      "html": "HTML 结构"
+    },
+    "checks": {
+      "title": {
+        "name": "页面标题",
+        "desc": "标题长度合适",
+        "sugg": ""
+      },
+      "description": {
+        "name": "Meta 描述",
+        "desc": "描述长度合适",
+        "sugg": ""
+      },
+      "viewport": {
+        "name": "Viewport",
+        "desc": "移动端配置正确",
+        "sugg": ""
+      },
+      "canonical": {
+        "name": "Canonical URL",
+        "desc": "已设置规范链接",
+        "sugg": "强烈建议添加自引用 canonical 标签，防止重复内容问题"
+      },
+      "robots": {
+        "name": "Robots 指令",
+        "desc": "未设置 robots 标签（默认允许索引）",
+        "sugg": "请确认这是预期的行为，否则搜索引擎将忽略此页面"
+      },
+      "keywords": {
+        "name": "Meta Keywords",
+        "desc": "已设置 keywords（主流搜索引擎已忽略此标签）",
+        "sugg": ""
+      },
+      "og": {
+        "name": "Open Graph",
+        "desc": "Open Graph 标签完整",
+        "sugg": "添加 og:title, og:description, og:image 以优化社交分享效果"
+      },
+      "twitter": {
+        "name": "Twitter Card",
+        "desc": "Twitter Card 标签完整",
+        "sugg": "添加 twitter:card 等标签可优化 Twitter 分享体验"
+      },
+      "h1": {
+        "name": "H1 标签",
+        "desc": "H1 标签配置正确",
+        "sugg": "必须添加一个描述页面主要内容的 H1 标签"
+      },
+      "heading-hierarchy": {
+        "name": "标题层级",
+        "desc": "标题层级结构正确",
+        "sugg": "保持标题层级连续，不要跳级"
+      },
+      "images": {
+        "name": "图片数量",
+        "desc": "页面没有图片",
+        "sugg": ""
+      },
+      "img-alt": {
+        "name": "图片 Alt 属性",
+        "desc": "所有图片都有 alt 属性",
+        "sugg": "Alt 属性对于可访问性和图片 SEO 至关重要"
+      },
+      "img-dimensions": {
+        "name": "图片尺寸",
+        "desc": "未指定图片尺寸",
+        "sugg": "指定 width 和 height 可减少 CLS（累积布局偏移）"
+      },
+      "link-count": {
+        "name": "链接数量",
+        "desc": "链接统计",
+        "sugg": ""
+      },
+      "link-security": {
+        "name": "外链安全",
+        "desc": "外链安全配置正确",
+        "sugg": "为外链添加 rel=noopener noreferrer 以提升安全性"
+      },
+      "structured-data": {
+        "name": "结构化数据",
+        "desc": "未检测到结构化数据",
+        "sugg": "添加 JSON-LD 结构化数据有助于获得富文本搜索结果"
+      },
+      "structured-data-error": {
+        "name": "JSON-LD 语法错误",
+        "desc": "JSON-LD 解析失败",
+        "sugg": "请检查 JSON 语法是否正确"
+      },
+      "doctype": {
+        "name": "DOCTYPE",
+        "desc": "DOCTYPE 声明正确",
+        "sugg": "在 HTML 第一行添加 DOCTYPE html"
+      },
+      "html-lang": {
+        "name": "HTML Lang",
+        "desc": "已设置语言属性",
+        "sugg": "在 html 标签添加 lang 属性以声明页面语言"
+      },
+      "semantic": {
+        "name": "语义化标签",
+        "desc": "使用了语义化标签",
+        "sugg": "合理使用 header, nav, main, footer 等标签有助于 SEO"
+      },
+      "content-length": {
+        "name": "正文字数",
+        "desc": "正文内容充实",
+        "sugg": "页面可能依赖 JS 渲染，搜索引擎可能无法抓取到正文"
+      }
+    },
+    "preview": {
+      "searchTitle": "搜索结果预览",
+      "socialTitle": "社交媒体预览",
+      "noTitle": "(无标题)",
+      "noDescription": "(无描述)"
+    },
+    "panels": {
+      "noBaseUrl": "本地 HTML / 代码模式无来源地址，相对路径图片/链接无法预览或跳转。",
+      "headings": {
+        "empty": "页面没有标题标签",
+        "emptyText": "(空)"
+      },
+      "images": {
+        "empty": "页面没有图片",
+        "total": "总计 {{count}} 张",
+        "missingAlt": "缺少 Alt: {{count}}",
+        "noPreview": "无预览",
+        "previewAlt": "图片预览",
+        "noSrc": "(无 src)",
+        "missingAltAttr": "缺少 alt 属性"
+      },
+      "links": {
+        "internal": "内链",
+        "external": "外链",
+        "internalTab": "内部链接",
+        "externalTab": "外部链接",
+        "noInternal": "无内部链接",
+        "noExternal": "无外部链接",
+        "noText": "(无文字)",
+        "noHref": "(无 href)"
+      },
+      "structuredData": {
+        "empty": "未检测到结构化数据"
+      }
+    },
+    "pageStats": {
+      "words": "文字",
+      "images": "图片",
+      "links": "链接",
+      "headings": "标题",
+      "charset": "字符编码",
+      "author": "作者",
+      "generator": "生成器"
+    }
+  },
+  "svgConverter": {
+    "sections": {
+      "upload": "上传 SVG",
+      "params": "转换参数",
+      "preview": "预览对比",
+      "actions": "操作 & 使用说明"
+    },
+    "uploader": {
+      "title": "拖拽 SVG 文件到此处，或",
+      "button": "选择 SVG 文件",
+      "hint": "支持批量上传多个 SVG 文件"
+    },
+    "fileList": {
+      "addedCount": "已添加 {{count}} 个文件",
+      "current": "（当前：{{name}}）",
+      "clearAll": "清空列表",
+      "converting": "转换中...",
+      "failed": "失败",
+      "download": "下载",
+      "remove": "移除",
+      "empty": "列表为空"
+    },
+    "params": {
+      "presetSize": "预设尺寸",
+      "customSize": "自定义尺寸",
+      "width": "宽度 (px)",
+      "height": "高度 (px)",
+      "outputFormat": "输出格式",
+      "bgSettings": "背景设置",
+      "transparent": "透明背景",
+      "transparentActive": "已启用透明背景",
+      "bgColorJpeg": "背景色（JPEG 不支持透明）",
+      "unifiedMode": "统一参数",
+      "individualModeActive": "独立参数模式",
+      "individualModeHint": "独立参数模式：点击文件列表切换编辑对象，参数将分别应用到每个文件",
+      "originalSize": "原始尺寸：{{w}} × {{h}}",
+      "uploadFirst": "请上传文件"
+    },
+    "presets": {
+      "original": {
+        "label": "原始尺寸",
+        "description": "保持 SVG 原始宽高"
+      },
+      "icon": {
+        "label": "图标尺寸",
+        "description": "64×64 像素，适合应用图标"
+      },
+      "web": {
+        "label": "网页尺寸",
+        "description": "512×512 像素，适合网页展示"
+      },
+      "social": {
+        "label": "社交媒体",
+        "description": "1024×1024 像素，适合头像/封面"
+      },
+      "keepOriginal": "保持原始"
+    },
+    "formats": {
+      "png": "PNG（支持透明背景）",
+      "jpeg": "JPEG（适合照片，体积小）",
+      "webp": "WebP（体积最小，支持透明）"
+    },
+    "preview": {
+      "original": "原始 SVG",
+      "converted": "转换后图片",
+      "converting": "正在转换...",
+      "convertFailed": "转换失败",
+      "waiting": "等待转换...",
+      "convertedAlt": "转换后预览",
+      "fileSize": "文件大小：",
+      "originalSize": "原始尺寸：",
+      "exportSize": "导出尺寸：",
+      "outputFormat": "输出格式："
+    },
+    "actions": {
+      "downloadAll": "批量下载（{{count}} 个文件）",
+      "reconvert": "重新转换",
+      "clearAndReupload": "清空并重新上传"
+    },
+    "stats": {
+      "totalFiles": "总文件数：",
+      "fileCount": "{{count}} 个",
+      "originalSize": "原始总大小：",
+      "converted": "已转换：",
+      "convertedSize": "转换后总大小："
+    },
+    "guide": {
+      "title": "使用说明与注意事项",
+      "tip1": "支持批量上传多个 SVG 文件，默认统一参数应用到所有文件。",
+      "tip2": "点击独立参数按钮可为每个文件单独设置转换参数。",
+      "tip3": "点击文件列表中的文件可切换预览对象。",
+      "tip4": "PNG 格式支持透明背景，适合带透明效果的图标和图形。",
+      "tip5": "JPEG 格式体积最小但不支持透明，适合照片类图片。",
+      "tip6": "WebP 格式兼顾小体积与透明背景，浏览器兼容性较好。",
+      "tip7": "复杂 SVG（外部字体、滤镜、动画）可能导出效果不佳，建议简化后再转换。"
+    },
+    "toast": {
+      "noValidSvg": "未找到有效的 SVG 文件",
+      "filteredNonSvg": "已过滤 {{count}} 个非 SVG 文件",
+      "parseFailed": "解析失败: {{name}}",
+      "added": "已添加 {{count}} 个文件",
+      "noFilesToDownload": "没有可下载的文件",
+      "startDownload": "开始下载 {{count}} 个文件"
+    }
+  }
+}

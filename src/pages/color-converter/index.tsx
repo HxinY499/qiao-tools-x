@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { HexAlphaColorPicker } from 'react-colorful';
+import { useTranslation } from 'react-i18next';
 
 import { CopyButton } from '@/components/copy-button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -10,6 +11,7 @@ import { Slider } from '@/components/ui/slider';
 import { selectHex, selectHSL, useColorConverterStore } from './store';
 
 function ColorConverterPage() {
+  const { t } = useTranslation('tools');
   const { color, setColor, setFromHex, setFromHSL } = useColorConverterStore();
   const hexValue = useColorConverterStore(selectHex);
   const hslValue = useColorConverterStore(selectHSL);
@@ -38,23 +40,23 @@ function ColorConverterPage() {
     const hexRegex = /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{4}|[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$/;
 
     if (!value) {
-      setHexError('请输入颜色值');
+      setHexError(t('colorConverter.inputRequired'));
       return;
     }
 
     if (!value.startsWith('#')) {
-      setHexError('必须以 # 开头');
+      setHexError(t('colorConverter.mustStartWithHash'));
       return;
     }
 
     const validLengths = [4, 5, 7, 9];
     if (!validLengths.includes(value.length)) {
-      setHexError('长度必须为 4/5/7/9 位（含 #）');
+      setHexError(t('colorConverter.invalidLength'));
       return;
     }
 
     if (!hexRegex.test(value)) {
-      setHexError('格式不正确，仅支持 0-9 和 A-F');
+      setHexError(t('colorConverter.invalidHexFormat'));
       return;
     }
 
@@ -122,7 +124,7 @@ function ColorConverterPage() {
                 {hexError && (
                   <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center">
                     <div className="bg-red-500/90 text-white px-4 py-2 rounded-lg text-sm font-medium">
-                      颜色格式不正确
+                      {t('colorConverter.invalidColorFormat')}
                     </div>
                   </div>
                 )}
@@ -153,7 +155,7 @@ function ColorConverterPage() {
               {hexError ? (
                 <p className="text-xs text-red-500 mt-2">{hexError}</p>
               ) : (
-                <p className="text-xs text-muted-foreground mt-2">支持 3/4/6/8 位格式（如 #333 或 #FF5733）</p>
+                <p className="text-xs text-muted-foreground mt-2">{t('colorConverter.hexFormatHint')}</p>
               )}
             </div>
           </CardContent>

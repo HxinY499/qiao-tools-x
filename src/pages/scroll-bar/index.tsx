@@ -1,6 +1,7 @@
 import './index.css';
 
 import { type ChangeEvent, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { CodeArea } from '@/components/code-area';
 import { ColorPicker } from '@/components/color-picker';
@@ -50,6 +51,7 @@ ${hoverPart}`;
 }
 
 function ScrollBarPage() {
+  const { t } = useTranslation('tools');
   const { config, hasHorizontal, showWhenHover, setConfig, setHasHorizontal, setShowWhenHover } = useScrollbarStore();
 
   // cssCode 是 config/hasHorizontal/showWhenHover 的纯派生值，无需 useState + useEffect
@@ -122,10 +124,10 @@ function ScrollBarPage() {
       <Card className="shadow-sm flex flex-col gap-4 p-4 lg:p-5">
         <div className="flex items-center justify-between gap-2 mb-1">
           <div>
-            <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">配置滚动条样式</h2>
+            <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">{t('scrollBar.configTitle')}</h2>
           </div>
           <Button type="button" variant="ghost" size="sm" className="h-7 px-2 text-[11px]" onClick={resetConfig}>
-            重置
+            {t('scrollBar.reset')}
           </Button>
         </div>
 
@@ -133,7 +135,7 @@ function ScrollBarPage() {
           {/* 主体 */}
           <div className="rounded-lg border bg-muted/60 px-3 py-3 space-y-2">
             <div className="flex items-end gap-2 mb-1">
-              <span className="text-sm font-medium">主体</span>
+              <span className="text-sm font-medium">{t('scrollBar.scrollbarSection')}</span>
               <span className="text-[11px] text-muted-foreground">scrollbar</span>
             </div>
             <div className="grid grid-cols-[auto,minmax(0,1fr)] items-center gap-2">
@@ -154,7 +156,7 @@ function ScrollBarPage() {
           {/* 轨道 */}
           <div className="rounded-lg border bg-muted/60 px-3 py-3 space-y-2">
             <div className="flex items-end gap-2 mb-1">
-              <span className="text-sm font-medium">轨道</span>
+              <span className="text-sm font-medium">{t('scrollBar.trackSection')}</span>
               <span className="text-[11px] text-muted-foreground">track</span>
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -221,7 +223,7 @@ function ScrollBarPage() {
           {/* 滑块 */}
           <div className="rounded-lg border bg-muted/60 px-3 py-3 space-y-2">
             <div className="flex items-end gap-2 mb-1">
-              <span className="text-sm font-medium">滑块</span>
+              <span className="text-sm font-medium">{t('scrollBar.thumbSection')}</span>
               <span className="text-[11px] text-muted-foreground">thumb</span>
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -288,7 +290,7 @@ function ScrollBarPage() {
           {/* 拐角 */}
           <div className="rounded-lg border bg-muted/60 px-3 py-3 space-y-2">
             <div className="flex items-end gap-2 mb-1">
-              <span className="text-sm font-medium">拐角</span>
+              <span className="text-sm font-medium">{t('scrollBar.cornerSection')}</span>
               <span className="text-[11px] text-muted-foreground">corner</span>
             </div>
             <div className="space-y-1 flex flex-col">
@@ -305,20 +307,20 @@ function ScrollBarPage() {
       {/* 右侧：预览 + 代码 */}
       <Card className="shadow-sm flex flex-col gap-4 p-4 lg:p-5">
         <div>
-          <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">预览 & CSS 代码</h2>
+          <h2 className="text-xs font-medium tracking-[0.3em] text-muted-foreground uppercase">{t('scrollBar.previewTitle')}</h2>
         </div>
 
         <div className="rounded-lg border bg-muted/40 p-3">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-medium">滚动条预览区域</span>
+            <span className="text-xs font-medium">{t('scrollBar.previewAreaLabel')}</span>
             <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
               <label className="inline-flex items-center gap-1 cursor-pointer">
                 <Checkbox checked={showWhenHover} onCheckedChange={(v) => setShowWhenHover(Boolean(v))} />
-                <span>仅 hover 时显示</span>
+                <span>{t('scrollBar.showOnHover')}</span>
               </label>
               <label className="inline-flex items-center gap-1 cursor-pointer">
                 <Checkbox checked={hasHorizontal} onCheckedChange={(v) => setHasHorizontal(Boolean(v))} />
-                <span>包含横向滚动</span>
+                <span>{t('scrollBar.includeHorizontal')}</span>
               </label>
             </div>
           </div>
@@ -329,12 +331,11 @@ function ScrollBarPage() {
           >
             <div style={{ width: hasHorizontal ? '1000px' : '100%' }}>
               <p className="mb-2">
-                这里是滚动条预览区域，你可以上下滚动（如果开启横向，也可以左右滚动）来查看样式效果。
+                {t('scrollBar.previewText')}
               </p>
               {Array.from({ length: 12 }).map((_, idx) => (
                 <p key={idx} className="mb-1.5">
-                  第 {idx + 1} 行：Scrollbar visual config demo —
-                  调整左侧参数，观察滚动条的宽度、颜色、圆角、边框等变化。
+                  {t('scrollBar.previewRow', { count: idx + 1 })}
                 </p>
               ))}
             </div>
@@ -346,11 +347,11 @@ function ScrollBarPage() {
         </div>
 
         <div className="border-t border-border pt-3 mt-1">
-          <h3 className="text-xs font-semibold mb-1.5">使用小贴士</h3>
+          <h3 className="text-xs font-semibold mb-1.5">{t('scrollBar.tipsTitle')}</h3>
           <ul className="list-disc pl-4 text-[11px] text-muted-foreground space-y-1">
-            <li>生成的 CSS 默认使用选择器 .scrollbar-code-area，你可以根据实际项目修改为自己的类名。</li>
-            <li>如果只想在 hover 时显示滚动条，请勾选「仅 hover 时显示」。</li>
-            <li>横向滚动开关只影响预览区域的内容宽度，方便你同时预览横向滚动条样式。</li>
+            <li>{t('scrollBar.tip1')}</li>
+            <li>{t('scrollBar.tip2')}</li>
+            <li>{t('scrollBar.tip3')}</li>
           </ul>
         </div>
       </Card>

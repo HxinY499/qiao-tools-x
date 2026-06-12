@@ -1,5 +1,6 @@
 import { Clock, Code, FileText, Sparkles, TerminalSquare, X } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
 import { CopyButton } from '@/components/copy-button';
@@ -14,6 +15,7 @@ import { CRON_FORMATS, CRON_TEMPLATES, type CronFormat } from './types';
 import { detectFormat, formatNextRun, parseCron } from './utils';
 
 function CronTranslatorPage() {
+  const { t } = useTranslation('tools');
   const { expression, format, setExpression, setFormat } = useCronTranslatorStore();
   const [detectHint, setDetectHint] = useState<string | null>(null);
 
@@ -22,11 +24,18 @@ function CronTranslatorPage() {
     const detected = detectFormat(expression);
     if (detected && detected !== format) {
       const target = CRON_FORMATS.find((f) => f.value === detected);
-      setDetectHint(target ? `检测到 ${target.fields} 字段，可能需要切换到「${target.label}」` : null);
+      setDetectHint(
+        target
+          ? t('cronTranslator.detectHint', {
+              fields: target.fields,
+              label: t(`cronTranslator.formats.${target.value}.label`),
+            })
+          : null,
+      );
     } else {
       setDetectHint(null);
     }
-  }, [expression, format]);
+  }, [expression, format, t]);
 
   // 解析结果 / 错误（同步计算即可，cron-parser/cronstrue 都是同步）
   const parseState = useMemo(() => {
@@ -50,13 +59,13 @@ function CronTranslatorPage() {
         <CardHeader>
           <CardTitle className="text-base font-medium flex items-center gap-2">
             <TerminalSquare className="w-4 h-4" />
-            Cron 表达式
+            {t('cronTranslator.title')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           {/* 格式选择 */}
           <div className="space-y-2">
-            <Label>格式</Label>
+            <Label>{t('cronTranslator.formatLabel')}</Label>
             <div className="grid grid-cols-2 gap-2">
               {CRON_FORMATS.map((f) => {
                 const active = f.value === format;
@@ -72,8 +81,10 @@ function CronTranslatorPage() {
                         : 'border-input bg-background hover:bg-accent hover:text-accent-foreground',
                     )}
                   >
-                    <span className="font-medium">{f.label}</span>
-                    <span className={cn('text-[11px]', active ? 'opacity-80' : 'text-muted-foreground')}>{f.desc}</span>
+                    <span className="font-medium">{t(`cronTranslator.formats.${f.value}.label`)}</span>
+                    <span className={cn('text-[11px]', active ? 'opacity-80' : 'text-muted-foreground')}>
+                      {t(`cronTranslator.formats.${f.value}.desc`)}
+                    </span>
                   </button>
                 );
               })}
@@ -82,39 +93,49 @@ function CronTranslatorPage() {
 
           {/* 输入框 */}
           <div className="space-y-2">
-            <Label htmlFor="cron-expr">表达式</Label>
+            <Label htmlFor="cron-expr">{t('cronTranslator.exprLabel')}</Label>
             <div className="flex gap-2">
               <Input
                 id="cron-expr"
                 value={expression}
                 onChange={(e) => setExpression(e.target.value)}
-                placeholder={withSeconds ? '例如：0 0 9 * * 1-5' : '例如：0 9 * * 1-5'}
+                placeholder={withSeconds ? t('cronTranslator.placeholderWithSeconds') : t('cronTranslator.placeholder')}
                 className="flex-1 font-mono"
                 spellCheck={false}
                 autoCapitalize="off"
                 autoCorrect="off"
               />
               {expression && (
-                <Button variant="outline" size="icon" onClick={() => setExpression('')} title="清空">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setExpression('')}
+                  title={t('cronTranslator.clear')}
+                >
                   <X className="w-4 h-4" />
                 </Button>
               )}
             </div>
-            {detectHint && <p className="text-xs text-amber-600 dark:text-amber-500">提示：{detectHint}</p>}
+            {detectHint && (
+              <p className="text-xs text-amber-600 dark:text-amber-500">
+                {t('cronTranslator.hintPrefix')}
+                {detectHint}
+              </p>
+            )}
           </div>
 
           {/* 常用模板 */}
           <div className="space-y-2">
-            <Label>常用模板</Label>
+            <Label>{t('cronTranslator.templatesLabel')}</Label>
             <div className="flex flex-wrap gap-2">
-              {CRON_TEMPLATES.map((t) => (
+              {CRON_TEMPLATES.map((tpl) => (
                 <button
-                  key={t.label}
+                  key={tpl.i18nKey}
                   type="button"
-                  onClick={() => handleApplyTemplate(withSeconds ? t.withSeconds : t.standard)}
+                  onClick={() => handleApplyTemplate(withSeconds ? tpl.withSeconds : tpl.standard)}
                   className="px-3 h-7 text-xs rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors"
                 >
-                  {t.label}
+                  {t(`cronTranslator.templates.${tpl.i18nKey}`)}
                 </button>
               ))}
             </div>
@@ -140,7 +161,7 @@ function CronTranslatorPage() {
               <CardTitle className="text-base font-medium flex items-center justify-between">
                 <span className="flex items-center gap-2">
                   <Sparkles className="w-4 h-4" />
-                  翻译
+                  {t('cronTranslator.translation')}
                 </span>
                 <CopyButton
                   text={parseState.result.description}
@@ -148,7 +169,7 @@ function CronTranslatorPage() {
                   variant="ghost"
                   size="sm"
                   className="h-8 px-2 lg:px-3"
-                  onCopy={() => toast.success('已复制翻译')}
+                  onCopy={() => toast.success(t('cronTranslator.copied'))}
                 />
               </CardTitle>
             </CardHeader>
@@ -162,7 +183,7 @@ function CronTranslatorPage() {
             <CardHeader>
               <CardTitle className="text-base font-medium flex items-center gap-2">
                 <Code className="w-4 h-4" />
-                字段拆解
+                {t('cronTranslator.fieldsBreakdown')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -170,9 +191,9 @@ function CronTranslatorPage() {
                 <table className="w-full text-sm">
                   <thead className="bg-muted/40">
                     <tr className="text-left text-xs text-muted-foreground">
-                      <th className="px-3 py-2 font-medium w-20">字段</th>
-                      <th className="px-3 py-2 font-medium w-24">值</th>
-                      <th className="px-3 py-2 font-medium">取值范围</th>
+                      <th className="px-3 py-2 font-medium w-20">{t('cronTranslator.colField')}</th>
+                      <th className="px-3 py-2 font-medium w-24">{t('cronTranslator.colValue')}</th>
+                      <th className="px-3 py-2 font-medium">{t('cronTranslator.colRange')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -194,12 +215,12 @@ function CronTranslatorPage() {
             <CardHeader>
               <CardTitle className="text-base font-medium flex items-center gap-2">
                 <Clock className="w-4 h-4" />
-                未来 5 次执行
+                {t('cronTranslator.nextRunsTitle', { count: 5 })}
               </CardTitle>
             </CardHeader>
             <CardContent>
               {parseState.result.nextRuns.length === 0 ? (
-                <div className="text-sm text-muted-foreground py-3">无法计算执行时间（表达式可能含不支持的语法）</div>
+                <div className="text-sm text-muted-foreground py-3">{t('cronTranslator.nextRunsEmpty')}</div>
               ) : (
                 <ol className="space-y-1">
                   {parseState.result.nextRuns.map((ts, i) => {
@@ -221,7 +242,7 @@ function CronTranslatorPage() {
               )}
               <p className="mt-3 text-xs text-muted-foreground flex items-center gap-1">
                 <FileText className="w-3 h-3" />
-                基于当前本地时间计算
+                {t('cronTranslator.localTimeNote')}
               </p>
             </CardContent>
           </Card>

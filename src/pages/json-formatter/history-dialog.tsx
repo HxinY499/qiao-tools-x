@@ -1,6 +1,7 @@
 import { format } from 'date-fns';
 import { Archive, Clock, FileJson, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
@@ -22,6 +23,7 @@ interface HistoryDialogProps {
 }
 
 export function HistoryDialog({ onLoad }: HistoryDialogProps) {
+  const { t } = useTranslation('tools');
   const [open, setOpen] = useState(false);
   const [history, setHistory] = useState<SavedJson[]>([]);
   const [loading, setLoading] = useState(false);
@@ -33,7 +35,7 @@ export function HistoryDialog({ onLoad }: HistoryDialogProps) {
       setHistory(data);
     } catch (error) {
       console.error('Failed to load history:', error);
-      toast.error('加载历史记录失败');
+      toast.error(t('jsonFormatter.loadHistoryFailed'));
     } finally {
       setLoading(false);
     }
@@ -49,45 +51,45 @@ export function HistoryDialog({ onLoad }: HistoryDialogProps) {
     e.stopPropagation();
     try {
       await db.delete(id);
-      toast.success('删除成功');
+      toast.success(t('jsonFormatter.deleteSuccess'));
       loadHistory(); // Reload list
     } catch (error) {
       console.error('Failed to delete:', error);
-      toast.error('删除失败');
+      toast.error(t('jsonFormatter.deleteFailed'));
     }
   };
 
   const handleSelect = (content: string) => {
     onLoad(content);
     setOpen(false);
-    toast.success('已加载 JSON 内容');
+    toast.success(t('jsonFormatter.jsonLoaded'));
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" variant="outline" className="h-7 w-7 p-0 xl:w-auto xl:px-2" title="仓库">
+        <Button size="sm" variant="outline" className="h-7 w-7 p-0 xl:w-auto xl:px-2" title={t('jsonFormatter.repository')}>
           <Archive className="h-3.5 w-3.5" />
-          <span className="hidden xl:inline ml-2">仓库</span>
+          <span className="hidden xl:inline ml-2">{t('jsonFormatter.repository')}</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px] max-h-[80vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Archive className="h-5 w-5" />
-            JSON 仓库
+            {t('jsonFormatter.repositoryTitle')}
           </DialogTitle>
-          <DialogDescription>管理保存在本地 IndexedDB 中的 JSON 数据</DialogDescription>
+          <DialogDescription>{t('jsonFormatter.repositoryDesc')}</DialogDescription>
         </DialogHeader>
 
         <div className="flex-1 min-h-0 mt-4 border rounded-md">
           <ScrollArea className="h-[400px]">
             {loading ? (
-              <div className="flex items-center justify-center h-full py-8 text-muted-foreground">加载中...</div>
+              <div className="flex items-center justify-center h-full py-8 text-muted-foreground">{t('jsonFormatter.loading')}</div>
             ) : history.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full py-12 text-muted-foreground gap-2">
                 <FileJson className="h-8 w-8 opacity-20" />
-                <p>暂无保存的记录</p>
+                <p>{t('jsonFormatter.noRecords')}</p>
               </div>
             ) : (
               <div className="p-4 grid gap-3">
@@ -123,7 +125,7 @@ export function HistoryDialog({ onLoad }: HistoryDialogProps) {
                           </Button>
                         </TooltipTrigger>
                         <TooltipContent>
-                          <p>删除此记录</p>
+                          <p>{t('jsonFormatter.deleteRecord')}</p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>

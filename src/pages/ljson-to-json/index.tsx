@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { ChevronDown, ChevronRight, FileType2 } from 'lucide-react';
 import { memo, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { CodeArea } from '@/components/code-area';
 
@@ -23,6 +24,7 @@ const LjsonBlock = memo(function LjsonBlock({
   collapsed: boolean;
   onToggle: (index: number) => void;
 }) {
+  const { t } = useTranslation('tools');
   const handleToggle = useCallback(() => onToggle(block.index), [onToggle, block.index]);
 
   return (
@@ -37,7 +39,7 @@ const LjsonBlock = memo(function LjsonBlock({
         </button>
         {!block.valid && (
           <Badge variant="destructive" className="text-[10px] h-4 px-1.5">
-            解析失败
+            {t('ljsonToJson.parseFailed')}
           </Badge>
         )}
       </div>
@@ -71,12 +73,18 @@ const LjsonBlock = memo(function LjsonBlock({
 const EMPTY_RESULT: ParseResult = { blocks: [], validCount: 0, invalidCount: 0 };
 const isMergeable = (b: LjsonLineBlock) => b.valid;
 const successMessage = (count: number) => `已解析 ${count} 条 ljson 数据`;
+successMessage; // ref for type compatibility
 
 const PASTE_PLACEHOLDER = `{"id":"1","type":"message","text":"hello"}\n{"id":"2","type":"topic","topic":"greeting"}`;
 
 // ─── 主页面 ─────────────────────────────────────────────────
 
 export default function LjsonToJsonPage() {
+  const { t } = useTranslation('tools');
+  const successMessage = useCallback(
+    (count: number) => t('ljsonToJson.parsedSuccess', { count }),
+    [t],
+  );
   const controller = useBlockViewer<LjsonLineBlock, ParseResult>({
     emptyResult: EMPTY_RESULT,
     parse: parseLjsonToJson,
@@ -95,39 +103,39 @@ export default function LjsonToJsonPage() {
         open={open}
         onOpenChange={setOpen}
         onConfirm={handleConfirmFromDialog}
-        title="粘贴 ljson 原始数据"
-        description="将 ljson (JSON Lines / NDJSON) 原始文本粘贴到下方，一行一个 JSON 对象"
+        title={t('ljsonToJson.pasteTitle')}
+        description={t('ljsonToJson.pasteDesc')}
         placeholder={PASTE_PLACEHOLDER}
       />
       <RawTextDialog
         open={rawTextOpen}
         onOpenChange={setRawTextOpen}
         rawText={rawText}
-        title="ljson 原始文本"
-        description="以下是导入时的 ljson 原始数据"
+        title={t('ljsonToJson.rawTitle')}
+        description={t('ljsonToJson.rawDesc')}
       />
 
       <BlockListLayout
         controller={controller}
         emptyIcon={FileType2}
         dataLabel="ljson"
-        rawTextTitle="查看原始 ljson 文本"
+        rawTextTitle={t('ljsonToJson.viewRaw')}
         renderBlock={(block, collapsed) => (
           <LjsonBlock block={block} collapsed={collapsed} onToggle={toggleBlock} />
         )}
         renderStats={() => (
           <>
             <Badge variant="secondary" className="text-[10px] h-5">
-              共 {blocks.length} 条
+              {t('ljsonToJson.total', { count: blocks.length })}
             </Badge>
             {validCount > 0 && (
               <Badge className="text-[10px] h-5 bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/15">
-                {validCount} 成功
+                {t('ljsonToJson.success', { count: validCount })}
               </Badge>
             )}
             {invalidCount > 0 && (
               <Badge variant="destructive" className="text-[10px] h-5">
-                {invalidCount} 失败
+                {t('ljsonToJson.fail', { count: invalidCount })}
               </Badge>
             )}
           </>

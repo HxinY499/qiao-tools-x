@@ -4,6 +4,7 @@
 
 import { AlertCircle, Eraser } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -24,6 +25,7 @@ import { TemplateSelector } from './template-selector';
 import { executeMatch, executeReplace, flagsToString, generateExplanation } from './utils';
 
 export default function RegexVisualizerPage() {
+  const { t } = useTranslation('tools');
   const {
     pattern,
     testText,
@@ -55,7 +57,7 @@ export default function RegexVisualizerPage() {
   }, [pattern, flags, testText, validation.valid]);
 
   // 生成解释
-  const explanations = useMemo(() => generateExplanation(pattern), [pattern]);
+  const explanations = useMemo(() => generateExplanation(pattern, t), [pattern, t]);
 
   // 执行替换
   const replacedText = useMemo(() => {
@@ -64,7 +66,7 @@ export default function RegexVisualizerPage() {
   }, [pattern, flags, testText, replacePattern, validation.valid]);
 
   const handleClear = () => {
-    if (window.confirm('确定要清空所有内容吗？')) {
+    if (window.confirm(t('regexVisualizer.confirmClear'))) {
       reset();
     }
   };
@@ -78,13 +80,13 @@ export default function RegexVisualizerPage() {
           <div className="space-y-2">
             <div className="flex items-center justify-between gap-2 flex-wrap">
               <Label htmlFor="pattern" className="text-sm font-medium">
-                正则表达式
+                {t('regexVisualizer.label.pattern')}
               </Label>
               <div className="flex items-center gap-2">
                 <TemplateSelector onSelect={applyTemplate} />
                 <Button variant="ghost" size="sm" onClick={handleClear} className="gap-1 text-destructive">
                   <Eraser className="h-4 w-4" />
-                  清空
+                  {t('regexVisualizer.button.clear')}
                 </Button>
               </div>
             </div>
@@ -95,7 +97,7 @@ export default function RegexVisualizerPage() {
                 id="pattern"
                 value={pattern}
                 onChange={(e) => setPattern(e.target.value)}
-                placeholder="输入正则表达式，如 \d+、[a-z]+、(\w+)@(\w+)\.(\w+)"
+                placeholder={t('regexVisualizer.placeholder.pattern')}
                 className="font-mono text-sm flex-1"
                 spellCheck={false}
               />
@@ -115,13 +117,13 @@ export default function RegexVisualizerPage() {
           {/* 测试文本 */}
           <div className="space-y-2">
             <Label htmlFor="test-text" className="text-sm font-medium">
-              测试文本
+              {t('regexVisualizer.label.testText')}
             </Label>
             <Textarea
               id="test-text"
               value={testText}
               onChange={(e) => setTestText(e.target.value)}
-              placeholder="输入要测试的文本..."
+              placeholder={t('regexVisualizer.placeholder.testText')}
               className="min-h-[100px] font-mono text-sm resize-y custom-scrollbar"
               spellCheck={false}
             />
@@ -132,7 +134,7 @@ export default function RegexVisualizerPage() {
       {/* 可视化区域 */}
       <Card className="shadow-sm border">
         <CardHeader className="pb-2">
-          <CardTitle className="text-base flex items-center gap-2">可视化铁路图</CardTitle>
+          <CardTitle className="text-base flex items-center gap-2">{t('regexVisualizer.section.railroad')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="min-h-[120px] rounded-lg border bg-muted/20 p-4">
@@ -147,15 +149,15 @@ export default function RegexVisualizerPage() {
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="mb-4">
               <TabsTrigger value="match" className="gap-1.5">
-                匹配结果
+                {t('regexVisualizer.tab.match')}
                 {matches.length > 0 && (
                   <span className="ml-1 px-1.5 py-0.5 text-[10px] rounded-full bg-primary text-primary-foreground">
                     {matches.length}
                   </span>
                 )}
               </TabsTrigger>
-              <TabsTrigger value="explain">正则解释</TabsTrigger>
-              <TabsTrigger value="replace">替换预览</TabsTrigger>
+              <TabsTrigger value="explain">{t('regexVisualizer.tab.explain')}</TabsTrigger>
+              <TabsTrigger value="replace">{t('regexVisualizer.tab.replace')}</TabsTrigger>
             </TabsList>
 
             <TabsContent value="match" className="mt-0">
@@ -183,31 +185,31 @@ export default function RegexVisualizerPage() {
       {/* 图例说明 */}
       <Card className="shadow-sm border">
         <CardContent className="pt-4">
-          <h4 className="text-sm font-medium mb-3">图例说明</h4>
+          <h4 className="text-sm font-medium mb-3">{t('regexVisualizer.legend.title')}</h4>
           <div className="flex flex-wrap gap-3 text-xs">
             <div className="flex items-center gap-2">
               <span className="w-4 h-4 rounded bg-[hsl(210_40%_96%)] dark:bg-[hsl(210_30%_25%)] border border-[hsl(210_40%_80%)] dark:border-[hsl(210_40%_50%)]" />
-              <span>字符</span>
+              <span>{t('regexVisualizer.legend.literal')}</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="w-4 h-4 rounded bg-[hsl(280_60%_95%)] dark:bg-[hsl(280_40%_25%)] border border-[hsl(280_60%_70%)] dark:border-[hsl(280_50%_55%)]" />
-              <span>元字符</span>
+              <span>{t('regexVisualizer.legend.meta')}</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="w-4 h-4 rounded bg-[hsl(150_40%_94%)] dark:bg-[hsl(150_30%_22%)] border border-[hsl(150_40%_65%)] dark:border-[hsl(150_40%_45%)]" />
-              <span>字符类</span>
+              <span>{t('regexVisualizer.legend.class')}</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="w-4 h-4 rounded bg-[hsl(35_80%_95%)] dark:bg-[hsl(35_50%_25%)] border border-[hsl(35_80%_70%)] dark:border-[hsl(35_60%_55%)]" />
-              <span>分组</span>
+              <span>{t('regexVisualizer.legend.group')}</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="w-4 h-4 rounded bg-[hsl(0_60%_95%)] dark:bg-[hsl(0_40%_25%)] border border-[hsl(0_60%_70%)] dark:border-[hsl(0_50%_55%)]" />
-              <span>锚点</span>
+              <span>{t('regexVisualizer.legend.anchor')}</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="w-4 h-4 rounded bg-[hsl(200_60%_94%)] dark:bg-[hsl(200_40%_25%)] border border-[hsl(200_60%_65%)] dark:border-[hsl(200_50%_55%)]" />
-              <span>量词</span>
+              <span>{t('regexVisualizer.legend.quantifier')}</span>
             </div>
           </div>
         </CardContent>

@@ -1,5 +1,6 @@
 import { ArrowDownAZ, ChevronDown, Eraser, HelpCircle, Replace, Settings2, Trash2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
 import { CopyButton } from '@/components/copy-button';
@@ -41,16 +42,13 @@ const calculateReadingTime = (cjkCount: number, nonCjkCount: number) => {
 
   if (cjkCount === 0 && nonCjkCount === 0) {
     return {
-      text: '0 分钟',
       minutes: 0,
     };
   }
 
   const minutes = cjkCount / CHARS_PER_MINUTE_CJK + nonCjkCount / WORDS_PER_MINUTE_EN;
-  const ceilMinutes = Math.ceil(minutes);
 
   return {
-    text: ceilMinutes < 1 ? '少于 1 分钟' : `${ceilMinutes} 分钟`,
     minutes,
   };
 };
@@ -102,16 +100,17 @@ const StatCard = ({
   </Card>
 );
 
-const COMMON_REGEX = [
-  { label: '匹配数字', value: '\\d+' },
-  { label: '匹配字母', value: '[a-zA-Z]+' },
-  { label: '匹配中文', value: '[\\u4e00-\\u9fa5]+' },
-  { label: '匹配空白字符', value: '\\s+' },
-  { label: '匹配换行符', value: '\\n' },
-  { label: '匹配邮箱', value: '\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*' },
+const COMMON_REGEX_VALUES = [
+  { labelKey: 'wordCount.regexNumbers', value: '\\d+' },
+  { labelKey: 'wordCount.regexLetters', value: '[a-zA-Z]+' },
+  { labelKey: 'wordCount.regexChinese', value: '[\\u4e00-\\u9fa5]+' },
+  { labelKey: 'wordCount.regexWhitespace', value: '\\s+' },
+  { labelKey: 'wordCount.regexNewline', value: '\\n' },
+  { labelKey: 'wordCount.regexEmail', value: '\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*' },
 ];
 
 export default function WordCountAndProcessPage() {
+  const { t } = useTranslation('tools');
   const { text, setText, targetWordCount, setTargetWordCount } = useWordCountStore();
   const [replacePopoverOpen, setReplacePopoverOpen] = useState(false);
   const [findText, setFindText] = useState('');
@@ -121,8 +120,15 @@ export default function WordCountAndProcessPage() {
 
   const stats = useMemo(() => analyzeText(text), [text]);
 
+  const readingTimeText = useMemo(() => {
+    const { minutes } = stats.readingTime;
+    if (minutes === 0) return t('wordCount.readingTimeZero');
+    const ceilMinutes = Math.ceil(minutes);
+    return ceilMinutes < 1 ? t('wordCount.readingTimeLessThanOne') : t('wordCount.readingTimeMinutes', { count: ceilMinutes });
+  }, [stats.readingTime, t]);
+
   const handleClear = () => {
-    if (window.confirm('确定要清空内容吗？')) {
+    if (window.confirm(t('wordCount.confirmClear'))) {
       setText('');
     }
   };
@@ -133,20 +139,20 @@ export default function WordCountAndProcessPage() {
     switch (type) {
       case 'spaces':
         newText = newText.replace(/[ \t]+/g, ' ').replace(/^ +| +$/gm, '');
-        toast.success('已去除多余空格');
+        toast.success(t('wordCount.toastSpacesRemoved'));
         break;
       case 'lines':
         newText = newText.replace(/\n\s*\n/g, '\n').trim();
-        toast.success('已去除空行');
+        toast.success(t('wordCount.toastLinesRemoved'));
         break;
       case 'tabs':
         newText = newText.replace(/\t/g, ' ');
-        toast.success('已去除制表符');
+        toast.success(t('wordCount.toastTabsRemoved'));
         break;
       case 'fullwidth':
         newText = newText.replace(/[\uFF01-\uFF5E]/g, (ch) => String.fromCharCode(ch.charCodeAt(0) - 0xfee0));
         newText = newText.replace(/\u3000/g, ' ');
-        toast.success('已将全角转半角');
+        toast.success(t('wordCount.toastFullwidthConverted'));
         break;
       case 'all':
         newText = newText.replace(/[\uFF01-\uFF5E]/g, (ch) => String.fromCharCode(ch.charCodeAt(0) - 0xfee0));
@@ -154,7 +160,7 @@ export default function WordCountAndProcessPage() {
         newText = newText.replace(/\t/g, ' ');
         newText = newText.replace(/[ \t]+/g, ' ').replace(/^ +| +$/gm, '');
         newText = newText.replace(/\n\s*\n/g, '\n').trim();
-        toast.success('已执行全部清理');
+        toast.success(t('wordCount.toastAllCleaned'));
         break;
     }
 
@@ -163,7 +169,7 @@ export default function WordCountAndProcessPage() {
 
   const handleReplace = (replaceAll: boolean = true) => {
     if (!findText) {
-      toast.error('请输入查找内容');
+      toast.error(t('wordCount.toastFindEmpty'));
       return;
     }
 
@@ -193,7 +199,7 @@ export default function WordCountAndProcessPage() {
       const newText = text.replace(searchValue, finalReplaceText);
 
       if (newText === text) {
-        toast.info('未找到匹配内容或内容未发生变化');
+        toast.info(t('wordCount.toastNoMatch'));
         return;
       }
 
@@ -205,10 +211,10 @@ export default function WordCountAndProcessPage() {
       }
 
       setText(newText);
-      toast.success(`替换完成，共替换 ${count} 处`);
+      toast.success(t('wordCount.toastReplaced', { count }));
       setReplacePopoverOpen(false);
     } catch {
-      toast.error('正则表达式错误');
+      toast.error(t('wordCount.toastRegexError'));
     }
   };
 
@@ -217,10 +223,10 @@ export default function WordCountAndProcessPage() {
     // 将字面量 \n 替换为真实换行符
     const newText = text.replace(/\\n/g, '\n');
     if (newText === text) {
-      toast.info('未找到 \\n 文本');
+      toast.info(t('wordCount.toastNoNewline'));
     } else {
       setText(newText);
-      toast.success('已将所有 \\n 替换为真实换行符');
+      toast.success(t('wordCount.toastNewlineReplaced'));
       setReplacePopoverOpen(false);
     }
   };
@@ -236,10 +242,10 @@ export default function WordCountAndProcessPage() {
     });
 
     if (newText === text) {
-      toast.info('未找到可去除的转义符');
+      toast.info(t('wordCount.toastNoEscape'));
     } else {
       setText(newText);
-      toast.success('已去除所有转义符');
+      toast.success(t('wordCount.toastEscapeRemoved'));
       setReplacePopoverOpen(false);
     }
   };
@@ -250,13 +256,13 @@ export default function WordCountAndProcessPage() {
     <div className="max-w-5xl w-full mx-auto px-4 pb-5 lg:py-8 space-y-6">
       <Collapsible open={isStatsOpen} onOpenChange={setIsStatsOpen} className="space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold">统计数据</h3>
+          <h3 className="text-lg font-semibold">{t('wordCount.statsTitle')}</h3>
           <CollapsibleTrigger asChild>
             <Button variant="ghost" size="sm" className="w-9 p-0">
               <ChevronDown
                 className={cn('h-4 w-4 transition-transform duration-200', isStatsOpen ? '' : '-rotate-90')}
               />
-              <span className="sr-only">切换统计面板</span>
+              <span className="sr-only">{t('wordCount.toggleStats')}</span>
             </Button>
           </CollapsibleTrigger>
         </div>
@@ -264,11 +270,11 @@ export default function WordCountAndProcessPage() {
         <CollapsibleContent className="space-y-6">
           {/* 统计卡片区 */}
           <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
-            <StatCard title="字数" value={stats.words} />
-            <StatCard title="字符数" value={stats.chars} sub={`无空格: ${stats.charsNoSpaces}`} />
-            <StatCard title="阅读时间" value={stats.readingTime.text} />
-            <StatCard title="段落" value={stats.paragraphs} />
-            <StatCard title="句子" value={stats.sentences} />
+            <StatCard title={t('wordCount.statWords')} value={stats.words} />
+            <StatCard title={t('wordCount.statChars')} value={stats.chars} sub={`${t('wordCount.statCharsNoSpaces')}: ${stats.charsNoSpaces}`} />
+            <StatCard title={t('wordCount.statReadingTime')} value={readingTimeText} />
+            <StatCard title={t('wordCount.statParagraphs')} value={stats.paragraphs} />
+            <StatCard title={t('wordCount.statSentences')} value={stats.sentences} />
           </div>
 
           {/* 目标设定 & 进度条 */}
@@ -276,12 +282,12 @@ export default function WordCountAndProcessPage() {
             <div className="flex flex-col md:flex-row gap-4 items-end md:items-center justify-between">
               <div className="flex flex-col gap-1.5 w-full max-w-xs">
                 <Label htmlFor="target" className="text-sm font-semibold">
-                  目标字数
+                  {t('wordCount.targetWordCount')}
                 </Label>
                 <Input
                   id="target"
                   type="number"
-                  placeholder="设置目标字数（可选）"
+                  placeholder={t('wordCount.targetWordCountPlaceholder')}
                   value={targetWordCount || ''}
                   onChange={(e) => setTargetWordCount(Number(e.target.value))}
                   min={0}
@@ -290,7 +296,7 @@ export default function WordCountAndProcessPage() {
               {targetWordCount > 0 && (
                 <div className="flex-1 w-full space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span>完成度</span>
+                    <span>{t('wordCount.progress')}</span>
                     <span className="font-medium">
                       {Math.round(progress)}% ({stats.words} / {targetWordCount})
                     </span>
@@ -306,52 +312,50 @@ export default function WordCountAndProcessPage() {
       {/* 编辑区 */}
       <div className="grid gap-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <h3 className="text-lg font-semibold">文本内容</h3>
+          <h3 className="text-lg font-semibold">{t('wordCount.textContentTitle')}</h3>
           <div className="flex flex-wrap gap-2">
             {/* 查找替换 Popover */}
             <Popover open={replacePopoverOpen} onOpenChange={setReplacePopoverOpen}>
               <PopoverTrigger asChild>
                 <Button variant="outline" size="sm" disabled={!text}>
                   <Replace className="h-4 w-4 mr-2" />
-                  查找替换
+                  {t('wordCount.btnFindReplace')}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-80 p-4" align="end">
                 <div className="grid gap-4">
                   <div className="flex items-center justify-between">
-                    <h4 className="font-medium leading-none">查找与替换</h4>
+                    <h4 className="font-medium leading-none">{t('wordCount.findReplaceTitle')}</h4>
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
                         </TooltipTrigger>
                         <TooltipContent className="max-w-xs text-xs break-words">
-                          这是一个轻量级文本处理工具，不支持查找高亮。
-                          <br />
-                          如果需要，请使用浏览器自带查找功能（快捷键 Ctrl/Cmd + F）
+                          {t('wordCount.findReplaceTooltip')}
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
                   </div>
                   <div className="grid gap-2">
                     <div className="grid gap-2">
-                      <Label htmlFor="find">查找</Label>
+                      <Label htmlFor="find">{t('wordCount.labelFind')}</Label>
                       <Textarea
                         id="find"
                         className="min-h-[60px] text-xs resize-y"
                         value={findText}
                         onChange={(e) => setFindText(e.target.value)}
-                        placeholder="输入查找内容..."
+                        placeholder={t('wordCount.placeholderFind')}
                       />
                     </div>
                     <div className="grid gap-2">
-                      <Label htmlFor="replace">替换为</Label>
+                      <Label htmlFor="replace">{t('wordCount.labelReplaceWith')}</Label>
                       <Textarea
                         id="replace"
                         className="min-h-[60px] text-xs resize-y"
                         value={replaceText}
                         onChange={(e) => setReplaceText(e.target.value)}
-                        placeholder="输入替换内容..."
+                        placeholder={t('wordCount.placeholderReplace')}
                       />
                     </div>
                   </div>
@@ -359,22 +363,22 @@ export default function WordCountAndProcessPage() {
                     <div className="flex items-center space-x-2">
                       <Switch id="regex-mode" checked={useRegex} onCheckedChange={setUseRegex} />
                       <Label htmlFor="regex-mode" className="text-xs">
-                        使用正则表达式
+                        {t('wordCount.useRegex')}
                       </Label>
                     </div>
                     {useRegex && (
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="outline" size="sm" className="h-7 text-xs px-2">
-                            常用正则 <ChevronDown className="ml-1 h-3 w-3 opacity-50" />
+                            {t('wordCount.commonRegex')} <ChevronDown className="ml-1 h-3 w-3 opacity-50" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-[200px]">
-                          <DropdownMenuLabel>选择常用正则</DropdownMenuLabel>
+                          <DropdownMenuLabel>{t('wordCount.selectCommonRegex')}</DropdownMenuLabel>
                           <DropdownMenuSeparator />
-                          {COMMON_REGEX.map((item) => (
-                            <DropdownMenuItem key={item.label} onClick={() => setFindText(item.value)}>
-                              <span className="flex-1 truncate">{item.label}</span>
+                          {COMMON_REGEX_VALUES.map((item) => (
+                            <DropdownMenuItem key={item.labelKey} onClick={() => setFindText(item.value)}>
+                              <span className="flex-1 truncate">{t(item.labelKey)}</span>
                             </DropdownMenuItem>
                           ))}
                         </DropdownMenuContent>
@@ -389,7 +393,7 @@ export default function WordCountAndProcessPage() {
                       className="w-full text-xs h-8 justify-start px-3"
                       onClick={quickReplaceNewlineToBreak}
                     >
-                      ⚡ 将 \n 替换为真实换行
+                      ⚡ {t('wordCount.quickReplaceNewline')}
                     </Button>
                     <Button
                       variant="secondary"
@@ -397,7 +401,7 @@ export default function WordCountAndProcessPage() {
                       className="w-full text-xs h-8 justify-start px-3"
                       onClick={removeEscapes}
                     >
-                      ⚡ 去除转义符 (如 \' → ')
+                      ⚡ {t('wordCount.quickRemoveEscape')}
                     </Button>
                   </div>
 
@@ -408,10 +412,10 @@ export default function WordCountAndProcessPage() {
                       className="h-8 text-xs"
                       onClick={() => setReplacePopoverOpen(false)}
                     >
-                      取消
+                      {t('wordCount.btnCancel')}
                     </Button>
                     <Button size="sm" className="h-8 text-xs" onClick={() => handleReplace(true)}>
-                      全部替换
+                      {t('wordCount.btnReplaceAll')}
                     </Button>
                   </div>
                 </div>
@@ -423,17 +427,17 @@ export default function WordCountAndProcessPage() {
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" disabled={!text}>
                   <Eraser className="h-4 w-4 mr-2" />
-                  清理格式
+                  {t('wordCount.btnCleanFormat')}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuLabel>选择清理方式</DropdownMenuLabel>
+                <DropdownMenuLabel>{t('wordCount.selectCleanMethod')}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => handleFormat('spaces')}>去除多余空格</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleFormat('lines')}>去除空行</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleFormat('tabs')}>去除制表符</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleFormat('spaces')}>{t('wordCount.cleanSpaces')}</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleFormat('lines')}>{t('wordCount.cleanLines')}</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleFormat('tabs')}>{t('wordCount.cleanTabs')}</DropdownMenuItem>
                 <DropdownMenuItem onClick={() => handleFormat('fullwidth')}>
-                  全角转半角 <ArrowDownAZ className="ml-auto h-3 w-3 opacity-50" />
+                  {t('wordCount.cleanFullwidth')} <ArrowDownAZ className="ml-auto h-3 w-3 opacity-50" />
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
@@ -441,7 +445,7 @@ export default function WordCountAndProcessPage() {
                   className="text-primary focus:text-primary focus:bg-primary/10"
                 >
                   <Settings2 className="mr-2 h-4 w-4" />
-                  一键全部清理
+                  {t('wordCount.cleanAll')}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -452,8 +456,8 @@ export default function WordCountAndProcessPage() {
               variant="outline"
               size="sm"
               disabled={!text}
-              copyText="复制"
-              successText="已复制"
+              copyText={t('wordCount.btnCopy')}
+              successText={t('wordCount.btnCopied')}
             />
             <Button
               variant="ghost"
@@ -463,13 +467,13 @@ export default function WordCountAndProcessPage() {
               className="text-destructive hover:text-destructive/90"
             >
               <Trash2 className="h-4 w-4 mr-2" />
-              清空
+              {t('wordCount.btnClearText')}
             </Button>
           </div>
         </div>
         <Textarea
           className="min-h-[400px] text-base leading-relaxed p-4 resize-y font-mono"
-          placeholder="在此输入或粘贴文本..."
+          placeholder={t('wordCount.placeholderTextarea')}
           value={text}
           onChange={(e) => setText(e.target.value)}
         />

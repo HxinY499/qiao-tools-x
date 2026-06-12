@@ -1,5 +1,6 @@
 import { List, Pin, PinOff } from 'lucide-react';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/ui/button';
 import { cn } from '@/utils';
@@ -76,6 +77,7 @@ const TocRow = memo(function TocRow({ item, isActive, indent, onClick }: TocRowP
 });
 
 export function Toc({ htmlContent, previewRef, className, pinned, onPinChange }: TocProps) {
+  const { t } = useTranslation('tools');
   const [activeId, setActiveId] = useState<string>('');
 
   // 提取目录
@@ -173,9 +175,9 @@ export function Toc({ htmlContent, previewRef, className, pinned, onPinChange }:
       <div className={cn('flex flex-col', className)}>
         <div className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-muted-foreground border-b border-border">
           <List className="h-3.5 w-3.5" />
-          <span>目录</span>
+          <span>{t('markdownEditor.toc.title')}</span>
         </div>
-        <div className="p-4 text-xs text-muted-foreground text-center">暂无标题</div>
+        <div className="p-4 text-xs text-muted-foreground text-center">{t('markdownEditor.toc.empty')}</div>
       </div>
     );
   }
@@ -185,7 +187,7 @@ export function Toc({ htmlContent, previewRef, className, pinned, onPinChange }:
       {/* 标题栏 */}
       <div className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-muted-foreground border-b border-border shrink-0">
         <List className="h-3.5 w-3.5" />
-        <span>目录</span>
+        <span>{t('markdownEditor.toc.title')}</span>
         <span className="text-[10px] opacity-60">{tocItems.length}</span>
         <Button variant="ghost" size="icon" className="h-6 w-6 ml-auto" onClick={() => onPinChange?.(!pinned)}>
           {pinned ? <PinOff className="h-3 w-3" /> : <Pin className="h-3 w-3" />}

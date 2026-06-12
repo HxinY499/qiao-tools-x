@@ -2,6 +2,8 @@
  * 正则解释视图组件
  */
 
+import { useTranslation } from 'react-i18next';
+
 import { Badge } from '@/components/ui/badge';
 
 import type { ExplanationItem } from './types';
@@ -19,18 +21,20 @@ const TYPE_COLORS: Record<string, string> = {
   quantifier: 'bg-cyan-100 dark:bg-cyan-900/40 text-cyan-700 dark:text-cyan-300',
 };
 
-const TYPE_LABELS: Record<string, string> = {
-  literal: '字符',
-  meta: '元字符',
-  escape: '转义',
-  class: '字符类',
-  group: '分组',
-  quantifier: '量词',
-};
-
 export function ExplanationView({ items }: ExplanationViewProps) {
+  const { t } = useTranslation('tools');
+
+  const TYPE_LABEL_KEYS: Record<string, string> = {
+    literal: 'regexVisualizer.typeLabel.literal',
+    meta: 'regexVisualizer.typeLabel.meta',
+    escape: 'regexVisualizer.typeLabel.escape',
+    class: 'regexVisualizer.typeLabel.class',
+    group: 'regexVisualizer.typeLabel.group',
+    quantifier: 'regexVisualizer.typeLabel.quantifier',
+  };
+
   if (items.length === 0) {
-    return <div className="text-center text-muted-foreground py-8 text-sm">输入正则表达式以查看解释</div>;
+    return <div className="text-center text-muted-foreground py-8 text-sm">{t('regexVisualizer.explanation.empty')}</div>;
   }
 
   return (
@@ -48,7 +52,7 @@ export function ExplanationView({ items }: ExplanationViewProps) {
           <div className="flex-1 min-w-0">
             <p className="text-sm">{item.description}</p>
             <Badge variant="outline" className="mt-1 text-[10px]">
-              {TYPE_LABELS[item.type] || item.type}
+              {TYPE_LABEL_KEYS[item.type] ? t(TYPE_LABEL_KEYS[item.type]) : item.type}
             </Badge>
           </div>
         </div>
