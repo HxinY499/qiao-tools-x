@@ -26,6 +26,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/utils';
 
 import type { IssueSeverity, SeoAnalysisResult, SeoCategory, SeoCheckItem } from './types';
+import { buildReportText } from './utils';
 
 interface SeoResultViewProps {
   result: SeoAnalysisResult;
@@ -337,6 +338,11 @@ function ImagesPanel({ images, baseUrl }: { images: SeoAnalysisResult['images'];
           缺少 Alt: <span className="font-medium">{withoutAlt}</span>
         </span>
       </div>
+      {!baseUrl && (
+        <p className="text-[11px] text-yellow-600 dark:text-yellow-500">
+          本地 HTML / 代码模式无来源地址，相对路径图片无法预览。
+        </p>
+      )}
 
       <List height={280} itemCount={images.length} itemSize={48} width="100%" className="custom-scrollbar">
         {ImageRow}
@@ -445,6 +451,11 @@ function LinksPanel({ links, baseUrl }: { links: SeoAnalysisResult['links']; bas
           外链 <span className="font-medium text-foreground">{external.length}</span>
         </span>
       </div>
+      {!baseUrl && (
+        <p className="text-[11px] text-yellow-600 dark:text-yellow-500">
+          本地 HTML / 代码模式无来源地址，相对路径链接无法跳转。
+        </p>
+      )}
       <Tabs defaultValue="internal" className="w-full">
         <TabsList className="h-8 w-full">
           <TabsTrigger value="internal" className="flex-1 text-xs">
@@ -520,22 +531,32 @@ export function SeoResultView({ result, onReset }: SeoResultViewProps) {
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2">
         <Button variant="ghost" size="sm" onClick={onReset} className="h-8 gap-1.5 px-2">
           <ArrowLeft className="h-4 w-4" />
           <span className="hidden sm:inline">重新分析</span>
         </Button>
-        {result.url && (
-          <a
-            href={result.finalUrl || result.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
-          >
-            <span className="max-w-[200px] truncate sm:max-w-[300px]">{result.finalUrl || result.url}</span>
-            <ExternalLink className="h-3 w-3 shrink-0" />
-          </a>
-        )}
+        <div className="flex min-w-0 items-center gap-2">
+          {result.url && (
+            <a
+              href={result.finalUrl || result.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <span className="max-w-[160px] truncate sm:max-w-[260px]">{result.finalUrl || result.url}</span>
+              <ExternalLink className="h-3 w-3 shrink-0" />
+            </a>
+          )}
+          <CopyButton
+            text={buildReportText(result)}
+            mode="icon-text"
+            variant="outline"
+            size="sm"
+            copyText="复制报告"
+            successText="已复制"
+          />
+        </div>
       </div>
 
       {/* Score Card */}
@@ -634,6 +655,29 @@ export function SeoResultView({ result, onReset }: SeoResultViewProps) {
                 <p className="text-[10px] text-muted-foreground">标题</p>
               </div>
             </div>
+
+            {(result.meta.author || result.meta.generator || result.meta.charset) && (
+              <div className="mt-3 space-y-1 border-t pt-3 text-[11px] text-muted-foreground">
+                {result.meta.charset && (
+                  <p className="flex gap-1.5">
+                    <span className="shrink-0 font-medium">字符编码</span>
+                    <span className="min-w-0 truncate text-foreground">{result.meta.charset}</span>
+                  </p>
+                )}
+                {result.meta.author && (
+                  <p className="flex gap-1.5">
+                    <span className="shrink-0 font-medium">作者</span>
+                    <span className="min-w-0 truncate text-foreground">{result.meta.author}</span>
+                  </p>
+                )}
+                {result.meta.generator && (
+                  <p className="flex gap-1.5">
+                    <span className="shrink-0 font-medium">生成器</span>
+                    <span className="min-w-0 truncate text-foreground">{result.meta.generator}</span>
+                  </p>
+                )}
+              </div>
+            )}
           </Card>
         </div>
       </div>

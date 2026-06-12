@@ -25,6 +25,8 @@
 
 > **注**：`Info` 级别和 `Success` 级别的检测项**永远不扣分**。
 
+> **实现说明**：所有长度/比例阈值集中定义在 `utils.ts` 的 `SEO_THRESHOLDS` 常量中；各分类检测逻辑拆分为独立的 `checkMeta` / `checkSocial` / `checkHeadings` / `checkImages` / `checkLinks` / `checkStructuredData` / `checkHtmlStructure` 纯函数，便于测试与维护。
+
 ---
 
 ## 2. 详细检测逻辑
@@ -42,6 +44,7 @@
 | | 未包含 `width=device-width` | Warning | Medium |
 | **Canonical** | 缺失 | Warning | Medium |
 | **Robots** | 包含 `noindex` / `nofollow` | Warning | None (仅提示) |
+| **Keywords** | 存在 keywords 标签 | Info | None (仅提示，主流搜索引擎已忽略) |
 
 ### 2.2 标题结构 (Headings)
 
@@ -88,6 +91,8 @@
 | **DOCTYPE** | 缺失 | Error | Low |
 | **Lang 属性** | `<html>` 标签缺少 `lang` | Warning | Low |
 | **语义化标签** | 未使用 `<header>`, `<main>` 等 | Info | None |
+| **正文字数** | 未检测到正文内容 (0 字) | Warning | Medium |
+| | 正文字数 < 300 (薄内容) | Warning | Low |
 
 ---
 

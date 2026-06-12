@@ -22,6 +22,7 @@ import {
   Search,
   Sparkles,
   Square,
+  TerminalSquare,
 } from 'lucide-react';
 import { lazy } from 'react';
 
@@ -396,6 +397,20 @@ export const toolRoutes: ToolRoute[] = [
       description:
         '免费在线 ASCII Art 生成器，输入文字选择字体即可渲染出 ASCII 大字，支持多种 figlet 字体、一键复制与下载，适合给 README、Banner、代码注释加趣味装饰。',
       keywords: 'ASCII Art,ASCII 字符画,ASCII 大字,figlet,文字 banner,代码注释装饰,README banner',
+    },
+  },
+  {
+    key: ToolKey.CronTranslator,
+    path: '/cron-translator',
+    title: 'Cron 表达式翻译',
+    subtitle: '把 cron 表达式翻译成中文自然语言，并预览未来 5 次执行时间，支持 5 字段与带秒 6 字段',
+    icon: TerminalSquare,
+    component: lazy(() => import('@/pages/cron-translator')),
+    category: 'dev',
+    seo: {
+      description:
+        '免费在线 Cron 表达式翻译工具，将 cron 表达式翻译成中文自然语言，自动拆解字段含义，预览未来 5 次执行时间，支持 5 字段标准格式与带秒 6 字段格式。',
+      keywords: 'cron 翻译,crontab 解析,cron 表达式,cron 在线工具,定时任务,Cron 翻译器,cron 中文',
     },
   },
 ];

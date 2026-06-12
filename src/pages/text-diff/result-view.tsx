@@ -1,4 +1,4 @@
-import { FileDiff, SquareSplitVertical } from 'lucide-react';
+import { FileDiff, Loader2, SquareSplitVertical } from 'lucide-react';
 import { useRef } from 'react';
 
 import { CopyButton } from '@/components/copy-button';
@@ -12,6 +12,7 @@ import type { DiffLine, DiffViewMode, TextDiffStats } from './types';
 
 interface TextDiffResultViewProps {
   hasResult: boolean;
+  isComputing: boolean;
   lines: DiffLine[];
   syncScroll: boolean;
   onSyncScrollChange: (value: boolean) => void;
@@ -72,6 +73,7 @@ function renderSegments(line: DiffLine, side: 'left' | 'right') {
 
 export function TextDiffResultView({
   hasResult,
+  isComputing,
   lines,
   syncScroll,
   onSyncScrollChange,
@@ -170,7 +172,12 @@ export function TextDiffResultView({
         </div>
       </CardHeader>
       <CardContent className="pt-3">
-        {hasResult ? (
+        {isComputing && !hasResult ? (
+          <div className="flex flex-col items-center justify-center gap-2 py-10 text-muted-foreground/70 text-sm">
+            <Loader2 className="h-8 w-8 animate-spin opacity-40" />
+            <p>正在对比，文本较大时请稍候…</p>
+          </div>
+        ) : hasResult ? (
           <div className="grid gap-3 md:grid-cols-2">
             <div
               ref={leftResultRef}

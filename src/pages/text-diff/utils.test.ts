@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { buildDiffLines, buildDiffSummaryText, calculateStats } from './utils';
+import { buildDiffLines, buildDiffSummaryText, calculateStats, MAX_CHAR_DIFF_LINE_LENGTH } from './utils';
 
 describe('buildDiffLines', () => {
   it('两个相同文本应全为 unchanged', () => {
@@ -52,6 +52,43 @@ describe('buildDiffLines', () => {
       expect(modified.leftSegments.length).toBeGreaterThan(0);
       expect(modified.rightSegments.length).toBeGreaterThan(0);
     }
+  });
+
+  it('删 1 行加 3 行时不应错误硬配对（LCS 对齐）', () => {
+    // old 的 'x' 与 new 完全无关，new 多出 3 行
+    const lines = buildDiffLines('a\nx\nb', 'a\np\nq\nr\nb');
+    // 锚点 a、b 应为 unchanged
+    const unchanged = lines.filter((l) => l.type === 'unchanged');
+    expect(unchanged.some((l) => l.leftSegments.map((s) => s.value).join('') === 'a')).toBe(true);
+    expect(unchanged.some((l) => l.leftSegments.map((s) => s.value).join('') === 'b')).toBe(true);
+    // 中间应有新增行（p/q/r 至少有 added），且不会把 x 与某行硬配成 modified 后丢失剩余行
+    const added = lines.filter((l) => l.type === 'added');
+    expect(added.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('块内相同的行应被识别为 unchanged 锚点', () => {
+    const lines = buildDiffLines('keep\nold', 'keep\nnew');
+    const keep = lines.find((l) => l.leftSegments.map((s) => s.value).join('') === 'keep');
+    expect(keep?.type).toBe('unchanged');
+  });
+
+  it('超长行应跳过字符级 diff，整行标记', () => {
+    const longBase = 'a'.repeat(MAX_CHAR_DIFF_LINE_LENGTH + 10);
+    const left = `${longBase}X`;
+    const right = `${longBase}Y`;
+    const lines = buildDiffLines(left, right);
+    const modified = lines.find((l) => l.type === 'modified');
+    expect(modified).toBeTruthy();
+    // 跳过字符级 diff：左侧整行作为一个 removed segment，而非拆成多个字符片段
+    expect(modified?.leftSegments).toHaveLength(1);
+    expect(modified?.leftSegments[0].type).toBe('removed');
+    expect(modified?.rightSegments).toHaveLength(1);
+    expect(modified?.rightSegments[0].type).toBe('added');
+  });
+
+  it('以换行结尾不应产生多余空行', () => {
+    const lines = buildDiffLines('a\nb\n', 'a\nb\n');
+    expect(lines).toHaveLength(2);
   });
 });
 

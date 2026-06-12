@@ -29,6 +29,7 @@ export enum ToolKey {
   SseToJson = 'sse-to-json',
   LjsonToJson = 'ljson-to-json',
   AsciiArt = 'ascii-art',
+  CronTranslator = 'cron-translator',
 }
 
 export type ToolRoute = {

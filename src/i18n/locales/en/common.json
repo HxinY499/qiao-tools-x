@@ -1,0 +1,30 @@
+{
+  "language": {
+    "label": "Language",
+    "zh-CN": "简体中文",
+    "en": "English"
+  },
+  "common": {
+    "retry": "Retry",
+    "backHome": "Home",
+    "copy": "Copy",
+    "copied": "Copied",
+    "clear": "Clear",
+    "download": "Download",
+    "reset": "Reset"
+  },
+  "category": {
+    "image": "Image",
+    "css": "Style",
+    "dev": "Developer",
+    "text": "Text",
+    "life": "Utilities",
+    "other": "Other"
+  },
+  "errorBoundary": {
+    "title": "This page hit a snag",
+    "description": "Don't worry, your data is safe.\nClick \"Retry\", or explore other tools.",
+    "techDetail": "Technical details",
+    "refreshHint": "Retry didn't work? Reload the whole page"
+  }
+}

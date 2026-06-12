@@ -85,25 +85,16 @@ function SeoAnalyzerPage() {
     setResult(analysisResult);
   }, [htmlCode]);
 
-  // 处理文件上传
-  const handleFileSelect = useCallback((file: File) => {
+  // 文件读取完成后分析（读取交由 FileDragUploader 内置能力）
+  const handleFileRead = useCallback((content: string | ArrayBuffer | null) => {
+    if (typeof content !== 'string' || !content) {
+      setError('文件内容为空或读取失败');
+      setIsLoading(false);
+      return;
+    }
     setError(null);
-    setIsLoading(true);
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const content = event.target?.result as string;
-      if (content) {
-        const analysisResult = analyzeHtml(content);
-        setResult(analysisResult);
-      }
-      setIsLoading(false);
-    };
-    reader.onerror = () => {
-      setError('文件读取失败');
-      setIsLoading(false);
-    };
-    reader.readAsText(file);
+    setResult(analyzeHtml(content));
+    setIsLoading(false);
   }, []);
 
   // 处理分析按钮点击
@@ -245,11 +236,17 @@ function SeoAnalyzerPage() {
                 placeholder="粘贴 HTML 代码..."
                 value={htmlCode}
                 onChange={(e) => setHtmlCode(e.target.value)}
+                onKeyDown={(e) => {
+                  if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+                    e.preventDefault();
+                    handleAnalyze();
+                  }
+                }}
                 disabled={isLoading}
                 className="min-h-[240px] font-mono text-xs"
               />
               <div className="flex items-center justify-between">
-                <p className="text-[11px] text-muted-foreground">粘贴完整的 HTML 代码进行分析</p>
+                <p className="text-[11px] text-muted-foreground">粘贴完整的 HTML 代码进行分析（⌘/Ctrl + Enter 快捷分析）</p>
                 <Button
                   onClick={handleAnalyze}
                   disabled={isLoading || !htmlCode.trim()}
@@ -265,14 +262,22 @@ function SeoAnalyzerPage() {
 
           {inputSource === 'file' && (
             <FileDragUploader
-              onFileSelect={handleFileSelect}
-              onError={setError}
-              validation={{ extensions: ['html', 'htm'] }}
+              onFileSelect={() => {
+                setError(null);
+                setIsLoading(true);
+              }}
+              onError={(err) => {
+                setError(err);
+                setIsLoading(false);
+              }}
+              validation={{ extensions: ['html', 'htm'], maxSize: 2 * 1024 * 1024 }}
               accept=".html,.htm"
               disabled={isLoading}
+              readAs="text"
+              onFileRead={handleFileRead}
               icon={<FileUp className="h-8 w-8 text-muted-foreground/40" />}
               title="点击选择或拖放 HTML 文件"
-              hint="支持 .html 和 .htm 文件"
+              hint="支持 .html 和 .htm 文件，单个文件不超过 2MB"
               buttonText="选择文件"
               className="min-h-[200px]"
             />
