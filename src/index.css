@@ -148,6 +148,13 @@
   background: transparent;
 }
 
+/* 块列表项：跳过视口外块的渲染/布局开销，缓解大数据量卡顿。
+   不影响浏览器查找（Ctrl/Cmd+F），文本仍在 DOM 中可被命中。 */
+.block-cv {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 220px;
+}
+
 /* 隐藏 mermaid 在 body 下创建的临时渲染容器 - 只隐藏错误元素，不影响正常渲染 */
 body > #d,
 body > .mermaid-error {

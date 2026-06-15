@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 
 // 向上查找最近的可滚动祖先（overflow-y 为 auto/scroll/overlay），找不到则回退到 window
-function findScrollParent(el: HTMLElement | null): HTMLElement | Window {
+export function findScrollParent(el: HTMLElement | null): HTMLElement | Window {
   let node = el?.parentElement ?? null;
   while (node) {
     const style = getComputedStyle(node);

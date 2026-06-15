@@ -26,6 +26,8 @@ interface UseBlockViewerOptions<B extends BaseBlock, R extends BaseParseResult<B
   isMergeable: (block: B) => boolean;
   /** 解析成功的 toast 文案构造（如 `已解析 N 条 SSE 数据`） */
   successMessage: (count: number) => string;
+  /** 取某 block 的可搜索文本（用于内置查找定位） */
+  getSearchText: (block: B) => string;
 }
 
 export interface BlockViewerController<B extends BaseBlock, R extends BaseParseResult<B>> {
@@ -45,6 +47,23 @@ export interface BlockViewerController<B extends BaseBlock, R extends BaseParseR
   toggleBlock: (index: number) => void;
   expandAll: () => void;
   collapseAll: () => void;
+  // ── 内置查找 ──
+  /** 查找栏是否打开 */
+  findOpen: boolean;
+  setFindOpen: (open: boolean) => void;
+  /** 查找关键词 */
+  query: string;
+  setQuery: (q: string) => void;
+  /** 命中的 block index 列表 */
+  matches: number[];
+  /** 当前命中在 matches 中的序号（-1 表示无） */
+  activeMatchIdx: number;
+  /** 切换到上一个/下一个命中（dir=1 下一个，-1 上一个） */
+  gotoMatch: (dir: 1 | -1) => void;
+  /** 当前高亮定位的 block index（null 表示无） */
+  highlightedIndex: number | null;
+  /** 供虚拟滚动列表注册 scrollToIndex 回调；传 null 注销 */
+  registerScroller: (fn: ((index: number) => void) | null) => void;
 }
 
 /**
@@ -54,7 +73,7 @@ export interface BlockViewerController<B extends BaseBlock, R extends BaseParseR
 export function useBlockViewer<B extends BaseBlock, R extends BaseParseResult<B>>(
   options: UseBlockViewerOptions<B, R>,
 ): BlockViewerController<B, R> {
-  const { emptyResult, parse, looksLike, isMergeable, successMessage } = options;
+  const { emptyResult, parse, looksLike, isMergeable, successMessage, getSearchText } = options;
 
   const [result, setResult] = useState<R>(emptyResult);
   const [open, setOpen] = useState(false);
@@ -62,6 +81,14 @@ export function useBlockViewer<B extends BaseBlock, R extends BaseParseResult<B>
   const [rawText, setRawText] = useState('');
   // 使用 Set 跟踪折叠状态（存储被折叠的 block index）
   const [collapsedSet, setCollapsedSet] = useState<Set<number>>(new Set());
+
+  // ── 内置查找状态 ──
+  const [findOpen, setFindOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const [activeMatchIdx, setActiveMatchIdx] = useState(-1);
+  const [highlightedIndex, setHighlightedIndex] = useState<number | null>(null);
+  // 虚拟滚动列表注册的 scrollToIndex 回调（无则回退 DOM scrollIntoView）
+  const scrollerRef = useRef<((index: number) => void) | null>(null);
 
   const blocks = result.blocks;
   const blocksRef = useRef(blocks);
@@ -99,6 +126,9 @@ export function useBlockViewer<B extends BaseBlock, R extends BaseParseResult<B>
     setResult(emptyResult);
     setCollapsedSet(new Set());
     setRawText('');
+    setQuery('');
+    setActiveMatchIdx(-1);
+    setHighlightedIndex(null);
   }, [emptyResult]);
 
   const toggleBlock = useCallback((index: number) => {
@@ -126,6 +156,62 @@ export function useBlockViewer<B extends BaseBlock, R extends BaseParseResult<B>
       2,
     );
   }, [blocks, isMergeable]);
+
+  // ── 内置查找：命中块 index 列表（大小写不敏感 includes） ──
+  const matches = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return [];
+    return blocks.filter((b) => getSearchText(b).toLowerCase().includes(q)).map((b) => b.index);
+  }, [query, blocks, getSearchText]);
+
+  const registerScroller = useCallback((fn: ((index: number) => void) | null) => {
+    scrollerRef.current = fn;
+  }, []);
+
+  // 定位到某个 block index：展开它 + 高亮 + 滚动到视口中央
+  const scrollToBlock = useCallback((blockIndex: number) => {
+    // 确保展开（从折叠集合移除）
+    setCollapsedSet((prev) => {
+      if (!prev.has(blockIndex)) return prev;
+      const next = new Set(prev);
+      next.delete(blockIndex);
+      return next;
+    });
+    setHighlightedIndex(blockIndex);
+    // 优先用虚拟滚动注册的 scrollToIndex，否则回退 DOM
+    requestAnimationFrame(() => {
+      if (scrollerRef.current) {
+        scrollerRef.current(blockIndex);
+      } else {
+        const el = document.querySelector(`[data-block-index="${blockIndex}"]`);
+        el?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      }
+    });
+  }, []);
+
+  // 查询变化时，自动定位到第一个命中
+  useEffect(() => {
+    if (matches.length === 0) {
+      setActiveMatchIdx(-1);
+      setHighlightedIndex(null);
+      return;
+    }
+    setActiveMatchIdx(0);
+    scrollToBlock(matches[0]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [matches]);
+
+  const gotoMatch = useCallback(
+    (dir: 1 | -1) => {
+      if (matches.length === 0) return;
+      setActiveMatchIdx((prev) => {
+        const nextIdx = (prev + dir + matches.length) % matches.length;
+        scrollToBlock(matches[nextIdx]);
+        return nextIdx;
+      });
+    },
+    [matches, scrollToBlock],
+  );
 
   // 全局粘贴事件
   useEffect(() => {
@@ -164,5 +250,14 @@ export function useBlockViewer<B extends BaseBlock, R extends BaseParseResult<B>
     toggleBlock,
     expandAll,
     collapseAll,
+    findOpen,
+    setFindOpen,
+    query,
+    setQuery,
+    matches,
+    activeMatchIdx,
+    gotoMatch,
+    highlightedIndex,
+    registerScroller,
   };
 }

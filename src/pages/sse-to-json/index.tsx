@@ -1,13 +1,14 @@
-import { Badge } from '@/components/ui/badge';
 import { ChevronDown, ChevronRight, Radio } from 'lucide-react';
 import { memo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { CodeArea } from '@/components/code-area';
+import { Badge } from '@/components/ui/badge';
 
 import {
   BlockListLayout,
   PasteInputDialog,
+  PlainCodeBlock,
   RawTextDialog,
   useBlockViewer,
 } from '../_shared/block-viewer';
@@ -18,10 +19,12 @@ import { looksLikeSse, type ParseResult, parseSseToJson, type SseDataBlock } fro
 const SseBlock = memo(function SseBlock({
   block,
   collapsed,
+  highlight,
   onToggle,
 }: {
   block: SseDataBlock;
   collapsed: boolean;
+  highlight: boolean;
   onToggle: (index: number) => void;
 }) {
   const { t } = useTranslation('tools');
@@ -60,15 +63,18 @@ const SseBlock = memo(function SseBlock({
       </div>
       {!collapsed && (
         <>
-          {block.type === 'json' && (
-            <CodeArea
-              code={block.formatted ?? ''}
-              language="json"
-              className="min-h-0"
-              codeClassName="!text-[11px]"
-              showCopyButton={false}
-            />
-          )}
+          {block.type === 'json' &&
+            (highlight ? (
+              <CodeArea
+                code={block.formatted ?? ''}
+                language="json"
+                className="min-h-0"
+                codeClassName="!text-[11px]"
+                showCopyButton={false}
+              />
+            ) : (
+              <PlainCodeBlock code={block.formatted ?? ''} />
+            ))}
           {block.type === 'signal' && (
             <div className="text-xs text-blue-600 dark:text-blue-400 bg-blue-500/10 rounded-md px-3 py-2 font-mono">
               {t('sseToJson.signal', { raw: block.raw })}
@@ -79,7 +85,7 @@ const SseBlock = memo(function SseBlock({
               <div className="text-xs text-destructive bg-destructive/10 rounded-md px-3 py-2 font-mono">
                 {block.error}
               </div>
-              <CodeArea code={block.raw} language="text" className="min-h-0" codeClassName="!text-[11px]" />
+              <PlainCodeBlock code={block.raw} />
             </div>
           )}
         </>
@@ -92,8 +98,7 @@ const SseBlock = memo(function SseBlock({
 
 const EMPTY_RESULT: ParseResult = { blocks: [], validCount: 0, invalidCount: 0, signalCount: 0 };
 const isMergeable = (b: SseDataBlock) => b.type === 'json' && b.valid;
-const successMessage = (count: number) => `已解析 ${count} 条 SSE 数据`;
-successMessage; // reference for type compatibility, overridden in component
+const getSearchText = (b: SseDataBlock) => b.formatted ?? b.raw;
 
 const PASTE_PLACEHOLDER = `event: message\ndata: {"key": "value"}\n\nevent: message\ndata: {"another": "object"}`;
 
@@ -101,16 +106,14 @@ const PASTE_PLACEHOLDER = `event: message\ndata: {"key": "value"}\n\nevent: mess
 
 export default function SseToJsonPage() {
   const { t } = useTranslation('tools');
-  const successMessage = useCallback(
-    (count: number) => t('sseToJson.parsedSuccess', { count }),
-    [t],
-  );
+  const successMessage = useCallback((count: number) => t('sseToJson.parsedSuccess', { count }), [t]);
   const controller = useBlockViewer<SseDataBlock, ParseResult>({
     emptyResult: EMPTY_RESULT,
     parse: parseSseToJson,
     looksLike: looksLikeSse,
     isMergeable,
     successMessage,
+    getSearchText,
   });
 
   const { result, open, setOpen, rawText, rawTextOpen, setRawTextOpen, handleConfirmFromDialog, toggleBlock } =
@@ -140,8 +143,8 @@ export default function SseToJsonPage() {
         emptyIcon={Radio}
         dataLabel="SSE"
         rawTextTitle={t('sseToJson.viewRaw')}
-        renderBlock={(block, collapsed) => (
-          <SseBlock block={block} collapsed={collapsed} onToggle={toggleBlock} />
+        renderBlock={(block, collapsed, highlight) => (
+          <SseBlock block={block} collapsed={collapsed} highlight={highlight} onToggle={toggleBlock} />
         )}
         renderStats={() => (
           <>

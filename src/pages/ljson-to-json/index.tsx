@@ -1,27 +1,30 @@
-import { Badge } from '@/components/ui/badge';
 import { ChevronDown, ChevronRight, FileType2 } from 'lucide-react';
 import { memo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { CodeArea } from '@/components/code-area';
+import { Badge } from '@/components/ui/badge';
 
 import {
   BlockListLayout,
   PasteInputDialog,
+  PlainCodeBlock,
   RawTextDialog,
   useBlockViewer,
 } from '../_shared/block-viewer';
-import { type LjsonLineBlock, looksLikeLjson, type ParseResult, parseLjsonToJson } from './utils';
+import { type LjsonLineBlock, looksLikeLjson, parseLjsonToJson, type ParseResult } from './utils';
 
 // ─── 单条 ljson 行 ──────────────────────────────────────────
 
 const LjsonBlock = memo(function LjsonBlock({
   block,
   collapsed,
+  highlight,
   onToggle,
 }: {
   block: LjsonLineBlock;
   collapsed: boolean;
+  highlight: boolean;
   onToggle: (index: number) => void;
 }) {
   const { t } = useTranslation('tools');
@@ -45,21 +48,24 @@ const LjsonBlock = memo(function LjsonBlock({
       </div>
       {!collapsed && (
         <>
-          {block.valid && (
-            <CodeArea
-              code={block.formatted ?? ''}
-              language="json"
-              className="min-h-0"
-              codeClassName="!text-[11px]"
-              showCopyButton={false}
-            />
-          )}
+          {block.valid &&
+            (highlight ? (
+              <CodeArea
+                code={block.formatted ?? ''}
+                language="json"
+                className="min-h-0"
+                codeClassName="!text-[11px]"
+                showCopyButton={false}
+              />
+            ) : (
+              <PlainCodeBlock code={block.formatted ?? ''} />
+            ))}
           {!block.valid && (
             <div className="space-y-1.5">
               <div className="text-xs text-destructive bg-destructive/10 rounded-md px-3 py-2 font-mono">
                 {block.error}
               </div>
-              <CodeArea code={block.raw} language="text" className="min-h-0" codeClassName="!text-[11px]" />
+              <PlainCodeBlock code={block.raw} />
             </div>
           )}
         </>
@@ -72,8 +78,7 @@ const LjsonBlock = memo(function LjsonBlock({
 
 const EMPTY_RESULT: ParseResult = { blocks: [], validCount: 0, invalidCount: 0 };
 const isMergeable = (b: LjsonLineBlock) => b.valid;
-const successMessage = (count: number) => `已解析 ${count} 条 ljson 数据`;
-successMessage; // ref for type compatibility
+const getSearchText = (b: LjsonLineBlock) => b.formatted ?? b.raw;
 
 const PASTE_PLACEHOLDER = `{"id":"1","type":"message","text":"hello"}\n{"id":"2","type":"topic","topic":"greeting"}`;
 
@@ -81,16 +86,14 @@ const PASTE_PLACEHOLDER = `{"id":"1","type":"message","text":"hello"}\n{"id":"2"
 
 export default function LjsonToJsonPage() {
   const { t } = useTranslation('tools');
-  const successMessage = useCallback(
-    (count: number) => t('ljsonToJson.parsedSuccess', { count }),
-    [t],
-  );
+  const successMessage = useCallback((count: number) => t('ljsonToJson.parsedSuccess', { count }), [t]);
   const controller = useBlockViewer<LjsonLineBlock, ParseResult>({
     emptyResult: EMPTY_RESULT,
     parse: parseLjsonToJson,
     looksLike: looksLikeLjson,
     isMergeable,
     successMessage,
+    getSearchText,
   });
 
   const { result, open, setOpen, rawText, rawTextOpen, setRawTextOpen, handleConfirmFromDialog, toggleBlock } =
@@ -120,8 +123,8 @@ export default function LjsonToJsonPage() {
         emptyIcon={FileType2}
         dataLabel="ljson"
         rawTextTitle={t('ljsonToJson.viewRaw')}
-        renderBlock={(block, collapsed) => (
-          <LjsonBlock block={block} collapsed={collapsed} onToggle={toggleBlock} />
+        renderBlock={(block, collapsed, highlight) => (
+          <LjsonBlock block={block} collapsed={collapsed} highlight={highlight} onToggle={toggleBlock} />
         )}
         renderStats={() => (
           <>
