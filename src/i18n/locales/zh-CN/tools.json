@@ -225,27 +225,17 @@
     "tip": "解锁 X/Y 轴可独立调整水平与垂直方向的圆角半径，生成椭圆形圆角。",
     "previewAndCode": "预览与代码"
   },
-  "ljsonToJson": {
+  "streamParser": {
     "parseFailed": "解析失败",
-    "pasteTitle": "粘贴 ljson 数据",
-    "pasteDesc": "粘贴 JSON Lines / NDJSON 格式数据，每行一条 JSON 对象",
+    "pasteTitle": "粘贴 SSE / JSONL 数据",
+    "pasteDesc": "粘贴 SSE (Server-Sent Events) 或 JSONL (JSON Lines / NDJSON) 数据，会自动识别格式并逐条解析为 JSON",
     "rawTitle": "原始文本",
-    "rawDesc": "查看输入的原始 ljson 文本",
+    "rawDesc": "查看输入的原始文本",
     "viewRaw": "查看原始文本",
     "parsedSuccess": "已解析 {{count}} 条数据",
-    "total": "共 {{count}} 条",
-    "success": "{{count}} 条成功",
-    "fail": "{{count}} 条失败"
-  },
-  "sseToJson": {
-    "parseFailed": "解析失败",
-    "pasteTitle": "粘贴 SSE 数据",
-    "pasteDesc": "粘贴 Server-Sent Events 原始数据，将提取 data 字段逐条解析为 JSON",
-    "rawTitle": "原始文本",
-    "rawDesc": "查看输入的原始 SSE 文本",
-    "viewRaw": "查看原始文本",
-    "parsedSuccess": "已解析 {{count}} 条 SSE 数据",
     "signal": "信号：{{raw}}",
+    "formatSse": "SSE",
+    "formatLjson": "JSONL",
     "total": "共 {{count}} 条",
     "success": "{{count}} 条 JSON",
     "signalCount": "{{count}} 条信号",

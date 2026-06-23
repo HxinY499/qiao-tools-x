@@ -131,17 +131,11 @@
     "seoDescription": "Free online Markdown editor with live preview, table insertion, code highlighting, GFM syntax and a rich toolbar.",
     "seoKeywords": "Markdown editor,Markdown preview,Markdown table,online Markdown,MD editor,Markdown tool"
   },
-  "sse-to-json": {
-    "title": "SSE to JSON",
-    "subtitle": "Extract data fields from raw SSE (Server-Sent Events) and parse each into formatted JSON",
-    "seoDescription": "Free online SSE to JSON parser. Extracts data fields from Server-Sent Events streams and parses each into formatted JSON with syntax highlighting and one-click copy.",
-    "seoKeywords": "SSE parser,SSE to JSON,Server-Sent Events,SSE data extraction,JSON formatter,EventStream parser"
-  },
-  "ljson-to-json": {
-    "title": "ljson to JSON",
-    "subtitle": "Parse JSON Lines / NDJSON line by line into formatted JSON, with merging and per-line view",
-    "seoDescription": "Free online ljson (JSON Lines / NDJSON) parser. Parse each line into formatted JSON with syntax highlighting, per-line view, error locating and one-click merged copy.",
-    "seoKeywords": "ljson parser,JSON Lines,NDJSON,jsonl parser,newline-delimited JSON,log JSON parser,JSON batch format"
+  "sse-jsonl-parser": {
+    "title": "SSE / JSONL Parser",
+    "subtitle": "Paste SSE or JSONL data — the format is auto-detected and each record parsed into formatted JSON",
+    "seoDescription": "Free online SSE / JSONL parser. Auto-detects Server-Sent Events and JSON Lines (NDJSON) formats, parses each record into formatted JSON with syntax highlighting, per-record view, error locating and one-click merged copy.",
+    "seoKeywords": "SSE parser,JSONL parser,JSON Lines,NDJSON,Server-Sent Events,SSE to JSON,stream parser,EventStream"
   },
   "ascii-art": {
     "title": "ASCII Art",

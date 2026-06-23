@@ -157,6 +157,9 @@ function ToolLayout() {
             {toolRoutes.map((route) => (
               <Route key={route.path} path={route.path} element={<ToolPage route={route} />} />
             ))}
+            {/* 兼容老链接：原 /sse-to-json 与 /ljson-to-json 已合并到 /sse-jsonl-parser */}
+            <Route path="/sse-to-json" element={<Navigate to="/sse-jsonl-parser" replace />} />
+            <Route path="/ljson-to-json" element={<Navigate to="/sse-jsonl-parser" replace />} />
             {/* 未匹配的工具路径重定向到首页 */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

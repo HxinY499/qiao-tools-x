@@ -26,8 +26,7 @@ export enum ToolKey {
   JsonSchemaConverter = 'json-schema-converter',
   RegexVisualizer = 'regex-visualizer',
   MarkdownEditor = 'markdown-editor',
-  SseToJson = 'sse-to-json',
-  LjsonToJson = 'ljson-to-json',
+  SseJsonlParser = 'sse-jsonl-parser',
   AsciiArt = 'ascii-art',
   CronTranslator = 'cron-translator',
 }

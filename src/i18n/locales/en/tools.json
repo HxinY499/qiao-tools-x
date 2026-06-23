@@ -225,27 +225,17 @@
     "tip": "Unlock X/Y axes to independently adjust horizontal and vertical radii for elliptical corners.",
     "previewAndCode": "Preview & Code"
   },
-  "ljsonToJson": {
+  "streamParser": {
     "parseFailed": "Parse Failed",
-    "pasteTitle": "Paste ljson Data",
-    "pasteDesc": "Paste JSON Lines / NDJSON data, one JSON object per line",
+    "pasteTitle": "Paste SSE / JSONL Data",
+    "pasteDesc": "Paste SSE (Server-Sent Events) or JSONL (JSON Lines / NDJSON) data. The format will be auto-detected and each record will be parsed as JSON.",
     "rawTitle": "Raw Text",
-    "rawDesc": "View the original ljson input text",
+    "rawDesc": "View the original input text",
     "viewRaw": "View Raw Text",
     "parsedSuccess": "Parsed {{count}} records",
-    "total": "Total: {{count}}",
-    "success": "{{count}} succeeded",
-    "fail": "{{count}} failed"
-  },
-  "sseToJson": {
-    "parseFailed": "Parse Failed",
-    "pasteTitle": "Paste SSE Data",
-    "pasteDesc": "Paste raw Server-Sent Events data. The data fields will be extracted and parsed as JSON.",
-    "rawTitle": "Raw Text",
-    "rawDesc": "View the original SSE input text",
-    "viewRaw": "View Raw Text",
-    "parsedSuccess": "Parsed {{count}} SSE records",
     "signal": "Signal: {{raw}}",
+    "formatSse": "SSE",
+    "formatLjson": "JSONL",
     "total": "Total: {{count}}",
     "success": "{{count}} JSON",
     "signalCount": "{{count}} signals",
