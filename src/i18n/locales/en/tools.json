@@ -758,44 +758,6 @@
       "mindmap": "Mind Map"
     }
   },
-  "jsonSchemaConverter": {
-    "placeholder": {
-      "schemaInput": "Paste JSON Schema here...",
-      "tsInput": "Paste TypeScript interface or type here..."
-    },
-    "options": {
-      "outputType": "Output Type",
-      "addExport": "Add export",
-      "optionalByDefault": "Optional by default",
-      "schemaVersion": "Schema Version",
-      "includeRequired": "Include required"
-    },
-    "button": {
-      "convert": "Convert",
-      "swap": "Swap",
-      "example": "Example",
-      "clear": "Clear"
-    },
-    "error": {
-      "invalidSchema": "Invalid JSON Schema",
-      "invalidTs": "Invalid TypeScript code"
-    },
-    "toast": {
-      "convertSuccess": "Converted successfully",
-      "exampleLoaded": "Example loaded"
-    },
-    "output": {
-      "waiting": "Waiting for conversion..."
-    },
-    "usage": {
-      "title": "Usage",
-      "schemaToTs": ": Converts JSON Schema to TypeScript interface or type, supporting nested objects, arrays, enums, union types, and more.",
-      "tsToSchema": ": Converts TypeScript interface/type to JSON Schema, supporting Draft-04 and Draft-07.",
-      "swapButton": "Swap button",
-      "swapDesc": ": Uses the output as new input for bidirectional validation.",
-      "supportedTypes": "Supported types: primitives, arrays, nested objects, union types (|), intersection types (&), enums, $ref references, and more."
-    }
-  },
   "regexVisualizer": {
     "label": {
       "pattern": "Regular Expression",

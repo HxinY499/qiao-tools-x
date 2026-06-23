@@ -758,44 +758,6 @@
       "mindmap": "脑图"
     }
   },
-  "jsonSchemaConverter": {
-    "placeholder": {
-      "schemaInput": "在此粘贴 JSON Schema...",
-      "tsInput": "在此粘贴 TypeScript interface 或 type..."
-    },
-    "options": {
-      "outputType": "输出类型",
-      "addExport": "添加 export",
-      "optionalByDefault": "默认可选",
-      "schemaVersion": "Schema 版本",
-      "includeRequired": "包含 required"
-    },
-    "button": {
-      "convert": "转换",
-      "swap": "交换",
-      "example": "示例",
-      "clear": "清空"
-    },
-    "error": {
-      "invalidSchema": "无效的 JSON Schema",
-      "invalidTs": "无效的 TypeScript 代码"
-    },
-    "toast": {
-      "convertSuccess": "转换成功",
-      "exampleLoaded": "已加载示例"
-    },
-    "output": {
-      "waiting": "等待转换..."
-    },
-    "usage": {
-      "title": "使用说明",
-      "schemaToTs": "：将 JSON Schema 转换为 TypeScript interface 或 type，支持嵌套对象、数组、枚举、联合类型等。",
-      "tsToSchema": "：将 TypeScript interface/type 转换为 JSON Schema，支持 Draft-04 和 Draft-07 版本。",
-      "swapButton": "交换按钮",
-      "swapDesc": "：将输出结果作为新的输入，方便双向校验转换结果。",
-      "supportedTypes": "支持的类型：基本类型、数组、嵌套对象、联合类型（| ）、交叉类型（&）、枚举、 引用等。"
-    }
-  },
   "regexVisualizer": {
     "label": {
       "pattern": "正则表达式",
