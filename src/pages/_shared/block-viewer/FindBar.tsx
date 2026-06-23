@@ -1,37 +1,59 @@
 import { useDebounceFn } from 'ahooks';
-import { ChevronDown, ChevronUp, Search, X } from 'lucide-react';
+import { CaseSensitive, ChevronDown, ChevronUp, Minus, Plus, Regex, Search, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { cn } from '@/utils';
 
-/** FindBar 只依赖 controller 的查找相关字段，用窄接口解耦泛型 */
+import { type ConditionOp, createEmptyCondition, type FindCondition } from './query-matcher';
+import { useBlockViewerSettings } from './settings-store';
+
+/** FindBar 只依赖 controller 的查找相关字段 */
 interface FindBarController {
-  query: string;
-  setQuery: (q: string) => void;
+  conditions: FindCondition[];
+  setConditions: (conditions: FindCondition[]) => void;
   matches: number[];
+  queryError: string | null;
   activeMatchIdx: number;
   gotoMatch: (dir: 1 | -1) => void;
   setFindOpen: (open: boolean) => void;
 }
 
-/** 内置查找栏：在全量数据中搜索并定位到目标块（不依赖浏览器 Ctrl+F） */
+/**
+ * 内置查找栏：多条件「包含 / 不包含」的查询面板。
+ * - 每个条件 = 一个下拉（包含/不包含）+ 一个输入框 + 一个删除按钮
+ * - 底部一个 + 按钮新增条件
+ * - 顶部统一的 大小写敏感 / 正则 / 上下条 / 关闭 按钮
+ */
 export function FindBar({ controller }: { controller: FindBarController }) {
-  const { query, setQuery, matches, activeMatchIdx, gotoMatch, setFindOpen } = controller;
-  const inputRef = useRef<HTMLInputElement>(null);
-  const [value, setValue] = useState(query);
+  const { conditions, setConditions, matches, queryError, activeMatchIdx, gotoMatch, setFindOpen } = controller;
+  const { caseSensitive, regexMode, setCaseSensitive, setRegexMode } = useBlockViewerSettings();
+  const { t } = useTranslation('blockViewer');
 
-  // 打开时自动聚焦
-  useEffect(() => {
-    inputRef.current?.focus();
-    inputRef.current?.select();
-  }, []);
+  const count = matches.length;
+  const current = activeMatchIdx >= 0 ? activeMatchIdx + 1 : 0;
+  const hasError = !!queryError;
+  const hasInput = conditions.some((c) => c.value.length > 0);
+  const isOnlyRow = conditions.length <= 1;
 
-  const { run: debouncedSetQuery } = useDebounceFn((q: string) => setQuery(q), { wait: 200 });
+  const handleAdd = () => {
+    setConditions([...conditions, createEmptyCondition('include')]);
+  };
 
-  const handleChange = (q: string) => {
-    setValue(q);
-    debouncedSetQuery(q);
+  const handleRemove = (id: string) => {
+    if (isOnlyRow) {
+      // 仅剩一行时不删除，而是清空内容（保证 UI 上至少有一行）
+      setConditions(conditions.map((c) => (c.id === id ? { ...c, value: '' } : c)));
+      return;
+    }
+    setConditions(conditions.filter((c) => c.id !== id));
+  };
+
+  const handleUpdate = (id: string, patch: Partial<Pick<FindCondition, 'op' | 'value'>>) => {
+    setConditions(conditions.map((c) => (c.id === id ? { ...c, ...patch } : c)));
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -44,51 +66,169 @@ export function FindBar({ controller }: { controller: FindBarController }) {
     }
   };
 
-  const count = matches.length;
-  const current = activeMatchIdx >= 0 ? activeMatchIdx + 1 : 0;
+  return (
+    <div className={cn('mb-3 rounded-md border bg-card', hasError && 'border-destructive/60')}>
+      {/* 顶栏：开关 + 计数 + 上下条 + 关闭 */}
+      <div className="flex items-center gap-2 px-2 py-1.5 border-b border-border/40">
+        <Search className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+        <span className="text-xs text-muted-foreground shrink-0">{t('find.title')}</span>
+
+        <div className="flex-1" />
+
+        <span className="text-xs text-muted-foreground tabular-nums shrink-0 min-w-[3.5rem] text-right">
+          {hasInput && !hasError ? `${current} / ${count}` : ''}
+        </span>
+
+        <Button
+          size="icon"
+          variant={caseSensitive ? 'secondary' : 'ghost'}
+          className="h-6 w-6 shrink-0"
+          onClick={() => setCaseSensitive(!caseSensitive)}
+          title={t('find.caseSensitive')}
+        >
+          <CaseSensitive className="h-3.5 w-3.5" />
+        </Button>
+        <Button
+          size="icon"
+          variant={regexMode ? 'secondary' : 'ghost'}
+          className="h-6 w-6 shrink-0"
+          onClick={() => setRegexMode(!regexMode)}
+          title={t('find.regexMode')}
+        >
+          <Regex className="h-3.5 w-3.5" />
+        </Button>
+
+        <div className="h-4 w-px bg-border mx-0.5 shrink-0" />
+
+        <Button
+          size="icon"
+          variant="ghost"
+          className="h-6 w-6 shrink-0"
+          disabled={count === 0}
+          onClick={() => gotoMatch(-1)}
+          title={t('find.prev')}
+        >
+          <ChevronUp className="h-3.5 w-3.5" />
+        </Button>
+        <Button
+          size="icon"
+          variant="ghost"
+          className="h-6 w-6 shrink-0"
+          disabled={count === 0}
+          onClick={() => gotoMatch(1)}
+          title={t('find.next')}
+        >
+          <ChevronDown className="h-3.5 w-3.5" />
+        </Button>
+        <Button
+          size="icon"
+          variant="ghost"
+          className="h-6 w-6 shrink-0"
+          onClick={() => setFindOpen(false)}
+          title={t('find.close')}
+        >
+          <X className="h-3.5 w-3.5" />
+        </Button>
+      </div>
+
+      {/* 条件行列表 */}
+      <div className="px-2 py-2 space-y-1.5">
+        {conditions.map((cond, idx) => (
+          <ConditionRow
+            key={cond.id}
+            condition={cond}
+            autoFocus={idx === 0 && conditions.length === 1 && !cond.value}
+            regexMode={regexMode}
+            onUpdate={handleUpdate}
+            onRemove={handleRemove}
+            onKeyDown={handleKeyDown}
+          />
+        ))}
+        <div className="pt-0.5">
+          <Button size="sm" variant="ghost" className="h-7 text-xs text-muted-foreground" onClick={handleAdd}>
+            <Plus className="h-3.5 w-3.5 mr-1" />
+            {t('find.addCondition')}
+          </Button>
+        </div>
+      </div>
+
+      {hasError && (
+        <div className="border-t border-destructive/30 px-3 py-1 text-[11px] text-destructive font-mono">
+          {queryError}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── 单条条件行 ─────────────────────────────────────────────
+
+interface ConditionRowProps {
+  condition: FindCondition;
+  autoFocus: boolean;
+  regexMode: boolean;
+  onUpdate: (id: string, patch: Partial<Pick<FindCondition, 'op' | 'value'>>) => void;
+  onRemove: (id: string) => void;
+  onKeyDown: (e: React.KeyboardEvent) => void;
+}
+
+function ConditionRow({ condition, autoFocus, regexMode, onUpdate, onRemove, onKeyDown }: ConditionRowProps) {
+  const { t } = useTranslation('blockViewer');
+  const inputRef = useRef<HTMLInputElement>(null);
+  // 输入框使用本地状态 + debounce 推到上层，减少高频重算
+  const [localValue, setLocalValue] = useState(condition.value);
+
+  // 外部 value 变化时同步（清空、reset 等场景）
+  useEffect(() => {
+    setLocalValue(condition.value);
+  }, [condition.value]);
+
+  useEffect(() => {
+    if (autoFocus) {
+      inputRef.current?.focus();
+    }
+  }, [autoFocus]);
+
+  const { run: debouncedPush } = useDebounceFn((v: string) => onUpdate(condition.id, { value: v }), { wait: 200 });
+
+  const handleChange = (v: string) => {
+    setLocalValue(v);
+    debouncedPush(v);
+  };
 
   return (
-    <div className="mb-3 flex items-center gap-2 rounded-md border bg-card px-2 py-1.5">
-      <Search className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+    <div className="flex items-center gap-1.5">
+      <Select value={condition.op} onValueChange={(op) => onUpdate(condition.id, { op: op as ConditionOp })}>
+        <SelectTrigger className="h-7 w-[88px] text-xs shrink-0">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="include" className="text-xs">
+            {t('find.opInclude')}
+          </SelectItem>
+          <SelectItem value="exclude" className="text-xs">
+            {t('find.opExclude')}
+          </SelectItem>
+        </SelectContent>
+      </Select>
+
       <Input
         ref={inputRef}
-        value={value}
+        value={localValue}
         onChange={(e) => handleChange(e.target.value)}
-        onKeyDown={handleKeyDown}
-        placeholder="查找内容并定位到对应块…"
-        className="h-7 border-0 bg-transparent px-0 text-sm shadow-none focus-visible:ring-0"
+        onKeyDown={onKeyDown}
+        placeholder={regexMode ? t('find.placeholderRegex') : t('find.placeholderKeyword')}
+        className="h-7 text-sm"
       />
-      <span className="text-xs text-muted-foreground tabular-nums shrink-0 min-w-[3.5rem] text-right">
-        {value.trim() ? `${current} / ${count}` : ''}
-      </span>
+
       <Button
         size="icon"
         variant="ghost"
-        className="h-6 w-6 shrink-0"
-        disabled={count === 0}
-        onClick={() => gotoMatch(-1)}
-        title="上一个 (Shift+Enter)"
+        className="h-7 w-7 shrink-0 text-muted-foreground hover:text-destructive"
+        onClick={() => onRemove(condition.id)}
+        title={t('find.removeCondition')}
       >
-        <ChevronUp className="h-3.5 w-3.5" />
-      </Button>
-      <Button
-        size="icon"
-        variant="ghost"
-        className="h-6 w-6 shrink-0"
-        disabled={count === 0}
-        onClick={() => gotoMatch(1)}
-        title="下一个 (Enter)"
-      >
-        <ChevronDown className="h-3.5 w-3.5" />
-      </Button>
-      <Button
-        size="icon"
-        variant="ghost"
-        className="h-6 w-6 shrink-0"
-        onClick={() => setFindOpen(false)}
-        title="关闭 (Esc)"
-      >
-        <X className="h-3.5 w-3.5" />
+        <Minus className="h-3.5 w-3.5" />
       </Button>
     </div>
   );

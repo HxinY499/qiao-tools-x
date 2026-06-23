@@ -164,3 +164,39 @@ body > .mermaid-error {
 /* Markdown body 列表标记（从工具页移出来，避免 React 每次渲染都新建 <style>） */
 .markdown-body ul { list-style-type: disc; }
 .markdown-body ol { list-style-type: decimal; }
+
+/* 块查看器：定位到目标块时的一次性脉冲动画 */
+@keyframes block-viewer-pulse {
+  0% {
+    background-color: hsl(var(--primary) / 0.30);
+    box-shadow: inset 0 0 0 9999px hsl(var(--primary) / 0.06), 0 0 0 4px hsl(var(--primary) / 0.35);
+  }
+  60% {
+    background-color: hsl(var(--primary) / 0.18);
+    box-shadow: inset 0 0 0 9999px hsl(var(--primary) / 0.04), 0 0 0 2px hsl(var(--primary) / 0.2);
+  }
+  100% {
+    background-color: hsl(var(--primary) / 0.12);
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+.block-viewer-highlight {
+  position: relative;
+  border-radius: 6px;
+  background-color: hsl(var(--primary) / 0.12);
+  animation: block-viewer-pulse 1000ms ease-out 1;
+}
+.block-viewer-highlight::before {
+  content: '';
+  position: absolute;
+  left: -6px;
+  top: 4px;
+  bottom: 4px;
+  width: 3px;
+  border-radius: 2px;
+  background-color: hsl(var(--primary));
+}
+.dark .block-viewer-highlight {
+  background-color: hsl(var(--primary) / 0.20);
+}

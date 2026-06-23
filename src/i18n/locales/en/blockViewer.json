@@ -1,0 +1,56 @@
+{
+  "empty": {
+    "hint": "Press <kbd>{{shortcut}}</kbd> to paste {{label}} data and parse automatically",
+    "manual": "Or click the button below to enter manually",
+    "pasteButton": "Paste {{label}} Data"
+  },
+  "toolbar": {
+    "reimport": "Reimport",
+    "clear": "Clear",
+    "expand": "Expand",
+    "collapse": "Collapse",
+    "expandAllTitle": "Expand all",
+    "collapseAllTitle": "Collapse all",
+    "expandFilteredTitle": "Expand currently matched blocks",
+    "collapseFilteredTitle": "Collapse currently matched blocks",
+    "rawText": "Raw Text",
+    "find": "Find",
+    "findTitle": "Find and locate (/)",
+    "showMatchedOnly": "Only matched",
+    "showMatchedOnlyTitle": "Show only blocks matching the query",
+    "showMatchedOnlyDisabled": "Enter a search keyword first",
+    "copyAllJson": "Copy all JSON",
+    "syntaxHighlight": "Syntax highlight",
+    "virtualScroll": "Virtual scroll",
+    "virtualScrollTitle": "When on, only blocks in the viewport are rendered. Browser find (Ctrl/Cmd+F) won't locate blocks outside the viewport.",
+    "virtualScrollHint": "Virtual scroll is on: only blocks in the viewport are rendered. Browser find (Ctrl/Cmd+F) is unavailable — use the Find button (or press /) above instead.",
+    "matchCountTitle": "Matches / Total"
+  },
+  "find": {
+    "title": "Find Conditions",
+    "placeholderKeyword": "Keyword",
+    "placeholderRegex": "Regular expression",
+    "addCondition": "Add condition",
+    "removeCondition": "Remove this condition",
+    "opInclude": "Include",
+    "opExclude": "Exclude",
+    "caseSensitive": "Match case",
+    "regexMode": "Regex",
+    "prev": "Previous (Shift+Enter)",
+    "next": "Next (Enter)",
+    "close": "Close (Esc)"
+  },
+  "list": {
+    "noMatches": "No matching blocks"
+  },
+  "scrollToTop": {
+    "title": "Back to top"
+  },
+  "paste": {
+    "cancel": "Cancel",
+    "confirm": "Parse"
+  },
+  "matcher": {
+    "invalidRegex": "Invalid regular expression"
+  }
+}

@@ -1,14 +1,15 @@
 import { useVirtualizer } from '@tanstack/react-virtual';
 import type { LucideIcon } from 'lucide-react';
-import { ClipboardPaste, FileText, FoldVertical, Search, Trash2, UnfoldVertical } from 'lucide-react';
+import { ClipboardPaste, FileText, Filter, FoldVertical, Search, Trash2, UnfoldVertical } from 'lucide-react';
 import type { ReactNode } from 'react';
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { CopyButton } from '@/components/copy-button';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { cn } from '@/utils';
 
 import { FindBar } from './FindBar';
 import { PASTE_SHORTCUT } from './isMac';
@@ -39,6 +40,7 @@ export function BlockListLayout<B extends BaseBlock, R extends BaseParseResult<B
   renderBlock,
   renderStats,
 }: BlockListLayoutProps<B, R>) {
+  const { t } = useTranslation('blockViewer');
   const {
     result,
     collapsedSet,
@@ -50,14 +52,34 @@ export function BlockListLayout<B extends BaseBlock, R extends BaseParseResult<B
     collapseAll,
     findOpen,
     setFindOpen,
+    conditions,
+    matches,
     highlightedIndex,
+    highlightNonce,
     registerScroller,
   } = controller;
 
-  const { highlightEnabled, virtualScrollEnabled, setHighlightEnabled, setVirtualScrollEnabled } =
-    useBlockViewerSettings();
+  const {
+    highlightEnabled,
+    virtualScrollEnabled,
+    showMatchedOnly,
+    setHighlightEnabled,
+    setVirtualScrollEnabled,
+    setShowMatchedOnly,
+  } = useBlockViewerSettings();
 
   const blocks = result.blocks;
+  const hasQuery = conditions.some((c) => c.value.length > 0);
+
+  // 是否启用"仅显示匹配"过滤：开关开启 + 有查询
+  const filtering = showMatchedOnly && hasQuery;
+
+  // 渲染用的 blocks：过滤模式下只保留命中块
+  const visibleBlocks = useMemo(() => {
+    if (!filtering) return blocks;
+    const matchSet = new Set(matches);
+    return blocks.filter((b) => matchSet.has(b.index));
+  }, [blocks, matches, filtering]);
 
   // `/` 键打开查找栏（聚焦在非输入元素时）
   useEffect(() => {
@@ -86,14 +108,20 @@ export function BlockListLayout<B extends BaseBlock, R extends BaseParseResult<B
         </div>
         <div className="text-center space-y-1.5">
           <p className="text-sm text-muted-foreground">
-            直接按 <kbd className="px-1.5 py-0.5 rounded border bg-muted text-[11px] font-mono">{PASTE_SHORTCUT}</kbd>{' '}
-            粘贴 {dataLabel} 数据即可自动解析
+            <Trans
+              t={t}
+              i18nKey="empty.hint"
+              values={{ shortcut: PASTE_SHORTCUT, label: dataLabel }}
+              components={{
+                kbd: <kbd className="px-1.5 py-0.5 rounded border bg-muted text-[11px] font-mono" />,
+              }}
+            />
           </p>
-          <p className="text-xs text-muted-foreground/60">或点击下方按钮手动输入</p>
+          <p className="text-xs text-muted-foreground/60">{t('empty.manual')}</p>
         </div>
         <Button onClick={() => setOpen(true)}>
           <ClipboardPaste className="h-4 w-4 mr-2" />
-          粘贴 {dataLabel} 数据
+          {t('empty.pasteButton', { label: dataLabel })}
         </Button>
       </div>
     );
@@ -107,45 +135,72 @@ export function BlockListLayout<B extends BaseBlock, R extends BaseParseResult<B
           <div className="flex items-center gap-1 overflow-x-auto custom-scrollbar -my-1 py-1 flex-1 min-w-0">
             <Button size="sm" variant="outline" onClick={() => setOpen(true)}>
               <ClipboardPaste className="h-3.5 w-3.5 mr-1.5" />
-              重新导入
+              {t('toolbar.reimport')}
             </Button>
             <Button size="sm" variant="ghost" onClick={handleClear}>
               <Trash2 className="h-3.5 w-3.5 mr-1.5" />
-              清空
+              {t('toolbar.clear')}
             </Button>
 
             <div className="h-4 w-px bg-border mx-1 shrink-0" />
 
-            <Button size="sm" variant="ghost" onClick={expandAll} title="全部展开">
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => expandAll(filtering ? visibleBlocks.map((b) => b.index) : undefined)}
+              title={filtering ? t('toolbar.expandFilteredTitle') : t('toolbar.expandAllTitle')}
+            >
               <UnfoldVertical className="h-3.5 w-3.5 mr-1.5" />
-              展开
+              {t('toolbar.expand')}
             </Button>
-            <Button size="sm" variant="ghost" onClick={collapseAll} title="全部折叠">
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => collapseAll(filtering ? visibleBlocks.map((b) => b.index) : undefined)}
+              title={filtering ? t('toolbar.collapseFilteredTitle') : t('toolbar.collapseAllTitle')}
+            >
               <FoldVertical className="h-3.5 w-3.5 mr-1.5" />
-              折叠
+              {t('toolbar.collapse')}
             </Button>
 
             <div className="h-4 w-px bg-border mx-1 shrink-0" />
 
             <Button size="sm" variant="ghost" onClick={() => setRawTextOpen(true)} title={rawTextTitle}>
               <FileText className="h-3.5 w-3.5 mr-1.5" />
-              原始文本
+              {t('toolbar.rawText')}
             </Button>
 
             <Button
               size="sm"
               variant={findOpen ? 'secondary' : 'ghost'}
               onClick={() => setFindOpen(!findOpen)}
-              title="查找并定位（/）"
+              title={t('toolbar.findTitle')}
             >
               <Search className="h-3.5 w-3.5 mr-1.5" />
-              查找
+              {t('toolbar.find')}
+            </Button>
+
+            <Button
+              size="sm"
+              variant={filtering ? 'secondary' : 'ghost'}
+              onClick={() => setShowMatchedOnly(!showMatchedOnly)}
+              disabled={!hasQuery}
+              title={hasQuery ? t('toolbar.showMatchedOnlyTitle') : t('toolbar.showMatchedOnlyDisabled')}
+            >
+              <Filter className="h-3.5 w-3.5 mr-1.5" />
+              {t('toolbar.showMatchedOnly')}
             </Button>
 
             {mergedJson && (
               <>
                 <div className="h-4 w-px bg-border mx-1 shrink-0" />
-                <CopyButton text={mergedJson} mode="icon-text" size="sm" variant="ghost" copyText="复制全部 JSON" />
+                <CopyButton
+                  text={mergedJson}
+                  mode="icon-text"
+                  size="sm"
+                  variant="ghost"
+                  copyText={t('toolbar.copyAllJson')}
+                />
               </>
             )}
 
@@ -155,7 +210,7 @@ export function BlockListLayout<B extends BaseBlock, R extends BaseParseResult<B
             <div className="flex items-center gap-1.5 shrink-0 pl-0.5">
               <Switch id="bv-highlight" checked={highlightEnabled} onCheckedChange={setHighlightEnabled} />
               <Label htmlFor="bv-highlight" className="text-xs text-muted-foreground cursor-pointer whitespace-nowrap">
-                语法高亮
+                {t('toolbar.syntaxHighlight')}
               </Label>
             </div>
             <div className="flex items-center gap-1.5 shrink-0 pl-2">
@@ -163,15 +218,26 @@ export function BlockListLayout<B extends BaseBlock, R extends BaseParseResult<B
               <Label
                 htmlFor="bv-virtual"
                 className="text-xs text-muted-foreground cursor-pointer whitespace-nowrap"
-                title="开启后仅渲染可视区域的块，浏览器查找（Ctrl/Cmd+F）将无法定位到视口外的块"
+                title={t('toolbar.virtualScrollTitle')}
               >
-                虚拟滚动
+                {t('toolbar.virtualScroll')}
               </Label>
             </div>
           </div>
 
           {/* 右侧：统计 Badges（锁住不折行、不参与横滚） */}
-          <div className="flex items-center gap-1.5 shrink-0">{renderStats()}</div>
+          <div className="flex items-center gap-1.5 shrink-0">
+            {hasQuery && (
+              <Badge
+                variant="outline"
+                className="text-[10px] h-5 font-mono tabular-nums"
+                title={t('toolbar.matchCountTitle')}
+              >
+                {matches.length} / {blocks.length}
+              </Badge>
+            )}
+            {renderStats()}
+          </div>
         </div>
 
         {/* 查找栏：与顶栏同处 sticky 容器内，一起吸顶 */}
@@ -183,35 +249,38 @@ export function BlockListLayout<B extends BaseBlock, R extends BaseParseResult<B
       </div>
 
       {virtualScrollEnabled && (
-        <p className="mb-3 text-[11px] text-amber-600 dark:text-amber-400">
-          虚拟滚动已开启：仅渲染可视区域的块，浏览器查找（Ctrl/Cmd+F）无效。请用上方「查找」按钮（或按 /）搜索并定位。
-        </p>
+        <p className="mb-3 text-[11px] text-amber-600 dark:text-amber-400">{t('toolbar.virtualScrollHint')}</p>
       )}
 
-      {virtualScrollEnabled ? (
+      {filtering && visibleBlocks.length === 0 ? (
+        <div className="py-8 text-center text-sm text-muted-foreground">{t('list.noMatches')}</div>
+      ) : virtualScrollEnabled ? (
         <VirtualBlockList
-          blocks={blocks}
+          blocks={visibleBlocks}
           collapsedSet={collapsedSet}
           highlightEnabled={highlightEnabled}
           highlightedIndex={highlightedIndex}
+          highlightNonce={highlightNonce}
           registerScroller={registerScroller}
           renderBlock={renderBlock}
         />
       ) : (
         <div className="divide-y divide-border/40">
-          {blocks.map((block) => (
-            <div
-              key={block.index}
-              data-block-index={block.index}
-              className={cn(
-                'block-cv py-3 first:pt-0 last:pb-0 transition-shadow',
-                highlightedIndex === block.index &&
-                  'rounded-md ring-2 ring-primary ring-offset-2 ring-offset-background',
-              )}
-            >
-              {renderBlock(block, collapsedSet.has(block.index), highlightEnabled)}
-            </div>
-          ))}
+          {visibleBlocks.map((block) => {
+            const isHighlighted = highlightedIndex === block.index;
+            return (
+              <div key={block.index} data-block-index={block.index} className="block-cv py-3 first:pt-0 last:pb-0">
+                {isHighlighted ? (
+                  // 用 nonce 作 key 让定位时重新挂载，重启脉冲动画
+                  <div key={highlightNonce} className="block-viewer-highlight">
+                    {renderBlock(block, collapsedSet.has(block.index), highlightEnabled)}
+                  </div>
+                ) : (
+                  renderBlock(block, collapsedSet.has(block.index), highlightEnabled)
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
 
@@ -239,6 +308,7 @@ function VirtualBlockList<B extends BaseBlock>({
   collapsedSet,
   highlightEnabled,
   highlightedIndex,
+  highlightNonce,
   registerScroller,
   renderBlock,
 }: {
@@ -246,6 +316,7 @@ function VirtualBlockList<B extends BaseBlock>({
   collapsedSet: Set<number>;
   highlightEnabled: boolean;
   highlightedIndex: number | null;
+  highlightNonce: number;
   registerScroller: (fn: ((index: number) => void) | null) => void;
   renderBlock: (block: B, collapsed: boolean, highlight: boolean) => ReactNode;
 }) {
@@ -273,14 +344,22 @@ function VirtualBlockList<B extends BaseBlock>({
     scrollMargin,
   });
 
+  // block.index → 当前 blocks 数组下标的映射（过滤模式下与 block.index 不再相等）
+  const indexMap = useMemo(() => {
+    const m = new Map<number, number>();
+    blocks.forEach((b, i) => m.set(b.index, i));
+    return m;
+  }, [blocks]);
+
   // 把 scrollToIndex 能力注册给 controller，供查找定位调用
   useEffect(() => {
-    registerScroller((index: number) => {
-      // blocks 的 index 字段即数组下标（解析时递增生成），这里直接用
-      virtualizer.scrollToIndex(index, { align: 'center' });
+    registerScroller((blockIndex: number) => {
+      const arrayIdx = indexMap.get(blockIndex);
+      if (arrayIdx === undefined) return;
+      virtualizer.scrollToIndex(arrayIdx, { align: 'center' });
     });
     return () => registerScroller(null);
-  }, [registerScroller, virtualizer]);
+  }, [registerScroller, virtualizer, indexMap]);
 
   const items = virtualizer.getVirtualItems();
 
@@ -292,19 +371,23 @@ function VirtualBlockList<B extends BaseBlock>({
       >
         {items.map((virtualItem) => {
           const block = blocks[virtualItem.index];
+          const isHighlighted = highlightedIndex === block.index;
           return (
             <div
               key={block.index}
               data-index={virtualItem.index}
               data-block-index={block.index}
               ref={virtualizer.measureElement}
-              className={cn(
-                'py-3 transition-shadow',
-                highlightedIndex === block.index &&
-                  'rounded-md ring-2 ring-primary ring-offset-2 ring-offset-background',
-              )}
+              className="py-3"
             >
-              {renderBlock(block, collapsedSet.has(block.index), highlightEnabled)}
+              {isHighlighted ? (
+                // 用 nonce 作 key 让定位时重新挂载，重启脉冲动画
+                <div key={highlightNonce} className="block-viewer-highlight">
+                  {renderBlock(block, collapsedSet.has(block.index), highlightEnabled)}
+                </div>
+              ) : (
+                renderBlock(block, collapsedSet.has(block.index), highlightEnabled)
+              )}
             </div>
           );
         })}

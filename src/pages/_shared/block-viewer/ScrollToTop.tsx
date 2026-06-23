@@ -1,5 +1,6 @@
 import { ArrowUp } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/ui/button';
 
@@ -22,6 +23,7 @@ export function findScrollParent(el: HTMLElement | null): HTMLElement | Window {
 
 /** 回到顶部按钮，自动监听最近的可滚动祖先 */
 export function ScrollToTop() {
+  const { t } = useTranslation('blockViewer');
   const anchorRef = useRef<HTMLDivElement>(null);
   const scrollerRef = useRef<HTMLElement | Window | null>(null);
   const [visible, setVisible] = useState(false);
@@ -58,7 +60,7 @@ export function ScrollToTop() {
           variant="outline"
           className="fixed bottom-6 right-6 z-50 h-9 w-9 rounded-full shadow-md bg-background/80 backdrop-blur-sm"
           onClick={scrollToTop}
-          title="回到顶部"
+          title={t('scrollToTop.title')}
         >
           <ArrowUp className="h-4 w-4" />
         </Button>

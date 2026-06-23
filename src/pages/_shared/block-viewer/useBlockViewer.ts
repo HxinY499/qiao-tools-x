@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
+import { compileMatcher, createEmptyCondition, type FindCondition } from './query-matcher';
+import { useBlockViewerSettings } from './settings-store';
+
 /** block 必须具备的最小字段：唯一索引 + 解析结果 */
 export interface BaseBlock {
   index: number;
@@ -45,23 +48,29 @@ export interface BlockViewerController<B extends BaseBlock, R extends BaseParseR
   handleConfirmFromDialog: (text: string) => void;
   handleClear: () => void;
   toggleBlock: (index: number) => void;
-  expandAll: () => void;
-  collapseAll: () => void;
+  /** 展开块；传入 indices 只展开这些块，不传展开全部 */
+  expandAll: (indices?: number[]) => void;
+  /** 折叠块；传入 indices 只折叠这些块，不传折叠全部 */
+  collapseAll: (indices?: number[]) => void;
   // ── 内置查找 ──
   /** 查找栏是否打开 */
   findOpen: boolean;
   setFindOpen: (open: boolean) => void;
-  /** 查找关键词 */
-  query: string;
-  setQuery: (q: string) => void;
+  /** 查找条件列表（包含 / 不包含） */
+  conditions: FindCondition[];
+  setConditions: (conditions: FindCondition[]) => void;
   /** 命中的 block index 列表 */
   matches: number[];
+  /** 正则模式下首个非法正则的错误信息（普通模式恒 null） */
+  queryError: string | null;
   /** 当前命中在 matches 中的序号（-1 表示无） */
   activeMatchIdx: number;
   /** 切换到上一个/下一个命中（dir=1 下一个，-1 上一个） */
   gotoMatch: (dir: 1 | -1) => void;
   /** 当前高亮定位的 block index（null 表示无） */
   highlightedIndex: number | null;
+  /** 高亮 nonce：每次"定位"动作递增，用于让 UI 重启脉冲动画（即便定位到的还是同一个块） */
+  highlightNonce: number;
   /** 供虚拟滚动列表注册 scrollToIndex 回调；传 null 注销 */
   registerScroller: (fn: ((index: number) => void) | null) => void;
 }
@@ -84,9 +93,11 @@ export function useBlockViewer<B extends BaseBlock, R extends BaseParseResult<B>
 
   // ── 内置查找状态 ──
   const [findOpen, setFindOpen] = useState(false);
-  const [query, setQuery] = useState('');
+  // 默认带一个空的"包含"条件，方便用户直接输入
+  const [conditions, setConditions] = useState<FindCondition[]>(() => [createEmptyCondition('include')]);
   const [activeMatchIdx, setActiveMatchIdx] = useState(-1);
   const [highlightedIndex, setHighlightedIndex] = useState<number | null>(null);
+  const [highlightNonce, setHighlightNonce] = useState(0);
   // 虚拟滚动列表注册的 scrollToIndex 回调（无则回退 DOM scrollIntoView）
   const scrollerRef = useRef<((index: number) => void) | null>(null);
 
@@ -126,7 +137,7 @@ export function useBlockViewer<B extends BaseBlock, R extends BaseParseResult<B>
     setResult(emptyResult);
     setCollapsedSet(new Set());
     setRawText('');
-    setQuery('');
+    setConditions([createEmptyCondition('include')]);
     setActiveMatchIdx(-1);
     setHighlightedIndex(null);
   }, [emptyResult]);
@@ -140,10 +151,35 @@ export function useBlockViewer<B extends BaseBlock, R extends BaseParseResult<B>
     });
   }, []);
 
-  const expandAll = useCallback(() => setCollapsedSet(new Set()), []);
+  /**
+   * 展开（取消折叠）：传入 indices 时只展开这些；不传则展开全部。
+   * 用于"仅显示匹配"场景下，让按钮只作用于当前可见的块。
+   */
+  const expandAll = useCallback((indices?: number[]) => {
+    if (!indices) {
+      setCollapsedSet(new Set());
+      return;
+    }
+    setCollapsedSet((prev) => {
+      const next = new Set(prev);
+      for (const i of indices) next.delete(i);
+      return next;
+    });
+  }, []);
 
-  const collapseAll = useCallback(() => {
-    setCollapsedSet(new Set(blocksRef.current.map((b) => b.index)));
+  /**
+   * 折叠：传入 indices 时只折叠这些；不传则折叠全部。
+   */
+  const collapseAll = useCallback((indices?: number[]) => {
+    if (!indices) {
+      setCollapsedSet(new Set(blocksRef.current.map((b) => b.index)));
+      return;
+    }
+    setCollapsedSet((prev) => {
+      const next = new Set(prev);
+      for (const i of indices) next.add(i);
+      return next;
+    });
   }, []);
 
   // 合并所有可纳入的 block 为 JSON 数组字符串
@@ -157,12 +193,21 @@ export function useBlockViewer<B extends BaseBlock, R extends BaseParseResult<B>
     );
   }, [blocks, isMergeable]);
 
-  // ── 内置查找：命中块 index 列表（大小写不敏感 includes） ──
+  // ── 内置查找：按 conditions + caseSensitive + regexMode 编译 matcher，对 blocks 过滤 ──
+  const caseSensitive = useBlockViewerSettings((s) => s.caseSensitive);
+  const regexMode = useBlockViewerSettings((s) => s.regexMode);
+
+  const compiled = useMemo(
+    () => compileMatcher({ conditions, caseSensitive, regexMode }),
+    [conditions, caseSensitive, regexMode],
+  );
+
   const matches = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return [];
-    return blocks.filter((b) => getSearchText(b).toLowerCase().includes(q)).map((b) => b.index);
-  }, [query, blocks, getSearchText]);
+    if (compiled.isEmpty || compiled.error) return [];
+    return blocks.filter((b) => compiled.test(getSearchText(b))).map((b) => b.index);
+  }, [compiled, blocks, getSearchText]);
+
+  const queryError = compiled.error;
 
   const registerScroller = useCallback((fn: ((index: number) => void) | null) => {
     scrollerRef.current = fn;
@@ -178,6 +223,7 @@ export function useBlockViewer<B extends BaseBlock, R extends BaseParseResult<B>
       return next;
     });
     setHighlightedIndex(blockIndex);
+    setHighlightNonce((n) => n + 1);
     // 优先用虚拟滚动注册的 scrollToIndex，否则回退 DOM
     requestAnimationFrame(() => {
       if (scrollerRef.current) {
@@ -252,12 +298,14 @@ export function useBlockViewer<B extends BaseBlock, R extends BaseParseResult<B>
     collapseAll,
     findOpen,
     setFindOpen,
-    query,
-    setQuery,
+    conditions,
+    setConditions,
     matches,
+    queryError,
     activeMatchIdx,
     gotoMatch,
     highlightedIndex,
+    highlightNonce,
     registerScroller,
   };
 }

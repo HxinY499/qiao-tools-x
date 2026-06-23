@@ -1,5 +1,6 @@
 import { Braces } from 'lucide-react';
 import { useCallback, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -27,6 +28,7 @@ interface PasteInputDialogProps {
 
 /** 粘贴原始数据并触发解析的输入弹窗 */
 export function PasteInputDialog({ open, onOpenChange, onConfirm, title, description, placeholder }: PasteInputDialogProps) {
+  const { t } = useTranslation('blockViewer');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // 每次弹窗打开时清空 textarea 并聚焦
@@ -74,11 +76,11 @@ export function PasteInputDialog({ open, onOpenChange, onConfirm, title, descrip
         />
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            取消
+            {t('paste.cancel')}
           </Button>
           <Button onClick={handleConfirm}>
             <Braces className="h-3.5 w-3.5 mr-1.5" />
-            解析
+            {t('paste.confirm')}
             <kbd className="ml-1.5 text-[10px] opacity-60">{SUBMIT_SHORTCUT}</kbd>
           </Button>
         </DialogFooter>

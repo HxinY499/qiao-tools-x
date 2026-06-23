@@ -1,0 +1,56 @@
+{
+  "empty": {
+    "hint": "直接按 <kbd>{{shortcut}}</kbd> 粘贴 {{label}} 数据即可自动解析",
+    "manual": "或点击下方按钮手动输入",
+    "pasteButton": "粘贴 {{label}} 数据"
+  },
+  "toolbar": {
+    "reimport": "重新导入",
+    "clear": "清空",
+    "expand": "展开",
+    "collapse": "折叠",
+    "expandAllTitle": "全部展开",
+    "collapseAllTitle": "全部折叠",
+    "expandFilteredTitle": "展开当前匹配的块",
+    "collapseFilteredTitle": "折叠当前匹配的块",
+    "rawText": "原始文本",
+    "find": "查找",
+    "findTitle": "查找并定位（/）",
+    "showMatchedOnly": "仅显示匹配",
+    "showMatchedOnlyTitle": "只显示命中查询的块",
+    "showMatchedOnlyDisabled": "请先输入查询关键词",
+    "copyAllJson": "复制全部 JSON",
+    "syntaxHighlight": "语法高亮",
+    "virtualScroll": "虚拟滚动",
+    "virtualScrollTitle": "开启后仅渲染可视区域的块，浏览器查找（Ctrl/Cmd+F）将无法定位到视口外的块",
+    "virtualScrollHint": "虚拟滚动已开启：仅渲染可视区域的块，浏览器查找（Ctrl/Cmd+F）无效。请用上方「查找」按钮（或按 /）搜索并定位。",
+    "matchCountTitle": "匹配数 / 总数"
+  },
+  "find": {
+    "title": "查找条件",
+    "placeholderKeyword": "关键词",
+    "placeholderRegex": "正则表达式",
+    "addCondition": "添加条件",
+    "removeCondition": "删除该条件",
+    "opInclude": "包含",
+    "opExclude": "不包含",
+    "caseSensitive": "区分大小写",
+    "regexMode": "正则表达式",
+    "prev": "上一个 (Shift+Enter)",
+    "next": "下一个 (Enter)",
+    "close": "关闭 (Esc)"
+  },
+  "list": {
+    "noMatches": "没有匹配的块"
+  },
+  "scrollToTop": {
+    "title": "回到顶部"
+  },
+  "paste": {
+    "cancel": "取消",
+    "confirm": "解析"
+  },
+  "matcher": {
+    "invalidRegex": "非法正则表达式"
+  }
+}

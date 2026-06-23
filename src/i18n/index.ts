@@ -1,10 +1,12 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
+import enBlockViewer from './locales/en/blockViewer.json';
 import enCommon from './locales/en/common.json';
 import enRoutes from './locales/en/routes.json';
 import enTools from './locales/en/tools.json';
 import enToolPage from './locales/en/toolPage.json';
+import zhBlockViewer from './locales/zh-CN/blockViewer.json';
 import zhCommon from './locales/zh-CN/common.json';
 import zhRoutes from './locales/zh-CN/routes.json';
 import zhTools from './locales/zh-CN/tools.json';
@@ -35,15 +37,17 @@ i18n.use(initReactI18next).init({
       routes: zhRoutes,
       toolPage: zhToolPage,
       tools: zhTools,
+      blockViewer: zhBlockViewer,
     },
     en: {
       common: enCommon,
       routes: enRoutes,
       toolPage: enToolPage,
       tools: enTools,
+      blockViewer: enBlockViewer,
     },
   },
-  ns: ['common', 'routes', 'toolPage', 'tools'],
+  ns: ['common', 'routes', 'toolPage', 'tools', 'blockViewer'],
   lng: resolveInitialLanguage(),
   fallbackLng: DEFAULT_LANGUAGE,
   defaultNS: 'common',
