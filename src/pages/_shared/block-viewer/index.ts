@@ -5,5 +5,6 @@ export { PlainCodeBlock } from './PlainCodeBlock';
 export { RawTextDialog } from './RawTextDialog';
 export { ScrollToTop } from './ScrollToTop';
 export { useBlockViewerSettings } from './settings-store';
+export { PrimaryBadge, StatsRow, StatsSummary } from './StatsSummary';
 export type { BaseBlock, BaseParseResult, BlockViewerController } from './useBlockViewer';
 export { useBlockViewer } from './useBlockViewer';

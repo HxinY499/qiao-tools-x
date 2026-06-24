@@ -236,10 +236,11 @@
     "signal": "信号：{{raw}}",
     "formatSse": "SSE",
     "formatLjson": "JSONL",
-    "total": "共 {{count}} 条",
-    "success": "{{count}} 条 JSON",
-    "signalCount": "{{count}} 条信号",
-    "fail": "{{count}} 条失败"
+    "statsFormat": "格式",
+    "statsTotal": "总数",
+    "statsValid": "有效 JSON",
+    "statsSignal": "信号",
+    "statsInvalid": "解析失败"
   },
   "cronTranslator": {
     "title": "Cron 表达式翻译",

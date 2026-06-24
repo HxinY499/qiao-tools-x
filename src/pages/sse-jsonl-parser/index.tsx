@@ -3,13 +3,14 @@ import { memo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { CodeArea } from '@/components/code-area';
-import { Badge } from '@/components/ui/badge';
 
 import {
   BlockListLayout,
   PasteInputDialog,
   PlainCodeBlock,
+  PrimaryBadge,
   RawTextDialog,
+  StatsRow,
   useBlockViewer,
 } from '../_shared/block-viewer';
 import {
@@ -20,6 +21,52 @@ import {
   type SseDataBlock,
   type StreamBlock,
 } from './utils';
+
+// ─── 单块通用：左侧色彩条 + 折叠按钮 + 元数据 ─────────────────
+
+type BlockTone = 'data' | 'signal' | 'error';
+
+const TONE_BAR: Record<BlockTone, string> = {
+  data: 'bg-border',
+  signal: 'bg-amber-400 dark:bg-amber-500',
+  error: 'bg-destructive',
+};
+
+function BlockHeader({
+  collapsed,
+  onToggle,
+  label,
+  tone,
+  meta,
+  status,
+}: {
+  collapsed: boolean;
+  onToggle: () => void;
+  label: string;
+  tone: BlockTone;
+  meta?: React.ReactNode;
+  status?: React.ReactNode;
+}) {
+  return (
+    <div className="flex items-center gap-2 mb-1">
+      {/* 左侧色条 */}
+      <span className={`w-[3px] h-3.5 rounded-sm shrink-0 ${TONE_BAR[tone]}`} aria-hidden />
+      <button
+        onClick={onToggle}
+        className="flex items-center gap-1 text-[11px] font-mono text-muted-foreground hover:text-foreground"
+      >
+        {collapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+        <span>{label}</span>
+      </button>
+      {meta}
+      {status}
+    </div>
+  );
+}
+
+function MetaSeparator() {
+  return <span className="text-muted-foreground/40">·</span>;
+}
 
 // ─── SSE 单块 ───────────────────────────────────────────────
 
@@ -37,37 +84,42 @@ const SseBlockView = memo(function SseBlockView({
   const { t } = useTranslation('tools');
   const handleToggle = useCallback(() => onToggle(block.index), [onToggle, block.index]);
 
+  const tone: BlockTone = block.type === 'signal' ? 'signal' : !block.valid ? 'error' : 'data';
+
+  const meta = (
+    <div className="flex items-center gap-1.5 text-[10px] font-mono text-muted-foreground/80 min-w-0">
+      {block.event && (
+        <>
+          <MetaSeparator />
+          <span className="truncate">{block.event}</span>
+        </>
+      )}
+      {block.id && (
+        <>
+          <MetaSeparator />
+          <span className="truncate">id:{block.id}</span>
+        </>
+      )}
+    </div>
+  );
+
+  const status =
+    block.type === 'signal' ? (
+      <span className="text-[10px] font-mono text-amber-600 dark:text-amber-400 ml-auto">{block.raw}</span>
+    ) : block.type === 'text' && !block.valid ? (
+      <span className="text-[10px] font-mono text-destructive ml-auto">{t('streamParser.parseFailed')}</span>
+    ) : null;
+
   return (
     <div className="relative">
-      <div className="flex items-center gap-1.5 mb-1">
-        <button
-          onClick={handleToggle}
-          className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground hover:text-foreground"
-        >
-          {collapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
-          <span>#{block.index + 1}</span>
-        </button>
-        {block.event && (
-          <Badge variant="outline" className="text-[10px] h-4 px-1.5 font-mono">
-            {block.event}
-          </Badge>
-        )}
-        {block.id && (
-          <Badge variant="outline" className="text-[10px] h-4 px-1.5 font-mono text-muted-foreground">
-            id: {block.id}
-          </Badge>
-        )}
-        {block.type === 'signal' && (
-          <Badge className="text-[10px] h-4 px-1.5 bg-blue-500/15 text-blue-600 dark:text-blue-400 hover:bg-blue-500/15">
-            {block.raw}
-          </Badge>
-        )}
-        {block.type === 'text' && !block.valid && (
-          <Badge variant="destructive" className="text-[10px] h-4 px-1.5">
-            {t('streamParser.parseFailed')}
-          </Badge>
-        )}
-      </div>
+      <BlockHeader
+        collapsed={collapsed}
+        onToggle={handleToggle}
+        label={`#${block.index + 1}`}
+        tone={tone}
+        meta={meta}
+        status={status}
+      />
       {!collapsed && (
         <>
           {block.type === 'json' &&
@@ -83,7 +135,7 @@ const SseBlockView = memo(function SseBlockView({
               <PlainCodeBlock code={block.formatted ?? ''} />
             ))}
           {block.type === 'signal' && (
-            <div className="text-xs text-blue-600 dark:text-blue-400 bg-blue-500/10 rounded-md px-3 py-2 font-mono">
+            <div className="text-xs text-amber-700 dark:text-amber-400 bg-amber-500/10 rounded-md px-3 py-2 font-mono">
               {t('streamParser.signal', { raw: block.raw })}
             </div>
           )}
@@ -117,22 +169,21 @@ const LjsonBlockView = memo(function LjsonBlockView({
   const { t } = useTranslation('tools');
   const handleToggle = useCallback(() => onToggle(block.index), [onToggle, block.index]);
 
+  const tone: BlockTone = block.valid ? 'data' : 'error';
+
+  const status = !block.valid ? (
+    <span className="text-[10px] font-mono text-destructive ml-auto">{t('streamParser.parseFailed')}</span>
+  ) : null;
+
   return (
     <div className="relative">
-      <div className="flex items-center gap-1.5 mb-1">
-        <button
-          onClick={handleToggle}
-          className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground hover:text-foreground"
-        >
-          {collapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
-          <span>L{block.lineNo}</span>
-        </button>
-        {!block.valid && (
-          <Badge variant="destructive" className="text-[10px] h-4 px-1.5">
-            {t('streamParser.parseFailed')}
-          </Badge>
-        )}
-      </div>
+      <BlockHeader
+        collapsed={collapsed}
+        onToggle={handleToggle}
+        label={`L${block.lineNo}`}
+        tone={tone}
+        status={status}
+      />
       {!collapsed && (
         <>
           {block.valid &&
@@ -189,6 +240,20 @@ data: {"another": "object"}
 {"id":"1","type":"message","text":"hello"}
 {"id":"2","type":"topic","topic":"greeting"}`;
 
+const EXAMPLE_DATA = `event: message
+data: {"id":"chatcmpl-1","choices":[{"delta":{"role":"assistant","content":"Hello"}}]}
+
+event: message
+data: {"id":"chatcmpl-1","choices":[{"delta":{"content":" world"}}]}
+
+event: message
+data: {"id":"chatcmpl-1","choices":[{"delta":{"content":"!"}}]}
+
+event: message
+data: {"id":"chatcmpl-1","choices":[{"finish_reason":"stop","delta":{}}]}
+
+data: [DONE]`;
+
 // ─── 主页面 ─────────────────────────────────────────────────
 
 export default function StreamParserPage() {
@@ -206,7 +271,7 @@ export default function StreamParserPage() {
 
   const { result, open, setOpen, rawText, rawTextOpen, setRawTextOpen, handleConfirmFromDialog, toggleBlock } =
     controller;
-  const { blocks, format, validCount, invalidCount, signalCount } = result;
+  const { format, validCount, invalidCount, signalCount, blocks } = result;
 
   const renderBlock = useCallback(
     (block: StreamBlock, collapsed: boolean, highlight: boolean) => {
@@ -216,6 +281,27 @@ export default function StreamParserPage() {
       return <LjsonBlockView block={block} collapsed={collapsed} highlight={highlight} onToggle={toggleBlock} />;
     },
     [toggleBlock],
+  );
+
+  const renderPrimaryBadge = useCallback(() => {
+    if (format === 'sse') return <PrimaryBadge>{t('streamParser.formatSse')}</PrimaryBadge>;
+    if (format === 'ljson') return <PrimaryBadge>{t('streamParser.formatLjson')}</PrimaryBadge>;
+    return null;
+  }, [format, t]);
+
+  const renderStatsDetails = useCallback(
+    () => (
+      <>
+        <StatsRow label={t('streamParser.statsFormat')} value={format === 'unknown' ? '-' : format.toUpperCase()} />
+        <StatsRow label={t('streamParser.statsTotal')} value={blocks.length} />
+        {validCount > 0 && <StatsRow label={t('streamParser.statsValid')} value={validCount} tone="success" />}
+        {signalCount > 0 && <StatsRow label={t('streamParser.statsSignal')} value={signalCount} tone="warning" />}
+        {invalidCount > 0 && (
+          <StatsRow label={t('streamParser.statsInvalid')} value={invalidCount} tone="destructive" />
+        )}
+      </>
+    ),
+    [format, blocks.length, validCount, signalCount, invalidCount, t],
   );
 
   return (
@@ -242,39 +328,9 @@ export default function StreamParserPage() {
         dataLabel="SSE / JSONL"
         rawTextTitle={t('streamParser.viewRaw')}
         renderBlock={renderBlock}
-        renderStats={() => (
-          <>
-            {/* 当前识别到的格式 */}
-            {format === 'sse' && (
-              <Badge className="text-[10px] h-5 bg-purple-500/15 text-purple-600 dark:text-purple-400 hover:bg-purple-500/15">
-                {t('streamParser.formatSse')}
-              </Badge>
-            )}
-            {format === 'ljson' && (
-              <Badge className="text-[10px] h-5 bg-cyan-500/15 text-cyan-600 dark:text-cyan-400 hover:bg-cyan-500/15">
-                {t('streamParser.formatLjson')}
-              </Badge>
-            )}
-            <Badge variant="secondary" className="text-[10px] h-5">
-              {t('streamParser.total', { count: blocks.length })}
-            </Badge>
-            {validCount > 0 && (
-              <Badge className="text-[10px] h-5 bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/15">
-                {t('streamParser.success', { count: validCount })}
-              </Badge>
-            )}
-            {signalCount > 0 && (
-              <Badge className="text-[10px] h-5 bg-blue-500/15 text-blue-600 dark:text-blue-400 hover:bg-blue-500/15">
-                {t('streamParser.signalCount', { count: signalCount })}
-              </Badge>
-            )}
-            {invalidCount > 0 && (
-              <Badge variant="destructive" className="text-[10px] h-5">
-                {t('streamParser.fail', { count: invalidCount })}
-              </Badge>
-            )}
-          </>
-        )}
+        renderPrimaryBadge={renderPrimaryBadge}
+        renderStatsDetails={renderStatsDetails}
+        exampleText={EXAMPLE_DATA}
       />
     </>
   );

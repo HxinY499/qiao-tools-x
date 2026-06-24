@@ -1,20 +1,39 @@
 import { useVirtualizer } from '@tanstack/react-virtual';
 import type { LucideIcon } from 'lucide-react';
-import { ClipboardPaste, FileText, Filter, FoldVertical, Search, Trash2, UnfoldVertical } from 'lucide-react';
+import {
+  ClipboardPaste,
+  Copy,
+  Eye,
+  EyeOff,
+  FileText,
+  Filter,
+  FoldVertical,
+  MoreHorizontal,
+  Trash2,
+  UnfoldVertical,
+} from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 
-import { CopyButton } from '@/components/copy-button';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { cn } from '@/utils';
 
 import { FindBar } from './FindBar';
 import { PASTE_SHORTCUT } from './isMac';
 import { ScrollToTop } from './ScrollToTop';
 import { useBlockViewerSettings } from './settings-store';
+import { StatsSummary } from './StatsSummary';
 import type { BaseBlock, BaseParseResult, BlockViewerController } from './useBlockViewer';
 
 interface BlockListLayoutProps<B extends BaseBlock, R extends BaseParseResult<B>> {
@@ -27,8 +46,12 @@ interface BlockListLayoutProps<B extends BaseBlock, R extends BaseParseResult<B>
   rawTextTitle: string;
   /** 渲染单个 block（页面注入，处理各自的块类型差异）。highlight 为是否启用语法高亮 */
   renderBlock: (block: B, collapsed: boolean, highlight: boolean) => ReactNode;
-  /** 顶栏右侧统计 Badge 区（页面注入，处理各自统计字段差异） */
-  renderStats: () => ReactNode;
+  /** Popover 详情区（页面注入；用 dl/dt/dd 等表格化内容呈现各自的统计字段） */
+  renderStatsDetails?: () => ReactNode;
+  /** 顶栏快速主徽章（页面注入；通常是「格式」一项） */
+  renderPrimaryBadge?: () => ReactNode;
+  /** 空状态：可选的「示例数据」按钮（点击后用此文本调用 onLoadExample） */
+  exampleText?: string;
 }
 
 /** 块查看类工具的通用布局：空状态 + 顶栏 + 块列表 + 回到顶部 */
@@ -38,7 +61,9 @@ export function BlockListLayout<B extends BaseBlock, R extends BaseParseResult<B
   dataLabel,
   rawTextTitle,
   renderBlock,
-  renderStats,
+  renderStatsDetails,
+  renderPrimaryBadge,
+  exampleText,
 }: BlockListLayoutProps<B, R>) {
   const { t } = useTranslation('blockViewer');
   const {
@@ -48,6 +73,7 @@ export function BlockListLayout<B extends BaseBlock, R extends BaseParseResult<B
     setOpen,
     setRawTextOpen,
     handleClear,
+    handleConfirmFromDialog,
     expandAll,
     collapseAll,
     findOpen,
@@ -100,14 +126,26 @@ export function BlockListLayout<B extends BaseBlock, R extends BaseParseResult<B
     return () => document.removeEventListener('keydown', onKey);
   }, [findOpen, setFindOpen]);
 
+  const handleCopyAll = async () => {
+    if (!mergedJson) return;
+    try {
+      await navigator.clipboard.writeText(mergedJson);
+      toast.success(t('toolbar.copyAllJson'));
+    } catch {
+      /* ignore */
+    }
+  };
+
   if (blocks.length === 0) {
     return (
-      <div className="flex min-h-[calc(100vh-8rem)] flex-col items-center justify-center gap-5 px-4">
-        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-muted/50">
-          <EmptyIcon className="h-8 w-8 text-muted-foreground/50" strokeWidth={1.5} />
+      <div className="flex min-h-[calc(100vh-8rem)] flex-col items-center justify-center gap-6 px-4">
+        <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-primary/10 to-primary/5 ring-1 ring-primary/10">
+          <EmptyIcon className="h-10 w-10 text-primary/60" strokeWidth={1.5} />
         </div>
-        <div className="text-center space-y-1.5">
-          <p className="text-sm text-muted-foreground">
+        <div className="text-center space-y-2 max-w-md">
+          <h2 className="text-lg font-semibold text-foreground">{t('empty.heading', { label: dataLabel })}</h2>
+          <p className="text-sm text-muted-foreground">{t('empty.subheading')}</p>
+          <p className="text-xs text-muted-foreground/80 pt-1">
             <Trans
               t={t}
               i18nKey="empty.hint"
@@ -117,12 +155,19 @@ export function BlockListLayout<B extends BaseBlock, R extends BaseParseResult<B
               }}
             />
           </p>
-          <p className="text-xs text-muted-foreground/60">{t('empty.manual')}</p>
         </div>
-        <Button onClick={() => setOpen(true)}>
-          <ClipboardPaste className="h-4 w-4 mr-2" />
-          {t('empty.pasteButton', { label: dataLabel })}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button onClick={() => setOpen(true)}>
+            <ClipboardPaste className="h-4 w-4 mr-2" />
+            {t('empty.pasteButton', { label: dataLabel })}
+          </Button>
+          {exampleText && (
+            <Button variant="outline" onClick={() => handleConfirmFromDialog(exampleText)}>
+              <FileText className="h-4 w-4 mr-2" />
+              {t('empty.example')}
+            </Button>
+          )}
+        </div>
       </div>
     );
   }
@@ -130,20 +175,54 @@ export function BlockListLayout<B extends BaseBlock, R extends BaseParseResult<B
   return (
     <div className="w-full px-4 pb-5">
       <div className="sticky top-0 z-30 -mx-4 mb-4 bg-background/95 backdrop-blur-sm border-b border-border/40">
-        <div className="flex items-center gap-3 px-4 py-2">
-          {/* 左侧：操作按钮组（小屏可横向滚动，不再折行） */}
-          <div className="flex items-center gap-1 overflow-x-auto custom-scrollbar -my-1 py-1 flex-1 min-w-0">
+        <div className="flex items-center gap-2 px-4 py-2">
+          {/* 左侧：高频操作（数据导入相关） */}
+          <div className="flex items-center gap-1 shrink-0">
             <Button size="sm" variant="outline" onClick={() => setOpen(true)}>
               <ClipboardPaste className="h-3.5 w-3.5 mr-1.5" />
               {t('toolbar.reimport')}
             </Button>
-            <Button size="sm" variant="ghost" onClick={handleClear}>
-              <Trash2 className="h-3.5 w-3.5 mr-1.5" />
-              {t('toolbar.clear')}
+            <Button size="sm" variant="ghost" onClick={() => setRawTextOpen(true)} title={rawTextTitle}>
+              <FileText className="h-3.5 w-3.5 mr-1.5" />
+              {t('toolbar.rawText')}
             </Button>
+          </div>
 
-            <div className="h-4 w-px bg-border mx-1 shrink-0" />
+          <div className="h-4 w-px bg-border shrink-0" />
 
+          {/* 中间：过滤相关（高频） */}
+          <div className="flex items-center gap-1 shrink-0">
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => setFindOpen(!findOpen)}
+              title={t('toolbar.findTitle')}
+              className={cn(
+                findOpen && 'border border-primary/60 text-primary bg-primary/5 hover:bg-primary/10 hover:text-primary',
+              )}
+            >
+              <Filter className="h-3.5 w-3.5 mr-1.5" />
+              {t('toolbar.find')}
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => setShowMatchedOnly(!showMatchedOnly)}
+              disabled={!hasQuery}
+              title={hasQuery ? t('toolbar.showMatchedOnlyTitle') : t('toolbar.showMatchedOnlyDisabled')}
+              className={cn(
+                filtering &&
+                  'border border-primary/60 text-primary bg-primary/5 hover:bg-primary/10 hover:text-primary',
+              )}
+            >
+              {filtering ? <Eye className="h-3.5 w-3.5 mr-1.5" /> : <EyeOff className="h-3.5 w-3.5 mr-1.5" />}
+              {t('toolbar.showMatchedOnly')}
+            </Button>
+          </div>
+
+          {/* 响应式按钮：宽屏可见，窄屏收进菜单 */}
+          <div className="hidden md:flex items-center gap-1 shrink-0">
+            <div className="h-4 w-px bg-border shrink-0" />
             <Button
               size="sm"
               variant="ghost"
@@ -162,81 +241,103 @@ export function BlockListLayout<B extends BaseBlock, R extends BaseParseResult<B
               <FoldVertical className="h-3.5 w-3.5 mr-1.5" />
               {t('toolbar.collapse')}
             </Button>
-
-            <div className="h-4 w-px bg-border mx-1 shrink-0" />
-
-            <Button size="sm" variant="ghost" onClick={() => setRawTextOpen(true)} title={rawTextTitle}>
-              <FileText className="h-3.5 w-3.5 mr-1.5" />
-              {t('toolbar.rawText')}
-            </Button>
-
-            <Button
-              size="sm"
-              variant={findOpen ? 'secondary' : 'ghost'}
-              onClick={() => setFindOpen(!findOpen)}
-              title={t('toolbar.findTitle')}
-            >
-              <Search className="h-3.5 w-3.5 mr-1.5" />
-              {t('toolbar.find')}
-            </Button>
-
-            <Button
-              size="sm"
-              variant={filtering ? 'secondary' : 'ghost'}
-              onClick={() => setShowMatchedOnly(!showMatchedOnly)}
-              disabled={!hasQuery}
-              title={hasQuery ? t('toolbar.showMatchedOnlyTitle') : t('toolbar.showMatchedOnlyDisabled')}
-            >
-              <Filter className="h-3.5 w-3.5 mr-1.5" />
-              {t('toolbar.showMatchedOnly')}
-            </Button>
-
-            {mergedJson && (
-              <>
-                <div className="h-4 w-px bg-border mx-1 shrink-0" />
-                <CopyButton
-                  text={mergedJson}
-                  mode="icon-text"
-                  size="sm"
-                  variant="ghost"
-                  copyText={t('toolbar.copyAllJson')}
-                />
-              </>
-            )}
-
-            <div className="h-4 w-px bg-border mx-1 shrink-0" />
-
-            {/* 性能开关：语法高亮 / 虚拟滚动 */}
-            <div className="flex items-center gap-1.5 shrink-0 pl-0.5">
-              <Switch id="bv-highlight" checked={highlightEnabled} onCheckedChange={setHighlightEnabled} />
-              <Label htmlFor="bv-highlight" className="text-xs text-muted-foreground cursor-pointer whitespace-nowrap">
-                {t('toolbar.syntaxHighlight')}
-              </Label>
-            </div>
-            <div className="flex items-center gap-1.5 shrink-0 pl-2">
-              <Switch id="bv-virtual" checked={virtualScrollEnabled} onCheckedChange={setVirtualScrollEnabled} />
-              <Label
-                htmlFor="bv-virtual"
-                className="text-xs text-muted-foreground cursor-pointer whitespace-nowrap"
-                title={t('toolbar.virtualScrollTitle')}
-              >
-                {t('toolbar.virtualScroll')}
-              </Label>
-            </div>
           </div>
 
-          {/* 右侧：统计 Badges（锁住不折行、不参与横滚） */}
+          {mergedJson && (
+            <div className="hidden lg:flex items-center gap-1 shrink-0">
+              <div className="h-4 w-px bg-border shrink-0" />
+              <Button size="sm" variant="ghost" onClick={handleCopyAll} title={t('toolbar.copyAllJson')}>
+                <Copy className="h-3.5 w-3.5 mr-1.5" />
+                {t('toolbar.copyAllJson')}
+              </Button>
+            </div>
+          )}
+
+          {/* 弹性间隔 */}
+          <div className="flex-1 min-w-0" />
+
+          {/* 右侧：统计 + 更多菜单 */}
           <div className="flex items-center gap-1.5 shrink-0">
-            {hasQuery && (
-              <Badge
-                variant="outline"
-                className="text-[10px] h-5 font-mono tabular-nums"
-                title={t('toolbar.matchCountTitle')}
-              >
-                {matches.length} / {blocks.length}
-              </Badge>
-            )}
-            {renderStats()}
+            <StatsSummary
+              total={blocks.length}
+              matchCount={hasQuery ? matches.length : null}
+              primaryBadge={renderPrimaryBadge?.()}
+              details={renderStatsDetails?.()}
+            />
+
+            {/* ⋯ 更多菜单：低频操作 + 设置 */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button size="icon" variant="ghost" className="h-8 w-8" title={t('toolbar.more')}>
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                {/* 展开/折叠：md 起在顶栏可见，菜单内对应隐藏 */}
+                <DropdownMenuItem
+                  className="md:hidden"
+                  onClick={() => expandAll(filtering ? visibleBlocks.map((b) => b.index) : undefined)}
+                >
+                  <UnfoldVertical className="h-4 w-4 mr-2" />
+                  {filtering ? t('toolbar.expandFilteredTitle') : t('toolbar.expandAllTitle')}
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="md:hidden"
+                  onClick={() => collapseAll(filtering ? visibleBlocks.map((b) => b.index) : undefined)}
+                >
+                  <FoldVertical className="h-4 w-4 mr-2" />
+                  {filtering ? t('toolbar.collapseFilteredTitle') : t('toolbar.collapseAllTitle')}
+                </DropdownMenuItem>
+
+                {/* 复制全部 JSON：lg 起在顶栏可见，菜单内对应隐藏 */}
+                {mergedJson && (
+                  <>
+                    <DropdownMenuSeparator className="md:hidden" />
+                    <DropdownMenuItem className="lg:hidden" onClick={handleCopyAll}>
+                      <Copy className="h-4 w-4 mr-2" />
+                      {t('toolbar.copyAllJson')}
+                    </DropdownMenuItem>
+                  </>
+                )}
+
+                <DropdownMenuSeparator className="lg:hidden" />
+                <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-default focus:bg-transparent">
+                  <Switch
+                    id="bv-highlight"
+                    checked={highlightEnabled}
+                    onCheckedChange={setHighlightEnabled}
+                    className="mr-2"
+                  />
+                  <Label htmlFor="bv-highlight" className="text-xs cursor-pointer">
+                    {t('toolbar.syntaxHighlight')}
+                  </Label>
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-default focus:bg-transparent">
+                  <Switch
+                    id="bv-virtual"
+                    checked={virtualScrollEnabled}
+                    onCheckedChange={setVirtualScrollEnabled}
+                    className="mr-2"
+                  />
+                  <Label
+                    htmlFor="bv-virtual"
+                    className="text-xs cursor-pointer"
+                    title={t('toolbar.virtualScrollTitle')}
+                  >
+                    {t('toolbar.virtualScroll')}
+                  </Label>
+                </DropdownMenuItem>
+
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={handleClear}
+                  className="text-destructive focus:text-destructive focus:bg-destructive/10"
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  {t('toolbar.clear')}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 

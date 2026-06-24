@@ -1,12 +1,15 @@
 {
   "empty": {
-    "hint": "Press <kbd>{{shortcut}}</kbd> to paste {{label}} data and parse automatically",
+    "heading": "Paste {{label}} data to parse",
+    "subheading": "Supports Server-Sent Events and JSON Lines (NDJSON). Handy for debugging LLM streams or inspecting pushed data.",
+    "hint": "Press <kbd>{{shortcut}}</kbd> to paste {{label}} data, or:",
     "manual": "Or click the button below to enter manually",
-    "pasteButton": "Paste {{label}} Data"
+    "pasteButton": "Paste {{label}} Data",
+    "example": "View Example"
   },
   "toolbar": {
     "reimport": "Reimport",
-    "clear": "Clear",
+    "clear": "Clear data",
     "expand": "Expand",
     "collapse": "Collapse",
     "expandAllTitle": "Expand all",
@@ -14,20 +17,22 @@
     "expandFilteredTitle": "Expand currently matched blocks",
     "collapseFilteredTitle": "Collapse currently matched blocks",
     "rawText": "Raw Text",
-    "find": "Find",
-    "findTitle": "Find and locate (/)",
+    "find": "Filter",
+    "findTitle": "Open filter panel (/)",
     "showMatchedOnly": "Only matched",
-    "showMatchedOnlyTitle": "Show only blocks matching the query",
-    "showMatchedOnlyDisabled": "Enter a search keyword first",
+    "showMatchedOnlyTitle": "Show only blocks matching the filter",
+    "showMatchedOnlyDisabled": "Enter a filter keyword first",
     "copyAllJson": "Copy all JSON",
     "syntaxHighlight": "Syntax highlight",
     "virtualScroll": "Virtual scroll",
     "virtualScrollTitle": "When on, only blocks in the viewport are rendered. Browser find (Ctrl/Cmd+F) won't locate blocks outside the viewport.",
     "virtualScrollHint": "Virtual scroll is on: only blocks in the viewport are rendered. Browser find (Ctrl/Cmd+F) is unavailable — use the Find button (or press /) above instead.",
-    "matchCountTitle": "Matches / Total"
+    "matchCountTitle": "Matches / Total",
+    "more": "More actions",
+    "statsTitle": "Stats"
   },
   "find": {
-    "title": "Find Conditions",
+    "title": "Filter Conditions",
     "placeholderKeyword": "Keyword",
     "placeholderRegex": "Regular expression",
     "addCondition": "Add condition",

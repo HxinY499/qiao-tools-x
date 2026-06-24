@@ -1,12 +1,15 @@
 {
   "empty": {
-    "hint": "直接按 <kbd>{{shortcut}}</kbd> 粘贴 {{label}} 数据即可自动解析",
+    "heading": "粘贴 {{label}} 数据自动解析",
+    "subheading": "支持 Server-Sent Events 与 JSON Lines (NDJSON)，常用于调试 LLM 流式接口、查看推送数据。",
+    "hint": "按 <kbd>{{shortcut}}</kbd> 粘贴 {{label}} 数据，或：",
     "manual": "或点击下方按钮手动输入",
-    "pasteButton": "粘贴 {{label}} 数据"
+    "pasteButton": "粘贴 {{label}} 数据",
+    "example": "查看示例"
   },
   "toolbar": {
     "reimport": "重新导入",
-    "clear": "清空",
+    "clear": "清空数据",
     "expand": "展开",
     "collapse": "折叠",
     "expandAllTitle": "全部展开",
@@ -14,20 +17,22 @@
     "expandFilteredTitle": "展开当前匹配的块",
     "collapseFilteredTitle": "折叠当前匹配的块",
     "rawText": "原始文本",
-    "find": "查找",
-    "findTitle": "查找并定位（/）",
+    "find": "过滤",
+    "findTitle": "打开过滤面板（/）",
     "showMatchedOnly": "仅显示匹配",
-    "showMatchedOnlyTitle": "只显示命中查询的块",
-    "showMatchedOnlyDisabled": "请先输入查询关键词",
+    "showMatchedOnlyTitle": "只显示命中过滤的块",
+    "showMatchedOnlyDisabled": "请先输入过滤关键词",
     "copyAllJson": "复制全部 JSON",
     "syntaxHighlight": "语法高亮",
     "virtualScroll": "虚拟滚动",
     "virtualScrollTitle": "开启后仅渲染可视区域的块，浏览器查找（Ctrl/Cmd+F）将无法定位到视口外的块",
     "virtualScrollHint": "虚拟滚动已开启：仅渲染可视区域的块，浏览器查找（Ctrl/Cmd+F）无效。请用上方「查找」按钮（或按 /）搜索并定位。",
-    "matchCountTitle": "匹配数 / 总数"
+    "matchCountTitle": "匹配数 / 总数",
+    "more": "更多操作",
+    "statsTitle": "统计详情"
   },
   "find": {
-    "title": "查找条件",
+    "title": "过滤条件",
     "placeholderKeyword": "关键词",
     "placeholderRegex": "正则表达式",
     "addCondition": "添加条件",

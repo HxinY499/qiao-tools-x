@@ -236,10 +236,11 @@
     "signal": "Signal: {{raw}}",
     "formatSse": "SSE",
     "formatLjson": "JSONL",
-    "total": "Total: {{count}}",
-    "success": "{{count}} JSON",
-    "signalCount": "{{count}} signals",
-    "fail": "{{count}} failed"
+    "statsFormat": "Format",
+    "statsTotal": "Total",
+    "statsValid": "Valid JSON",
+    "statsSignal": "Signals",
+    "statsInvalid": "Parse failed"
   },
   "cronTranslator": {
     "title": "Cron Expression Translator",
