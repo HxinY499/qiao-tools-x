@@ -1,3 +1,5 @@
+import { Code2, FileText, ImageIcon, Lightbulb, type LucideIcon, Palette, Sparkles } from 'lucide-react';
+
 import { ToolCategory } from './type';
 
 export const LOADING_MESSAGES = [
@@ -16,6 +18,16 @@ export const CATEGORY_LABELS: Record<ToolCategory, string> = {
   text: '文本类',
   life: '生活实用类',
   other: '其他',
+};
+
+/** 每个分类对应的图标（左侧菜单分组使用） */
+export const CATEGORY_ICONS: Record<ToolCategory, LucideIcon> = {
+  image: ImageIcon,
+  css: Palette,
+  dev: Code2,
+  text: FileText,
+  life: Lightbulb,
+  other: Sparkles,
 };
 
 // api 基础地址

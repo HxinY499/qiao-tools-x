@@ -21,6 +21,16 @@
     "life": "Utilities",
     "other": "Other"
   },
+  "sidebar": {
+    "pinned": "Pinned",
+    "pinnedEmpty": "Hover a tool and click 📌 to pin",
+    "search": "Search tools",
+    "searchPlaceholder": "Search tools…",
+    "searchResults": "Search Results",
+    "searchEmpty": "No tools found",
+    "pin": "Pin",
+    "unpin": "Unpin"
+  },
   "errorBoundary": {
     "title": "This page hit a snag",
     "description": "Don't worry, your data is safe.\nClick \"Retry\", or explore other tools.",

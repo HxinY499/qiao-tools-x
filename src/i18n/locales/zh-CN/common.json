@@ -21,6 +21,16 @@
     "life": "生活实用类",
     "other": "其他"
   },
+  "sidebar": {
+    "pinned": "置顶工具",
+    "pinnedEmpty": "悬停工具，点 📌 即可置顶",
+    "search": "搜索工具",
+    "searchPlaceholder": "搜索工具…",
+    "searchResults": "搜索结果",
+    "searchEmpty": "没有找到工具",
+    "pin": "置顶",
+    "unpin": "取消置顶"
+  },
   "errorBoundary": {
     "title": "这个页面开了点小差",
     "description": "别担心，你的数据都还在。\n点「重试」再来一次，或者去逛逛别的工具。",

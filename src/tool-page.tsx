@@ -2,6 +2,7 @@ import { Info, Laptop, Moon, Sun } from 'lucide-react';
 import { Suspense, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { LanguageSwitcher } from '@/components/language-switcher';
 import { SEO } from '@/components/seo';
 import { Button } from '@/components/ui/button';
 import {
@@ -14,8 +15,7 @@ import {
 } from '@/components/ui/dialog';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
-import { useSidebar } from './components/ui/sidebar';
-import { useIsMobile } from './hooks/use-mobile';
+import { SidebarTrigger, useSidebar } from './components/ui/sidebar';
 import { useThemeStore, type ThemeSetting } from './store/theme';
 import { ToolRoute } from './type';
 import { cn } from './utils';
@@ -88,8 +88,11 @@ function ThemeToggleButton() {
 export function ToolPage({ route }: { route: ToolRoute }) {
   const { t } = useTranslation('routes');
   const { t: tTool } = useTranslation('toolPage');
-  const { open } = useSidebar();
-  const isMobile = useIsMobile();
+  const { isMobile } = useSidebar();
+
+  // 桌面端：sidebar 即使收成 icon-only 也仍在屏幕上，trigger 在 sidebar 内部；header 无需放 trigger
+  // 移动端：sidebar 是 sheet，关闭后没有任何入口，header 必须放一个 trigger
+  const showInlineTrigger = isMobile;
 
   // i18n 标题/副标题：优先取翻译，兜底 router.ts 里的原值
   const title = t(`${route.key}.title`, route.title);
@@ -113,19 +116,14 @@ export function ToolPage({ route }: { route: ToolRoute }) {
           <TooltipProvider delayDuration={200}>
             <header
               className={cn(
-                'h-14 pl-3 pr-2.5 flex items-center gap-3',
+                'h-14 pr-2.5 flex items-center gap-2',
                 'rounded-lg border border-sidebar-border bg-sidebar',
                 'animate-in fade-in slide-in-from-top-1 duration-300',
+                showInlineTrigger ? 'pl-2' : 'pl-3',
               )}
             >
-              {/* SidebarTrigger 占位（侧栏收起时让出空间） */}
-              <div
-                className={cn(
-                  'h-full bg-transparent transition-[width] duration-200 shrink-0',
-                  open ? 'w-0' : 'w-9',
-                  isMobile && 'w-7',
-                )}
-              />
+              {/* 折叠态把 SidebarTrigger 内嵌进 header，避免悬浮按钮孤悬在浮岛之外 */}
+              {showInlineTrigger && <SidebarTrigger className="shrink-0" />}
 
               {/* 标题 + 副标题 */}
               <div className="flex flex-col min-w-0 flex-1">
@@ -166,6 +164,7 @@ export function ToolPage({ route }: { route: ToolRoute }) {
                   </DialogContent>
                 </Dialog>
 
+                <LanguageSwitcher variant="icon" />
                 <ThemeToggleButton />
               </div>
             </header>
