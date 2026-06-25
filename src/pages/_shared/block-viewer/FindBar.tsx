@@ -1,5 +1,6 @@
 import { useDebounceFn } from 'ahooks';
 import { CaseSensitive, ChevronDown, ChevronUp, Plus, Regex, X } from 'lucide-react';
+import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -13,7 +14,7 @@ import { useBlockViewerSettings } from './settings-store';
 
 interface FindBarController {
   conditions: FindCondition[];
-  setConditions: (conditions: FindCondition[]) => void;
+  setConditions: Dispatch<SetStateAction<FindCondition[]>>;
   matches: number[];
   queryError: string | null;
   activeMatchIdx: number;
@@ -39,20 +40,25 @@ export function FindBar({ controller }: { controller: FindBarController }) {
   const isOnlyRow = conditions.length <= 1;
 
   const handleAdd = () => {
-    setConditions([...conditions, createEmptyCondition('include')]);
+    setConditions((prev) => [...prev, createEmptyCondition('include')]);
   };
 
   const handleRemove = (id: string) => {
-    if (isOnlyRow) {
+    setConditions((prev) => {
       // 仅剩一行时不删除，而是清空内容（保证 UI 上至少有一行）
-      setConditions(conditions.map((c) => (c.id === id ? { ...c, value: '' } : c)));
-      return;
-    }
-    setConditions(conditions.filter((c) => c.id !== id));
+      if (prev.length <= 1) {
+        return prev.map((c) => (c.id === id ? { ...c, value: '' } : c));
+      }
+      return prev.filter((c) => c.id !== id);
+    });
   };
 
   const handleUpdate = (id: string, patch: Partial<Pick<FindCondition, 'op' | 'value'>>) => {
-    setConditions(conditions.map((c) => (c.id === id ? { ...c, ...patch } : c)));
+    setConditions((prev) => {
+      // 该条件可能已被删除（如 debounce 推送晚于删除操作）——忽略，避免被"复活"
+      if (!prev.some((c) => c.id === id)) return prev;
+      return prev.map((c) => (c.id === id ? { ...c, ...patch } : c));
+    });
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {

@@ -1,3 +1,4 @@
+import type { Dispatch, SetStateAction } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -58,7 +59,7 @@ export interface BlockViewerController<B extends BaseBlock, R extends BaseParseR
   setFindOpen: (open: boolean) => void;
   /** 查找条件列表（包含 / 不包含） */
   conditions: FindCondition[];
-  setConditions: (conditions: FindCondition[]) => void;
+  setConditions: Dispatch<SetStateAction<FindCondition[]>>;
   /** 命中的 block index 列表 */
   matches: number[];
   /** 正则模式下首个非法正则的错误信息（普通模式恒 null） */
