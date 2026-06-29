@@ -310,24 +310,26 @@ export default function StreamParserPage() {
             ⚠ {t('streamParser.trailingIncomplete')}
           </div>
         )}
-        {/* 格式覆盖按钮 */}
-        <div className="flex items-center gap-1 mt-2 pt-2 border-t border-border/50">
-          <span className="text-[10px] text-muted-foreground mr-1">{t('streamParser.forceFormat')}:</span>
-          {(['auto', 'sse', 'ljson'] as const).map((opt) => (
-            <Button
-              key={opt}
-              variant={(forceFormat === null ? 'auto' : forceFormat) === opt ? 'default' : 'ghost'}
-              size="sm"
-              className="h-5 px-1.5 text-[10px]"
-              onClick={() => setForceFormat(opt === 'auto' ? null : opt)}
-            >
-              {opt === 'auto' ? t('streamParser.formatAuto') : opt.toUpperCase()}
-            </Button>
-          ))}
-        </div>
       </>
     ),
-    [format, blocks.length, validCount, signalCount, invalidCount, trailingIncomplete, forceFormat, setForceFormat, t],
+    [format, blocks.length, validCount, signalCount, invalidCount, trailingIncomplete, t],
+  );
+
+  const formatSelector = (
+    <div className="flex items-center gap-1">
+      <span className="text-xs text-muted-foreground mr-1">{t('streamParser.forceFormat')}:</span>
+      {(['auto', 'sse', 'ljson'] as const).map((opt) => (
+        <Button
+          key={opt}
+          variant={(forceFormat === null ? 'auto' : forceFormat) === opt ? 'default' : 'ghost'}
+          size="sm"
+          className="h-6 px-2 text-xs"
+          onClick={() => setForceFormat(opt === 'auto' ? null : opt)}
+        >
+          {opt === 'auto' ? t('streamParser.formatAuto') : opt.toUpperCase()}
+        </Button>
+      ))}
+    </div>
   );
 
   return (
@@ -347,6 +349,11 @@ export default function StreamParserPage() {
         title={t('streamParser.rawTitle')}
         description={t('streamParser.rawDesc')}
       />
+
+      {/* 格式选择器：始终可见 */}
+      <div className="px-4 pt-3 pb-1 flex items-center">
+        {formatSelector}
+      </div>
 
       <BlockListLayout
         controller={controller}
