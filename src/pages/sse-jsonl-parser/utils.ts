@@ -105,8 +105,6 @@ export function looksLikeLjson(text: string): boolean {
   const sample = lines.slice(0, 10);
   let validCount = 0;
   for (const line of sample) {
-    // 快速排除明显不是 JSON 的内容
-    if (!(line.startsWith('{') || line.startsWith('['))) continue;
     try {
       JSON.parse(line);
       validCount++;
@@ -162,8 +160,6 @@ function parseSse(sseText: string): {
   let invalidCount = 0;
   let signalCount = 0;
 
-  const lines = sseText.split('\n');
-
   let currentEvent: string | undefined;
   let currentId: string | undefined;
   let currentRetry: number | undefined;
@@ -208,10 +204,19 @@ function parseSse(sseText: string): {
     dataLines = [];
   };
 
-  for (const line of lines) {
-    const trimmed = line.trim();
+  // 游标方式逐行遍历，避免大文本 split 产生大量临时字符串
+  let pos = 0;
+  const len = sseText.length;
+  while (pos <= len) {
+    const nlIdx = sseText.indexOf('\n', pos);
+    const lineEnd = nlIdx === -1 ? len : nlIdx;
+    // 提取行内容（不含 \n），同时处理 \r\n
+    let line = sseText.slice(pos, lineEnd);
+    if (line.endsWith('\r')) line = line.slice(0, -1);
+    pos = lineEnd + 1;
 
-    if (trimmed === '') {
+    // SSE 规范：空行触发事件分发
+    if (line === '') {
       flushBlock();
       currentEvent = undefined;
       currentId = undefined;
@@ -219,31 +224,36 @@ function parseSse(sseText: string): {
       continue;
     }
 
-    if (trimmed.startsWith(':')) continue;
+    // SSE 规范要求字段名从行首开始（column 0），不 trim
+    // 注释行：以冒号开头
+    if (line.charCodeAt(0) === 58 /* ':' */) continue;
 
-    if (trimmed.startsWith('event:')) {
+    if (line.startsWith('event:')) {
       if (dataLines.length > 0) {
         flushBlock();
       }
-      currentEvent = stripLeadingSpace(trimmed.slice(6)) || undefined;
+      currentEvent = stripLeadingSpace(line.slice(6)) || undefined;
       continue;
     }
 
-    if (trimmed.startsWith('id:')) {
-      currentId = stripLeadingSpace(trimmed.slice(3)) || undefined;
+    if (line.startsWith('id:')) {
+      currentId = stripLeadingSpace(line.slice(3)) || undefined;
       continue;
     }
 
-    if (trimmed.startsWith('retry:')) {
-      const val = parseInt(stripLeadingSpace(trimmed.slice(6)), 10);
+    if (line.startsWith('retry:')) {
+      const val = parseInt(stripLeadingSpace(line.slice(6)), 10);
       currentRetry = isNaN(val) ? undefined : val;
       continue;
     }
 
-    if (trimmed.startsWith('data:')) {
-      dataLines.push(stripLeadingSpace(trimmed.slice(5)));
+    if (line.startsWith('data:')) {
+      dataLines.push(stripLeadingSpace(line.slice(5)));
       continue;
     }
+
+    // SSE 规范：没有冒号的非空行，整行作为字段名，值为空字符串
+    // 有冒号但不是已知字段名的行，按规范忽略
   }
 
   // 末尾兜底 flush：如果 dataLines 非空，说明最后一个事件块后缺少空行分隔符
@@ -267,9 +277,17 @@ function parseLjson(ljsonText: string): {
   let blockIndex = 0;
   let lineNo = 0;
 
-  const lines = ljsonText.split('\n');
-  for (const rawLine of lines) {
-    const line = rawLine.trim();
+  // 游标方式逐行遍历
+  let pos = 0;
+  const len = ljsonText.length;
+  while (pos <= len) {
+    const nlIdx = ljsonText.indexOf('\n', pos);
+    const lineEnd = nlIdx === -1 ? len : nlIdx;
+    let line = ljsonText.slice(pos, lineEnd);
+    if (line.endsWith('\r')) line = line.slice(0, -1);
+    line = line.trim();
+    pos = lineEnd + 1;
+
     if (!line) continue;
     lineNo++;
 
@@ -311,11 +329,12 @@ const EMPTY: ParseResult = {
 /**
  * 自动识别格式并解析。
  * 优先按 SSE 解析；不像 SSE 则按 JSONL 解析；都不像则返回空结果（format: 'unknown'）。
+ * @param forceFormat 可选，强制以指定格式解析（跳过自动识别）
  */
-export function parseStream(text: string): ParseResult {
+export function parseStream(text: string, forceFormat?: 'sse' | 'ljson'): ParseResult {
   if (!text.trim()) return { ...EMPTY };
 
-  const format = detectFormat(text);
+  const format = forceFormat ?? detectFormat(text);
 
   if (format === 'sse') {
     const { blocks, validCount, invalidCount, signalCount, trailingIncomplete } = parseSse(text);
@@ -327,8 +346,6 @@ export function parseStream(text: string): ParseResult {
     return { blocks, format, validCount, invalidCount, signalCount: 0 };
   }
 
-  // 都不像：仍尝试用 JSONL 兜底解析（用户可能粘了一段单行 JSON 数组等），
-  // 但 format 标记为 unknown，让 UI 显示提示。
-  // —— 选择不兜底，明确返回空，让用户看到"无法识别"提示。
+  // 都不像：明确返回空，让用户看到"无法识别"提示。
   return { ...EMPTY };
 }

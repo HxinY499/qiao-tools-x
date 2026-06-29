@@ -241,7 +241,9 @@
     "statsValid": "有效 JSON",
     "statsSignal": "信号",
     "statsInvalid": "解析失败",
-    "trailingIncomplete": "末尾事件块后缺少空行分隔符，数据可能未传输完整"
+    "trailingIncomplete": "末尾事件块后缺少空行分隔符，数据可能未传输完整",
+    "forceFormat": "解析模式",
+    "formatAuto": "自动"
   },
   "cronTranslator": {
     "title": "Cron 表达式翻译",

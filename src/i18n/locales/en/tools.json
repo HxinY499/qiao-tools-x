@@ -241,7 +241,9 @@
     "statsValid": "Valid JSON",
     "statsSignal": "Signals",
     "statsInvalid": "Parse failed",
-    "trailingIncomplete": "Missing trailing empty line after last event block — data may be incomplete"
+    "trailingIncomplete": "Missing trailing empty line after last event block — data may be incomplete",
+    "forceFormat": "Mode",
+    "formatAuto": "Auto"
   },
   "cronTranslator": {
     "title": "Cron Expression Translator",

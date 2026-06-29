@@ -16,8 +16,8 @@ export interface BaseParseResult<B extends BaseBlock> {
   blocks: B[];
 }
 
-/** 超过此数量时默认折叠后面的块 */
-const AUTO_COLLAPSE_THRESHOLD = 20;
+/** 默认折叠阈值（fallback，实际值从 settings store 读取） */
+const DEFAULT_AUTO_COLLAPSE_THRESHOLD = 20;
 
 interface UseBlockViewerOptions<B extends BaseBlock, R extends BaseParseResult<B>> {
   /** 空结果（清空时复位用），由各工具提供以保留各自统计字段 */
@@ -85,6 +85,11 @@ export function useBlockViewer<B extends BaseBlock, R extends BaseParseResult<B>
 ): BlockViewerController<B, R> {
   const { emptyResult, parse, looksLike, isMergeable, successMessage, getSearchText } = options;
 
+  // 从 settings store 读取配置（放在顶部，确保后续逻辑可用）
+  const caseSensitive = useBlockViewerSettings((s) => s.caseSensitive);
+  const regexMode = useBlockViewerSettings((s) => s.regexMode);
+  const autoCollapseThreshold = useBlockViewerSettings((s) => s.autoCollapseThreshold);
+
   const [result, setResult] = useState<R>(emptyResult);
   const [open, setOpen] = useState(false);
   const [rawTextOpen, setRawTextOpen] = useState(false);
@@ -106,16 +111,24 @@ export function useBlockViewer<B extends BaseBlock, R extends BaseParseResult<B>
   const blocksRef = useRef(blocks);
   blocksRef.current = blocks;
 
+  // 粘贴去重：记录上一次粘贴内容的哈希，避免重复解析
+  const lastPasteRef = useRef('');
+
+  // 用 ref 保证 handleParse 中读取最新的 autoCollapseThreshold
+  const autoCollapseThresholdRef = useRef(DEFAULT_AUTO_COLLAPSE_THRESHOLD);
+  autoCollapseThresholdRef.current = autoCollapseThreshold;
+
   const handleParse = useCallback(
     (text: string): R => {
       const parsed = parse(text);
       setResult(parsed);
       setRawText(text);
-      // 超过阈值时，默认折叠后面的块
-      if (parsed.blocks.length > AUTO_COLLAPSE_THRESHOLD) {
+      // 超过阈值时，默认折叠后面的块（0 表示不自动折叠）
+      const threshold = autoCollapseThresholdRef.current;
+      if (threshold > 0 && parsed.blocks.length > threshold) {
         const collapsed = new Set<number>();
         parsed.blocks.forEach((b) => {
-          if (b.index >= AUTO_COLLAPSE_THRESHOLD) collapsed.add(b.index);
+          if (b.index >= threshold) collapsed.add(b.index);
         });
         setCollapsedSet(collapsed);
       } else {
@@ -183,20 +196,20 @@ export function useBlockViewer<B extends BaseBlock, R extends BaseParseResult<B>
     });
   }, []);
 
-  // 合并所有可纳入的 block 为 JSON 数组字符串
+  // 合并所有可纳入的 block 为 JSON 数组字符串（lazy：仅在调用时计算）
+  const mergedJsonRef = useRef<{ blocks: B[]; value: string } | null>(null);
   const mergedJson = useMemo(() => {
+    // 使用 getter 模式：仍然是 string 类型对外，但利用缓存避免重复序列化
+    if (mergedJsonRef.current && mergedJsonRef.current.blocks === blocks) {
+      return mergedJsonRef.current.value;
+    }
     const mergeable = blocks.filter(isMergeable);
-    if (mergeable.length === 0) return '';
-    return JSON.stringify(
-      mergeable.map((b) => b.parsed),
-      null,
-      2,
-    );
+    const value = mergeable.length === 0 ? '' : JSON.stringify(mergeable.map((b) => b.parsed), null, 2);
+    mergedJsonRef.current = { blocks, value };
+    return value;
   }, [blocks, isMergeable]);
 
   // ── 内置查找：按 conditions + caseSensitive + regexMode 编译 matcher，对 blocks 过滤 ──
-  const caseSensitive = useBlockViewerSettings((s) => s.caseSensitive);
-  const regexMode = useBlockViewerSettings((s) => s.regexMode);
 
   const compiled = useMemo(
     () => compileMatcher({ conditions, caseSensitive, regexMode }),
@@ -260,7 +273,7 @@ export function useBlockViewer<B extends BaseBlock, R extends BaseParseResult<B>
     [matches, scrollToBlock],
   );
 
-  // 全局粘贴事件
+  // 全局粘贴事件（含去重：相同内容不重复解析）
   useEffect(() => {
     const handlePasteEvent = (e: ClipboardEvent) => {
       if (open) return;
@@ -275,6 +288,9 @@ export function useBlockViewer<B extends BaseBlock, R extends BaseParseResult<B>
       }
       const text = e.clipboardData?.getData('text/plain');
       if (!text || !looksLike(text)) return;
+      // 去重：与上次粘贴内容完全相同则跳过
+      if (text === lastPasteRef.current) return;
+      lastPasteRef.current = text;
       e.preventDefault();
       const parsed = handleParse(text);
       toast.success(successMessage(parsed.blocks.length), { position: 'top-right' });

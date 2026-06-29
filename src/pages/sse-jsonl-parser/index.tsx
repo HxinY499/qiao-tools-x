@@ -1,6 +1,8 @@
 import { ChevronDown, ChevronRight, Layers } from 'lucide-react';
-import { memo, useCallback } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import { Button } from '@/components/ui/button';
 
 import { CodeArea } from '@/components/code-area';
 
@@ -260,9 +262,13 @@ export default function StreamParserPage() {
   const { t } = useTranslation('tools');
   const successMessage = useCallback((count: number) => t('streamParser.parsedSuccess', { count }), [t]);
 
+  // 格式覆盖状态：null 表示自动识别
+  const [forceFormat, setForceFormat] = useState<'sse' | 'ljson' | null>(null);
+  const parse = useMemo(() => (text: string) => parseStream(text, forceFormat ?? undefined), [forceFormat]);
+
   const controller = useBlockViewer<StreamBlock, ParseResult>({
     emptyResult: EMPTY_RESULT,
-    parse: parseStream,
+    parse,
     looksLike: looksLikeStream,
     isMergeable,
     successMessage,
@@ -304,9 +310,24 @@ export default function StreamParserPage() {
             ⚠ {t('streamParser.trailingIncomplete')}
           </div>
         )}
+        {/* 格式覆盖按钮 */}
+        <div className="flex items-center gap-1 mt-2 pt-2 border-t border-border/50">
+          <span className="text-[10px] text-muted-foreground mr-1">{t('streamParser.forceFormat')}:</span>
+          {(['auto', 'sse', 'ljson'] as const).map((opt) => (
+            <Button
+              key={opt}
+              variant={(forceFormat === null ? 'auto' : forceFormat) === opt ? 'default' : 'ghost'}
+              size="sm"
+              className="h-5 px-1.5 text-[10px]"
+              onClick={() => setForceFormat(opt === 'auto' ? null : opt)}
+            >
+              {opt === 'auto' ? t('streamParser.formatAuto') : opt.toUpperCase()}
+            </Button>
+          ))}
+        </div>
       </>
     ),
-    [format, blocks.length, validCount, signalCount, invalidCount, trailingIncomplete, t],
+    [format, blocks.length, validCount, signalCount, invalidCount, trailingIncomplete, forceFormat, setForceFormat, t],
   );
 
   return (

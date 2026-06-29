@@ -16,11 +16,14 @@ type BlockViewerSettingsState = {
   caseSensitive: boolean;
   regexMode: boolean;
   showMatchedOnly: boolean;
+  /** 超过此数量时默认折叠后面的块（0 表示不折叠） */
+  autoCollapseThreshold: number;
   setHighlightEnabled: (enabled: boolean) => void;
   setVirtualScrollEnabled: (enabled: boolean) => void;
   setCaseSensitive: (enabled: boolean) => void;
   setRegexMode: (enabled: boolean) => void;
   setShowMatchedOnly: (enabled: boolean) => void;
+  setAutoCollapseThreshold: (threshold: number) => void;
 };
 
 export const useBlockViewerSettings = create<BlockViewerSettingsState>()(
@@ -31,11 +34,13 @@ export const useBlockViewerSettings = create<BlockViewerSettingsState>()(
       caseSensitive: false,
       regexMode: false,
       showMatchedOnly: true,
+      autoCollapseThreshold: 20,
       setHighlightEnabled: (enabled) => set({ highlightEnabled: enabled }),
       setVirtualScrollEnabled: (enabled) => set({ virtualScrollEnabled: enabled }),
       setCaseSensitive: (enabled) => set({ caseSensitive: enabled }),
       setRegexMode: (enabled) => set({ regexMode: enabled }),
       setShowMatchedOnly: (enabled) => set({ showMatchedOnly: enabled }),
+      setAutoCollapseThreshold: (threshold) => set({ autoCollapseThreshold: Math.max(0, threshold) }),
     }),
     {
       name: 'qiao-tools-x-persist-block-viewer',
@@ -45,6 +50,7 @@ export const useBlockViewerSettings = create<BlockViewerSettingsState>()(
         virtualScrollEnabled: state.virtualScrollEnabled,
         caseSensitive: state.caseSensitive,
         regexMode: state.regexMode,
+        autoCollapseThreshold: state.autoCollapseThreshold,
       }),
     },
   ),

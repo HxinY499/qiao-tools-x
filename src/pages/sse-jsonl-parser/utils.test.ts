@@ -247,3 +247,58 @@ describe('isSignal - 正则匹配', () => {
     expect(block.type).toBe('text'); // 无法解析为 JSON 也不是信号
   });
 });
+
+describe('looksLikeLjson - JSON 原始值', () => {
+  it('应识别包含原始值的 JSONL', () => {
+    expect(looksLikeLjson('"hello"\n123\ntrue\nnull\n"world"')).toBe(true);
+  });
+
+  it('应识别纯数字 JSONL', () => {
+    expect(looksLikeLjson('1\n2\n3\n4\n5')).toBe(true);
+  });
+
+  it('应识别混合 JSON 对象和原始值的 JSONL', () => {
+    expect(looksLikeLjson('{"a":1}\n"text"\n42\n{"b":2}')).toBe(true);
+  });
+});
+
+describe('parseStream - forceFormat 参数', () => {
+  it('强制以 JSONL 解析 SSE 格式的文本', () => {
+    const text = 'data: {"a":1}\n\ndata: {"b":2}\n\n';
+    // 自动识别应为 sse
+    expect(parseStream(text).format).toBe('sse');
+    // 强制 ljson
+    const result = parseStream(text, 'ljson');
+    expect(result.format).toBe('ljson');
+  });
+
+  it('强制以 SSE 解析 JSONL 格式的文本', () => {
+    const text = 'data: {"a":1}\ndata: {"b":2}\n';
+    const result = parseStream(text, 'sse');
+    expect(result.format).toBe('sse');
+    expect(result.blocks.length).toBeGreaterThan(0);
+  });
+
+  it('forceFormat 为 undefined 时走自动识别', () => {
+    const text = '{"a":1}\n{"b":2}\n{"c":3}';
+    expect(parseStream(text, undefined).format).toBe('ljson');
+  });
+});
+
+describe('parseSse - 不 trim 行首', () => {
+  it('行首有空白的 data: 不应被识别为有效字段', () => {
+    // 行首有空格的 "  data: ..." 不应被识别为 SSE 字段
+    const text = 'data: {"a":1}\n\n  data: {"b":2}\n\n';
+    const result = parseStream(text);
+    // 第一个块正常解析，第二个 "  data: ..." 不是有效字段行
+    // 只应有 1 个有效 JSON 块
+    expect(result.validCount).toBe(1);
+  });
+
+  it('CRLF 格式应正常解析', () => {
+    const text = 'data: {"a":1}\r\n\r\ndata: {"b":2}\r\n\r\n';
+    const result = parseStream(text);
+    expect(result.validCount).toBe(2);
+    expect(result.blocks.length).toBe(2);
+  });
+});
