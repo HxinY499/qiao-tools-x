@@ -240,7 +240,8 @@
     "statsTotal": "Total",
     "statsValid": "Valid JSON",
     "statsSignal": "Signals",
-    "statsInvalid": "Parse failed"
+    "statsInvalid": "Parse failed",
+    "trailingIncomplete": "Missing trailing empty line after last event block — data may be incomplete"
   },
   "cronTranslator": {
     "title": "Cron Expression Translator",

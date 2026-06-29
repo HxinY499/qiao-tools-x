@@ -174,3 +174,76 @@ describe('parseStream - 边界场景', () => {
     expect(result.format).toBe('unknown');
   });
 });
+
+describe('parseStream - trailingIncomplete 标记', () => {
+  it('末尾有空行时 trailingIncomplete 应为 false', () => {
+    const result = parseStream('data: {"a":1}\n\n');
+    expect(result.trailingIncomplete).toBeFalsy();
+  });
+
+  it('末尾无空行时 trailingIncomplete 应为 true', () => {
+    const result = parseStream('data: {"a":1}\n\ndata: {"b":2}');
+    expect(result.format).toBe('sse');
+    expect(result.trailingIncomplete).toBe(true);
+    // 数据仍然应该被正确解析
+    expect(result.blocks).toHaveLength(2);
+    expect(result.validCount).toBe(2);
+  });
+
+  it('仅有一条 data 且无尾部空行时应标记 trailingIncomplete', () => {
+    const result = parseStream('data: {"a":1}\ndata: {"b":2}');
+    expect(result.format).toBe('sse');
+    expect(result.trailingIncomplete).toBe(true);
+  });
+});
+
+describe('isSignal - 正则匹配', () => {
+  it('应匹配 [DONE]', () => {
+    const result = parseStream('data: {"a":1}\n\ndata: [DONE]\n\n');
+    const signal = result.blocks[1];
+    if (signal.kind !== 'sse') throw new Error('expected sse block');
+    expect(signal.type).toBe('signal');
+  });
+
+  it('应匹配 [END]', () => {
+    const result = parseStream('data: {"a":1}\n\ndata: [END]\n\n');
+    const signal = result.blocks[1];
+    if (signal.kind !== 'sse') throw new Error('expected sse block');
+    expect(signal.type).toBe('signal');
+  });
+
+  it('应匹配 [COMPLETE]', () => {
+    const result = parseStream('data: {"a":1}\n\ndata: [COMPLETE]\n\n');
+    const signal = result.blocks[1];
+    if (signal.kind !== 'sse') throw new Error('expected sse block');
+    expect(signal.type).toBe('signal');
+  });
+
+  it('应匹配自定义信号 [FINISHED]', () => {
+    const result = parseStream('data: {"a":1}\n\ndata: [FINISHED]\n\n');
+    const signal = result.blocks[1];
+    if (signal.kind !== 'sse') throw new Error('expected sse block');
+    expect(signal.type).toBe('signal');
+  });
+
+  it('应匹配 [STREAM_END]', () => {
+    const result = parseStream('data: {"a":1}\n\ndata: [STREAM_END]\n\n');
+    const signal = result.blocks[1];
+    if (signal.kind !== 'sse') throw new Error('expected sse block');
+    expect(signal.type).toBe('signal');
+  });
+
+  it('不应将 JSON 数组误判为信号', () => {
+    const result = parseStream('data: {"a":1}\n\ndata: [1,2,3]\n\n');
+    const block = result.blocks[1];
+    if (block.kind !== 'sse') throw new Error('expected sse block');
+    expect(block.type).toBe('json');
+  });
+
+  it('不应将小写方括号文本判为信号', () => {
+    const result = parseStream('data: {"a":1}\n\ndata: [done]\n\n');
+    const block = result.blocks[1];
+    if (block.kind !== 'sse') throw new Error('expected sse block');
+    expect(block.type).toBe('text'); // 无法解析为 JSON 也不是信号
+  });
+});

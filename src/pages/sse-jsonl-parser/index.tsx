@@ -271,7 +271,7 @@ export default function StreamParserPage() {
 
   const { result, open, setOpen, rawText, rawTextOpen, setRawTextOpen, handleConfirmFromDialog, toggleBlock } =
     controller;
-  const { format, validCount, invalidCount, signalCount, blocks } = result;
+  const { format, validCount, invalidCount, signalCount, blocks, trailingIncomplete } = result;
 
   const renderBlock = useCallback(
     (block: StreamBlock, collapsed: boolean, highlight: boolean) => {
@@ -299,9 +299,14 @@ export default function StreamParserPage() {
         {invalidCount > 0 && (
           <StatsRow label={t('streamParser.statsInvalid')} value={invalidCount} tone="destructive" />
         )}
+        {trailingIncomplete && (
+          <div className="text-[10px] text-amber-600 dark:text-amber-400 mt-1">
+            ⚠ {t('streamParser.trailingIncomplete')}
+          </div>
+        )}
       </>
     ),
-    [format, blocks.length, validCount, signalCount, invalidCount, t],
+    [format, blocks.length, validCount, signalCount, invalidCount, trailingIncomplete, t],
   );
 
   return (

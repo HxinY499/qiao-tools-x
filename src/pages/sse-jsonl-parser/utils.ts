@@ -68,6 +68,8 @@ export interface ParseResult {
   invalidCount: number;
   /** SSE 信号块数量（仅 sse 格式才会 > 0） */
   signalCount: number;
+  /** SSE 格式下，末尾事件块后缺少空行分隔符（数据可能不完整） */
+  trailingIncomplete?: boolean;
 }
 
 // ─── 格式识别 ────────────────────────────────────────────────
@@ -132,11 +134,13 @@ export function looksLikeStream(text: string): boolean {
 
 // ─── SSE 解析 ────────────────────────────────────────────────
 
-/** 已知的 SSE 流结束/特殊信号标记 */
-const KNOWN_SIGNALS = new Set(['[DONE]', '[END]', '[COMPLETE]']);
-
+/**
+ * 判断 SSE data 内容是否为流控信号。
+ * 匹配规则：方括号包裹的大写字母/下划线文本（如 [DONE]、[END]、[COMPLETE]、[FINISHED] 等），
+ * 排除合法 JSON 数组（以 `[{` 或 `["` 或 `[数字` 开头的情况）。
+ */
 function isSignal(raw: string): boolean {
-  return KNOWN_SIGNALS.has(raw);
+  return /^\[[A-Z][A-Z_]*\]$/.test(raw);
 }
 
 /** SSE 规范：字段值前如果有一个空格则去掉，否则原样保留 */
@@ -150,6 +154,7 @@ function parseSse(sseText: string): {
   validCount: number;
   invalidCount: number;
   signalCount: number;
+  trailingIncomplete: boolean;
 } {
   const results: SseDataBlock[] = [];
   let blockIndex = 0;
@@ -241,9 +246,11 @@ function parseSse(sseText: string): {
     }
   }
 
+  // 末尾兜底 flush：如果 dataLines 非空，说明最后一个事件块后缺少空行分隔符
+  const trailingIncomplete = dataLines.length > 0;
   flushBlock();
 
-  return { blocks: results, validCount, invalidCount, signalCount };
+  return { blocks: results, validCount, invalidCount, signalCount, trailingIncomplete };
 }
 
 // ─── JSONL 解析 ──────────────────────────────────────────────
@@ -311,8 +318,8 @@ export function parseStream(text: string): ParseResult {
   const format = detectFormat(text);
 
   if (format === 'sse') {
-    const { blocks, validCount, invalidCount, signalCount } = parseSse(text);
-    return { blocks, format, validCount, invalidCount, signalCount };
+    const { blocks, validCount, invalidCount, signalCount, trailingIncomplete } = parseSse(text);
+    return { blocks, format, validCount, invalidCount, signalCount, trailingIncomplete };
   }
 
   if (format === 'ljson') {
